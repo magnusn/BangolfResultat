@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jardesc>
+<jar path="E:/Java/eclipse/workspace/BangolfResultat/installer/BangolfResultat.jar"/>
+<options buildIfNeeded="true" compress="false" descriptionLocation="/BangolfResultat/Bangolfjar.jardesc" exportErrors="true" exportWarnings="true" overwrite="false" saveDescription="true" useSourceFolders="false"/>
+<manifest generateManifest="false" mainClassHandleIdentifier="=BangolfResultat/&lt;{SearchWindow.java[SearchWindow" manifestLocation="/BangolfResultat/bangolf.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+<sealing sealJar="false">
+<packagesToSeal/>
+<packagesToUnSeal/>
+</sealing>
+</manifest>
+<selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+<javaElement handleIdentifier="=BangolfResultat/&lt;"/>
+<file path="/BangolfResultat/doc/bilder/bgr.gif"/>
+<file path="/BangolfResultat/doc/om.htm"/>
+</selectedElements>
+</jardesc>
