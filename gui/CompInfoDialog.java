@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +13,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import datastruct.ResultList;
+
 
 /** klassen som beskriver fönstret där tävlingens inställningar ställs in */
 public class CompInfoDialog extends JDialog {

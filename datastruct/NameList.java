@@ -1,3 +1,4 @@
+package datastruct;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 /** klassen som beskriver namnlistan */
-class NameList {
+public class NameList {
 	private HashMap map;		// i denna hashmap lagras namnlistan
 	private LinkedList[] names; // vektor för sorterade namn
 	

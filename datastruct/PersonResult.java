@@ -1,5 +1,6 @@
+package datastruct;
 /** klassen som beskriver varje persons resultat */
-class PersonResult {
+public class PersonResult {
 	private String name, club, klass;		// personens namn, klubb och klass
 	private String licenseNbr;				// personens licensnummer
 	private int startNbr, rounds; 			// startnummer, idnummer och tävlingens antal varv

@@ -1,3 +1,5 @@
+package gui;
+
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -11,6 +13,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
+
+import datastruct.IOHandler;
+
 
 /** klassen som beskriver fönstret som där man sköter val av vilka klasser som skall kunna väljas */
 class KlassWindow extends JFrame {

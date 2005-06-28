@@ -1,3 +1,5 @@
+package snitt;
+
 import java.util.NoSuchElementException;
 import java.util.Comparator;
 import java.util.Collections;
@@ -13,8 +15,13 @@ import java.io.FileNotFoundException;
 
 import javax.swing.JOptionPane;
 
+import datastruct.IOHandler;
+import datastruct.Person;
+import datastruct.ResultList;
+
+
 /** klassen som beskriver snitthanteringen */
-class Snitt {
+public class Snitt {
 	private HashMap map;				// datastruktur för att lagra resultat
 	private String fileName, header;	// filnamnet och rubriken
 	public static final int NAME = 0;	// siffran för namn som används vid sortering

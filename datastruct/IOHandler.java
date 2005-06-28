@@ -1,3 +1,5 @@
+package datastruct;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
@@ -14,7 +16,7 @@ import java.util.StringTokenizer;
 import java.util.LinkedList;
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
-class IOHandler {
+public class IOHandler {
 	
 	/** skapar ett objekt av klassen */
 	public IOHandler() {

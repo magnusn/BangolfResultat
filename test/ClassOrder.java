@@ -1,4 +1,9 @@
+package test;
+
 import java.util.HashMap;
+
+import datastruct.IOHandler;
+
 
 class ClassOrder {
 	private HashMap map; // håller reda på klassernas ordning

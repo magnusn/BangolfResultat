@@ -1,9 +1,15 @@
+package gui;
+
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+
+import datastruct.IOHandler;
+
+import snitt.Snitt;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -14,7 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /** klassen som beskriver fönstret där man bestämmer sorteringsordningen */
-class CompareWindow extends JDialog {
+public class CompareWindow extends JDialog {
 	private HashMap map;			// håller reda på vilket sorteringsalternativ som tillhör en viss siffra
 	private JDialog compareDialog;	// sorteringsfönstret
 	private ListPanel compare;		// panelen där man kan välja hur snittlistan skall sorteras

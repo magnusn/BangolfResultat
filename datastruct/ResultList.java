@@ -1,3 +1,4 @@
+package datastruct;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
@@ -5,7 +6,7 @@ import java.util.StringTokenizer;
 import java.util.LinkedList;
 
 /** klassen som beskriver resultatlistan */
-class ResultList {
+public class ResultList {
 	private HashMap IDMap, classMap, classOrder;// sparar personresultaten, de olika klassnamnen samt klassordningen
 	public static final int FILT = 0;			// filtunderlagets heltalsvärde
 	public static final int EB = 1;				// EB-underlagets heltalsvärde

@@ -2,15 +2,18 @@
 <jardesc>
 <jar path="E:/Java/eclipse/workspace/BangolfResultat/installer/BangolfResultat.jar"/>
 <options buildIfNeeded="true" compress="false" descriptionLocation="/BangolfResultat/Bangolfjar.jardesc" exportErrors="true" exportWarnings="true" overwrite="false" saveDescription="true" useSourceFolders="false"/>
-<manifest generateManifest="false" mainClassHandleIdentifier="=BangolfResultat/&lt;{SearchWindow.java[SearchWindow" manifestLocation="/BangolfResultat/bangolf.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+<manifest generateManifest="false" mainClassHandleIdentifier="=BangolfResultat/&lt;gui{SearchWindow.java[SearchWindow" manifestLocation="/BangolfResultat/bangolf.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">
 <packagesToSeal/>
 <packagesToUnSeal/>
 </sealing>
 </manifest>
 <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-<javaElement handleIdentifier="=BangolfResultat/&lt;"/>
+<javaElement handleIdentifier="=BangolfResultat/&lt;gui"/>
 <file path="/BangolfResultat/doc/bilder/bgr.gif"/>
+<javaElement handleIdentifier="=BangolfResultat/&lt;datastruct"/>
+<javaElement handleIdentifier="=BangolfResultat/&lt;"/>
+<javaElement handleIdentifier="=BangolfResultat/&lt;snitt"/>
 <file path="/BangolfResultat/doc/om.htm"/>
 </selectedElements>
 </jardesc>

@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Color;
@@ -5,6 +7,9 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+
+import datastruct.ResultList;
+
 
 /** beskriver fönstret som visar de inmatade resultaten */
 class ScoreBoardWindow {

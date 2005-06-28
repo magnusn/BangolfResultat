@@ -1,3 +1,5 @@
+package gui;
+
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,6 +17,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
+
+import datastruct.IOHandler;
+import datastruct.PersonResult;
+import datastruct.ResultList;
+
 
 /** klassen som beskriver indatafönstret och resultatinmatningsfönstret */
 class ResultInputWindow {

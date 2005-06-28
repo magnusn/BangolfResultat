@@ -1,3 +1,5 @@
+package gui;
+
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
@@ -26,10 +28,18 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
+
+import datastruct.Filter;
+import datastruct.IOHandler;
+import datastruct.NameList;
+import datastruct.ResultList;
+
+import snitt.SnittWindow;
+
 import java.util.StringTokenizer;
 
 /** klassen som beskriver själva huvudfönstret och delen för sökning */
-class SearchWindow {
+public class SearchWindow {
 	private HashMap personTracker;			// håller reda på vem personen är även om någon persondata ändras
 	private HashMap personNameTracker;		// lagrar namnet som idnumret tillhör
 	private NameList name;					// namnlista som används för sökning

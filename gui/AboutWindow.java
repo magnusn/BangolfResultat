@@ -1,19 +1,23 @@
+package gui;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
+
 import java.awt.Dimension;
 import java.io.IOException;
+
 import javax.swing.JDialog;
 
-class AboutWindow extends JDialog {
+public class AboutWindow extends JDialog {
 	
 	public AboutWindow(JFrame owner) {
 		super(owner, "Om BangolfResultat", true);
 		setResizable(false);
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);
-		java.net.URL helpURL = AboutWindow.class.getResource("doc/om.htm");
-		if (helpURL != null) {
+		java.net.URL helpURL = AboutWindow.class.getClassLoader().getResource("doc/om.htm");
+		
+        if (helpURL != null) {
 			try {
 				editorPane.setPage(helpURL);
 			} catch (IOException e) {

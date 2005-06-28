@@ -1,3 +1,9 @@
+package snitt;
+
+import gui.CompareWindow;
+import gui.ListPanel;
+import gui.SearchWindow;
+
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -20,8 +26,14 @@ import java.io.File;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
+import datastruct.Filter;
+import datastruct.IOHandler;
+import datastruct.ResultList;
+
+
+
 /** klassen som beskriver fönstret för snittlistshanteringen */
-class SnittWindow extends JFrame {
+public class SnittWindow extends JFrame {
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
 	private JFrame frame;					// snittlistsfönstret
@@ -33,6 +45,7 @@ class SnittWindow extends JFrame {
 	private JMenuItem addComp, removeComp;	// menyalternativ för att lägga till och ta bort tävling
 	private JMenuItem saveToHTML, quit;		// spara snittlistan som webbsida och avsluta
 	private JMenuItem sort, classStarts; 	// välja sorteringsordning, ta reda på antal klasstarter
+	private JMenuItem editHTML;				// ställer in vad som skall visas på snittlistans webbsida
 	private String[] headers;				// rubriker för snittlistorna
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	
@@ -93,18 +106,21 @@ class SnittWindow extends JFrame {
 		saveToHTML = new JMenuItem("Spara snittlistan som webbsida...", KeyEvent.VK_S);
 		saveToHTML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		quit = new JMenuItem("Stäng snitthanterarfönstret", KeyEvent.VK_G);
+		editHTML = new JMenuItem("Utseende", KeyEvent.VK_U);
 		sort = new JMenuItem("Sorteringsordning", KeyEvent.VK_O);
 		classStarts = new JMenuItem("Klasstarter", KeyEvent.VK_K);
 		addComp.addActionListener(menuHand);
 		removeComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
 		quit.addActionListener(menuHand);
+		editHTML.addActionListener(menuHand);
 		sort.addActionListener(menuHand);
 		classStarts.addActionListener(menuHand);
 		menu.add(addComp);
 		menu.add(removeComp);
 		menu.add(saveToHTML);
 		menu.add(quit);
+		edit.add(editHTML);
 		edit.add(sort);
 		compute.add(classStarts);
 		setJMenuBar(bar);
@@ -257,6 +273,10 @@ class SnittWindow extends JFrame {
 			/** stänger fönstret */
 			else if(e.getSource() == quit) {
 				exit();
+			}
+			/** visar fönster för att ställa in snittlistans utseende */
+			else if(e.getSource() == editHTML) {
+			    new AppearanceWindow(frame);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {

@@ -1,6 +1,7 @@
+package datastruct;
 /** beskriver tävlingsinformation för en person */
-class Person {
-	private String name,club;				// namn och klubb
+public class Person {
+	private String name,club;		// namn och klubb
 	private int comps,rounds,hits;	// antal tävlingar, varv och slag
 	
 	/** skapar resultat för en person med namnet name och klubben club 

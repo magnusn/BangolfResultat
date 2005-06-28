@@ -1,3 +1,4 @@
+package gui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 /** klassen som beskriver en panel bestående av två listor med valda och ej valda element */
-class ListPanel extends JPanel {
+public class ListPanel extends JPanel {
 	private JButton addButton, removeButton;		// knappar för att välja eller välja bort ifrån listan
 	private JButton upButton, downButton;			// knappar för att flytta elementen uppåt eller neråt
 	private JLabel selectionLabel, selectedLabel; 	// beskrivande rubriker till listorna

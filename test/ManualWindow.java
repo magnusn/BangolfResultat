@@ -1,3 +1,8 @@
+package test;
+
+import gui.AboutWindow;
+import gui.SearchWindow;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
@@ -9,6 +14,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
+
 
 class ManualWindow extends JFrame {
 	
