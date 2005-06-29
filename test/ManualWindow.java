@@ -1,6 +1,5 @@
 package test;
 
-import gui.AboutWindow;
 import gui.SearchWindow;
 
 import javax.swing.JFrame;
@@ -25,19 +24,20 @@ class ManualWindow extends JFrame {
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);
 		editorPane.addHyperlinkListener(new Hyperactive());
-		URL helpURL = null;
+		URL manualURL = null;
 		try {
-			helpURL = AboutWindow.class.getResource("file:/E:/Java/bangolf/doc/manual.htm");
-			helpURL = new URL("file:/E:/Java/bangolf/doc/manual.htm");
-			System.out.println(AboutWindow.class.getResource(""));
+			manualURL = ManualWindow.class.getClassLoader().getResource("doc/manual.htm");
+			/*
+			manualURL = new URL("file:/E:/Java/bangolf/doc/manual.htm");
+			System.out.println(AboutWindow.class.getResource(""));*/
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		if (helpURL != null) {
+		if (manualURL != null) {
 			try {
-				editorPane.setPage(helpURL);
+				editorPane.setPage(manualURL);
 			} catch (IOException e) {
-				System.err.println("Attempted to read a bad URL: " + helpURL);
+				System.err.println("Attempted to read a bad URL: " + manualURL);
 			}
 		} else {
 			System.err.println("Couldn't find file: manual.htm");

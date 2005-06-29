@@ -316,7 +316,7 @@ public class IOHandler {
 			if(inLine.equals("Selected") || inLine.equals("Unselected")) {
 				i++;
 			} else {
-				vector[i].addElement(inLine);;
+				vector[i].addElement(inLine);
 			}
 			inLine = fileIn.readLine();
 		}

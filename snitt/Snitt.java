@@ -30,25 +30,32 @@ public class Snitt {
 	public static final int ROUNDS = 3;	// siffran för varv som används vid sortering
 	public static final int HITSUM = 4;	// siffran för slagsumma som används vid sortering
 	public static final int MEAN = 5;	// siffran för snitt som används vid sortering
-	private int[] compare;				// vektorn som håller reda på vad snittlistan skall sorteras efter
+	public static final int EX_MEAN=6;	// siffran för fjolårssnitt som används vid sortering
+	public static final int CHANGE=7;	// siffran för förändringen som används vid sortering
+	private int[][] compare;			// vektorn som håller reda på vad snittlistan skall sorteras efter
+	private int tabIndex;				// talar om vilken snittlistsflik som är vald
 	
 	/** skapar ett objekt för snitthantering, filen att skriva till är fileName och rubriken header */
-	public Snitt(String fileName, String header) {
+	public Snitt(String fileName, String header, int tabIndex) {
 		map = new HashMap();
 		if(!fileName.endsWith(".htm") && !fileName.endsWith(".html")) {
 			fileName = fileName + ".htm";
 		}
 		this.fileName = fileName;
 		this.header = header;
+		this.tabIndex = tabIndex;
 		IOHandler io = new IOHandler();
-		try {
-			compare = (int[]) io.load("compareby");
-		} catch (Exception e) {
-			compare = new int[2];
-			compare[0] = Snitt.MEAN;
-			compare[1] = Snitt.ROUNDS;
-			JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		loadCompareBy(io);
+	}
+	
+	/** skapar ett objekt för snitthantering, filen att skriva till är fileName */
+	public Snitt(String fileName) {
+		map = new HashMap();
+		if(!fileName.endsWith(".jmf")) {
+			fileName = fileName + ".jmf";
 		}
+		this.fileName = fileName;
+		IOHandler io = new IOHandler();
 	}
 	
 	/** läser in resultat ifrån filerna i strängvektorn fileNames och hämtar namn och klubb med hjälp av personTrack */
@@ -99,7 +106,7 @@ public class Snitt {
 						p.addHits(result);
 					}
 					else {
-						map.put(identity, new Person(name, club, 1, playedRounds, result));
+						map.put(identity, new Person(ident.intValue(), name, club, 1, playedRounds, result));
 					}
 				}
 				inLine = fileIn.readLine();
@@ -212,28 +219,7 @@ public class Snitt {
 			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
 			String heltal = str.nextToken();
 			String decimaltal = str.nextToken();
-			String medel;
-			if(snitt != 0.00) {
-				if(decimaltal.length() > 2) {
-					if(Integer.parseInt(decimaltal.substring(2,3)) >= 5) {
-						if(Integer.parseInt(decimaltal.substring(0,2)) == 99) {
-							medel = (Integer.parseInt(heltal) + 1) + "," + "00";
-						} else if(Integer.parseInt(decimaltal.substring(1,2)) == 9) {
-							medel = heltal + "," + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
-						} else {
-							medel = heltal + "," + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
-						}
-					} else {
-						medel = heltal + "," + decimaltal.substring(0,2);
-					}
-				} else if(decimaltal.length() > 1) {
-					medel = heltal + "," + decimaltal.substring(0,2);
-				} else {
-					medel = heltal + "," + decimaltal.substring(0,1) + "0";
-				}
-			} else {
-				medel = "-";
-			}
+			String medel = getMean(snitt, heltal, decimaltal);
 			String color = getColor(snitt, surface);
 			
 			if(oldPerson != null) {
@@ -284,6 +270,63 @@ public class Snitt {
 		bufferOut.close();
 	}
 	
+	/** skriver ut snittlistan utifrån resultatlistan list och underlaget surface */
+	public void outputToCompareFile(LinkedList list, int surface) throws IOException {
+		LinkedList res = list;
+		
+		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		bufferOut.write(String.valueOf(surface));
+		bufferOut.newLine();
+		
+		for (int i = 1; i <= res.size(); i++) {
+			Person person = (Person)res.get(i-1);
+			double snitt;
+			if(person.getRounds() != 0) {
+				snitt = (double)person.getHits()/(double)person.getRounds();
+			} else {
+				snitt = 0.00;
+			}
+			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
+			String heltal = str.nextToken();
+			String decimaltal = str.nextToken();
+			String medel = getMean(snitt, heltal, decimaltal);
+			String color = getColor(snitt, surface);
+			
+			bufferOut.write(person.getIdNbr() + ";" + person.getName() + ";" + person.getClub() + ";" + medel);
+			bufferOut.newLine();
+		}
+		
+		bufferOut.flush();
+		bufferOut.close();
+	}
+	
+	/** returnerar snittet som en sträng i önskvärt format */
+	private String getMean(double snitt, String heltal, String decimaltal) {
+	    String medel;
+		if(snitt != 0.00) {
+			if(decimaltal.length() > 2) {
+				if(Integer.parseInt(decimaltal.substring(2,3)) >= 5) {
+					if(Integer.parseInt(decimaltal.substring(0,2)) == 99) {
+						medel = (Integer.parseInt(heltal) + 1) + "," + "00";
+					} else if(Integer.parseInt(decimaltal.substring(1,2)) == 9) {
+						medel = heltal + "," + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
+					} else {
+						medel = heltal + "," + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
+					}
+				} else {
+					medel = heltal + "," + decimaltal.substring(0,2);
+				}
+			} else if(decimaltal.length() > 1) {
+				medel = heltal + "," + decimaltal.substring(0,2);
+			} else {
+				medel = heltal + "," + decimaltal.substring(0,1) + "0";
+			}
+		} else {
+			medel = "-";
+		}
+		return medel;
+	}
+	
 	/** tar reda på vilken färg snittet snitt skall ha utifrån underlaget surface */
 	private String getColor(double snitt, int surface) {
 		String color;
@@ -323,6 +366,20 @@ public class Snitt {
 		return color;
 	}
 	
+	/** laddar in data som bestämmer sorteringen */
+	private void loadCompareBy(IOHandler io) {
+	    try {
+			compare = (int[][]) io.load("compareby");
+		} catch (Exception e) {
+			compare = new int[4][2];
+			for(int i = 0; i < compare.length; i++) {
+			    compare[i][0] = Snitt.MEAN;
+			    compare[i][1] = Snitt.ROUNDS;
+			}
+			JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	/** klassen som beskriver sorteringen av resultaten */
 	class SnittComparator implements Comparator {
 		/**
@@ -358,22 +415,16 @@ public class Snitt {
 				leftCompareBy[MEAN] = new Integer(127 * 100000);
 			}
 			IOHandler io = new IOHandler();
-			try {
-				compare = (int[]) io.load("compareby");
-			} catch (Exception e) {
-				compare = new int[2];
-				compare[0] = Snitt.MEAN;
-				compare[1] = Snitt.ROUNDS;
-			}
-			for(int i = 0; i < compare.length; i++) {
-				if(leftCompareBy[compare[i]] instanceof String) {
-					if(!((String)leftCompareBy[compare[i]]).equals((String)rightCompareBy[compare[i]])) {
-						return ((String)leftCompareBy[compare[i]]).compareTo((String)rightCompareBy[compare[i]]);
+			loadCompareBy(io);
+			for(int i = 0; i < compare[tabIndex].length; i++) {
+				if(leftCompareBy[compare[tabIndex][i]] instanceof String) {
+					if(!((String)leftCompareBy[compare[tabIndex][i]]).equals((String)rightCompareBy[compare[tabIndex][i]])) {
+						return ((String)leftCompareBy[compare[tabIndex][i]]).compareTo((String)rightCompareBy[compare[tabIndex][i]]);
 					}
 				} else {
-					if(((Integer)leftCompareBy[compare[i]]).intValue() != ((Integer)rightCompareBy[compare[i]]).intValue()) {
-						int value = ((Integer)leftCompareBy[compare[i]]).intValue() - ((Integer)rightCompareBy[compare[i]]).intValue();
-						if(compare[i] != COMPS && compare[i] != ROUNDS) {
+					if(((Integer)leftCompareBy[compare[tabIndex][i]]).intValue() != ((Integer)rightCompareBy[compare[tabIndex][i]]).intValue()) {
+						int value = ((Integer)leftCompareBy[compare[tabIndex][i]]).intValue() - ((Integer)rightCompareBy[compare[tabIndex][i]]).intValue();
+						if(compare[tabIndex][i] != COMPS && compare[tabIndex][i] != ROUNDS) {
 							return value;
 						} else {
 							return -value;
@@ -382,21 +433,6 @@ public class Snitt {
 				}
 			}
 			return 0;
-			/*
-			Object o = new Integer(5);
-			if(o instanceof String) {
-				System.out.println(o);
-			}
-			if (snittLeft == snittRight) {
-				if (roundsLeft == roundsRight) {
-					return 0;
-				} else {
-					return roundsRight - roundsLeft;
-				}
-			}
-			else {
-				return (int) (snittLeft*100000 - snittRight*100000);
-			}*/
 		}
 	}
 }

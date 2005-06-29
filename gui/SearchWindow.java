@@ -69,7 +69,7 @@ public class SearchWindow {
 	private KlassWindow klassWindow;			// klasshanterarfönstret
 	private SnittWindow snittWindow;			// snittlistshanterarfönstret
 	private String compHeader, fileNameSKV, fileNameHTM;// tävlingsrubrik, filnamn för SKV- och HTML-filerna
-	public static File DIRSKV, DIRHTM, DIRSNITT;		// mappar för SKV- och HTML-filer
+	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för SKV- och HTML-filer
 	
 	/** skapar huvudfönstret */
 	public SearchWindow() {
@@ -305,10 +305,12 @@ public class SearchWindow {
 			DIRSKV = (File) io.load("dirskv");
 			DIRHTM = (File) io.load("dirhtm");
 			DIRSNITT = (File) io.load("dirsnitt");
+			DIRJMF = (File) io.load("dirjmf");
 		} catch (Exception e) {
 			DIRSKV = null;
 			DIRHTM = null;
 			DIRSNITT = null;
+			DIRJMF = null;
 		}
 	}
 	
@@ -423,6 +425,7 @@ public class SearchWindow {
 			io.save("dirskv", DIRSKV);
 			io.save("dirhtm", DIRHTM);
 			io.save("dirsnitt", DIRSNITT);
+			io.save("dirjmf", DIRJMF);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Senast använda mappar gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 		}

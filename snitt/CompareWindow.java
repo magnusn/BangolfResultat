@@ -1,4 +1,6 @@
-package gui;
+package snitt;
+
+import gui.ListPanel;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -9,7 +11,6 @@ import javax.swing.JMenuBar;
 
 import datastruct.IOHandler;
 
-import snitt.Snitt;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -22,16 +23,19 @@ import java.awt.event.KeyEvent;
 /** klassen som beskriver fönstret där man bestämmer sorteringsordningen */
 public class CompareWindow extends JDialog {
 	private HashMap map;			// håller reda på vilket sorteringsalternativ som tillhör en viss siffra
+	private Vector[] v;				// har koll på hur listorna skall sorteras
+	private int tabIndex;			// anger vilken flik som är vald i snitthanterarfönstret
 	private JDialog compareDialog;	// sorteringsfönstret
 	private ListPanel compare;		// panelen där man kan välja hur snittlistan skall sorteras
 	private IOHandler io;			// sköter skrivning till filer och inläsning från filer
 	private JMenuItem quit;			// menyalternativ för att avsluta
 	
 	/** skapar fönstret för klasshantering */
-	public CompareWindow(JFrame owner) {
+	public CompareWindow(JFrame owner, int tabIndex) {
 		super(owner, "Sorteraren", true);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		compareDialog = this;
+		this.tabIndex = tabIndex;
 		
 		io = new IOHandler();
 		map = new HashMap();
@@ -41,9 +45,11 @@ public class CompareWindow extends JDialog {
 		map.put("Varv", new Integer(Snitt.ROUNDS));
 		map.put("Slag", new Integer(Snitt.HITSUM));
 		map.put("Snitt", new Integer(Snitt.MEAN));
+		map.put("Snitt ifjol", new Integer(Snitt.EX_MEAN));
+		map.put("Förändring", new Integer(Snitt.CHANGE));
 		try {
-			Vector[] v = io.readFileList("compare", 2);
-			compare = new ListPanel(v[0], v[1]);
+			v = io.readFileList("compare", 8);
+			compare = new ListPanel(v[tabIndex*2], v[tabIndex*2 + 1]);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(compareDialog, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			Vector v1 = new Vector();
@@ -54,6 +60,8 @@ public class CompareWindow extends JDialog {
 			v2.add("Snitt");
 			v2.add("Varv");
 			v1.add("Slag");
+			v1.add("Snitt ifjol");
+			v1.add("Förändring");
 			compare = new ListPanel(v1, v2);
 		}
 		
@@ -98,21 +106,26 @@ public class CompareWindow extends JDialog {
 	
 	/** stänger ned fönstret efter att data sparats undan */
 	public void exit() {
-		Vector[] v = new Vector[2];
-		v[0] = compare.getSelection();
-		v[1] = compare.getSelected();
-		String[] s = new String[v[1].size()];
-		int[] compareBy = new int[v[1].size()];
-		for(int i = 0; i < s.length; i++) {
-			s[i] = (String)v[1].get(i);
-			compareBy[i] = ((Integer)map.get(s[i])).intValue();
-		}
+		v[tabIndex*2] = compare.getSelection();
+		v[tabIndex*2 + 1] = compare.getSelected();
+		String[] s = new String[v[tabIndex*2 + 1].size()];
 		try {
-			io.writeFileList("compare", v);
-			io.save("compareby", compareBy);
+		    int[][] compareBy = (int[][]) io.load("compareby");
+		    compareBy[tabIndex] = new int[s.length];
+		    for(int i = 0; i < s.length; i++) {
+				s[i] = (String)v[tabIndex*2 + 1].get(i);
+				compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
+			}
+			try {
+				io.writeFileList("compare", v);
+				io.save("compareby", compareBy);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(compareDialog, "Sparandet av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(compareDialog, "Sparandet av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
+		
 		compareDialog.dispose();
 	}
 }

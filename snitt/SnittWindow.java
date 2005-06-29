@@ -1,6 +1,5 @@
 package snitt;
 
-import gui.CompareWindow;
 import gui.ListPanel;
 import gui.SearchWindow;
 
@@ -42,10 +41,13 @@ public class SnittWindow extends JFrame {
 	private JFileChooser fileChooser;		// filväljare
 	private IOHandler io;					// sköter in- och utdata
 	private Filter skvFilter, htmFilter;	// filter för skv- och htmfiler
+	private Filter jmfFilter;				// filter för jmf-filer
 	private JMenuItem addComp, removeComp;	// menyalternativ för att lägga till och ta bort tävling
 	private JMenuItem saveToHTML, quit;		// spara snittlistan som webbsida och avsluta
+	private JMenuItem saveCompareFile;		// sparar en snittlista som kan användas vid jämförelse
 	private JMenuItem sort, classStarts; 	// välja sorteringsordning, ta reda på antal klasstarter
-	private JMenuItem editHTML;				// ställer in vad som skall visas på snittlistans webbsida
+	private JMenuItem appearance;			// ställer in vad som skall visas på snittlistans webbsida
+	private JMenuItem compareFileChooser;	// väljer fil att jämföra snittet med
 	private String[] headers;				// rubriker för snittlistorna
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	
@@ -60,6 +62,7 @@ public class SnittWindow extends JFrame {
 		fileChooser = new JFileChooser();
 		skvFilter = new Filter(new String[]{"skv"}, "Semikolonseparerad fil");
 		htmFilter = new Filter(new String[]{"htm", "html"}, "Webbsida");
+		jmfFilter = new Filter(new String[]{"jmf"}, "Jämförelsefil för snittlista");
 		snittList = new ListPanel[4];
 		io = new IOHandler();
 		try {
@@ -105,23 +108,30 @@ public class SnittWindow extends JFrame {
 		removeComp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
 		saveToHTML = new JMenuItem("Spara snittlistan som webbsida...", KeyEvent.VK_S);
 		saveToHTML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		saveCompareFile = new JMenuItem("Spara snittlista att jämföra med...", KeyEvent.VK_J);
+		saveCompareFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.CTRL_MASK));
 		quit = new JMenuItem("Stäng snitthanterarfönstret", KeyEvent.VK_G);
-		editHTML = new JMenuItem("Utseende", KeyEvent.VK_U);
-		sort = new JMenuItem("Sorteringsordning", KeyEvent.VK_O);
+		appearance = new JMenuItem("Utseende...", KeyEvent.VK_U);
+		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_O);
+		compareFileChooser = new JMenuItem("Välj fil att jämföra med...", KeyEvent.VK_V);
 		classStarts = new JMenuItem("Klasstarter", KeyEvent.VK_K);
 		addComp.addActionListener(menuHand);
 		removeComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
+		saveCompareFile.addActionListener(menuHand);
 		quit.addActionListener(menuHand);
-		editHTML.addActionListener(menuHand);
+		appearance.addActionListener(menuHand);
 		sort.addActionListener(menuHand);
+		compareFileChooser.addActionListener(menuHand);
 		classStarts.addActionListener(menuHand);
 		menu.add(addComp);
 		menu.add(removeComp);
 		menu.add(saveToHTML);
+		menu.add(saveCompareFile);
 		menu.add(quit);
-		edit.add(editHTML);
+		edit.add(appearance);
 		edit.add(sort);
+		edit.add(compareFileChooser);
 		compute.add(classStarts);
 		setJMenuBar(bar);
 		
@@ -178,6 +188,35 @@ public class SnittWindow extends JFrame {
 							, "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+			/** sparar snittlistan som webbsida */
+			if(e.getSource() == saveCompareFile) {
+				if(selected.size() != 0) {
+					fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
+					fileChooser.setFileFilter(jmfFilter);
+					int retval = fileChooser.showSaveDialog(frame);
+					if(retval == JFileChooser.APPROVE_OPTION) {
+						File file = fileChooser.getSelectedFile();
+						SearchWindow.DIRJMF = fileChooser.getCurrentDirectory();
+						int val;
+						if(file.exists()) {
+							val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
+									"Skriva över?", JOptionPane.YES_NO_OPTION);
+						} else {
+							val = JOptionPane.YES_OPTION;
+						}
+						if(val == JOptionPane.YES_OPTION) {
+							
+							makeCompareFile(file.getPath(), listPanel);
+						}
+					}
+					else if(retval == JFileChooser.CANCEL_OPTION) {
+						JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
+					}
+				} else {
+					JOptionPane.showMessageDialog(frame, "Inga tävlingar har valts! Snittlista gick ej att skapa."
+							, "Varning", JOptionPane.ERROR_MESSAGE);
+				}
+			}
 			/** lägger till tävlingar */
 			else if(e.getSource() == addComp) {
 				fileChooser.setMultiSelectionEnabled(true);
@@ -193,7 +232,7 @@ public class SnittWindow extends JFrame {
 						
 						boolean contains = false;
 						if(listPanel.contains(name)) {
-								contains = true;
+						    contains = true;
 						}
 						
 						if(!contains) {
@@ -275,16 +314,37 @@ public class SnittWindow extends JFrame {
 				exit();
 			}
 			/** visar fönster för att ställa in snittlistans utseende */
-			else if(e.getSource() == editHTML) {
+			else if(e.getSource() == appearance) {
 			    new AppearanceWindow(frame);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
-				new CompareWindow(frame);
+				new CompareWindow(frame, tab.getSelectedIndex());
+			}
+			/** väljer fil att jämföra med */
+			else if(e.getSource() == compareFileChooser) {
+			    fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
+				fileChooser.setFileFilter(jmfFilter);
+				int retval = fileChooser.showOpenDialog(frame);
+				if(retval == JFileChooser.APPROVE_OPTION) {
+				    File file = fileChooser.getSelectedFile();
+				    SearchWindow.DIRJMF = fileChooser.getCurrentDirectory();
+				    
+				    String name = file.getName();
+				    String path = file.getPath();
+				    
+				    try {
+				        // TODO io.readMeanFile(path);
+				    } catch (Exception ex) {
+				        JOptionPane.showMessageDialog(frame, "Filen " + name + " gick ej att läsa in korrekt.", "Varning", JOptionPane.ERROR_MESSAGE);
+				    }
+				} else if(retval == JFileChooser.CANCEL_OPTION) {
+				    JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
+				}
 			}
 			/** tar fram antal starter i de olika klasserna */
 			else if(e.getSource() == classStarts) {
-				Snitt snitt = new Snitt("notused.htm", null);
+				Snitt snitt = new Snitt("notused.htm");
 				boolean readOk = true;
 				if(selected.size() != 0) {
 					String[] fileNames = new String[selected.size()];
@@ -330,7 +390,7 @@ public class SnittWindow extends JFrame {
 	/** producerar en snittlista med filnamnet fileName och rubriken header 
 	 *  där filerna som inläses tas från ListPanel listPanel */
 	private void makeSnitt(String fileName, String header, ListPanel listPanel) {
-		Snitt snitt = new Snitt(fileName, header);
+		Snitt snitt = new Snitt(fileName, header, tab.getSelectedIndex());
 		int surface = -1;
 		boolean readOk = true;
 		if(listPanel == snittList[0]) {
@@ -377,6 +437,56 @@ public class SnittWindow extends JFrame {
 					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+	}
+	
+	/** producerar en snittlista med filnamnet fileName och rubriken header 
+	 *  där filerna som inläses tas från ListPanel listPanel */
+	private void makeCompareFile(String fileName, ListPanel listPanel) {
+		Snitt snitt = new Snitt(fileName);
+		int surface = -1;
+		boolean readOk = true;
+		if(listPanel == snittList[0]) {
+			surface = ResultList.FILT;
+		} else if(listPanel == snittList[1]) {
+			surface = ResultList.EB;
+		} else if(listPanel == snittList[2]) {
+			surface = ResultList.BETONG;
+		}
+		Vector v = listPanel.getSelected();
+		String[] fileNames = new String[v.size()];
+		for(int i = 0; i < fileNames.length; i++) {
+			String file = (String) v.get(i);
+			try {
+				fileNames[i] = (String) fileMap.get(file);
+				io.readSurface(fileNames[i]);
+				if(surface == -1) {
+					surface = io.readSurface(fileNames[i]);
+				} else if(surface != io.readSurface(fileNames[i]) && surface != BLANDAD) {
+					surface = BLANDAD;
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(frame, "Inläsningen av filen " + fileNames[i] + " misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				readOk = false;
+			}
+		}
+		if(readOk) {
+			try {
+				snitt.readResults(fileNames, personNameTracker);
+			}
+			catch (Exception e) {
+				JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				readOk = false;
+			}
+			if(readOk) {
+				LinkedList list = snitt.sortMap();
+				try {
+					snitt.outputToCompareFile(list, surface);
+					JOptionPane.showMessageDialog(frame, "Jämförelselistan är sparad.");
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(frame, "Skrivning till fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
