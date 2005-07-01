@@ -29,8 +29,6 @@ import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.ResultList;
 
-
-
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
@@ -41,7 +39,7 @@ public class SnittWindow extends JFrame {
 	private JFileChooser fileChooser;		// filväljare
 	private IOHandler io;					// sköter in- och utdata
 	private Filter skvFilter, htmFilter;	// filter för skv- och htmfiler
-	private Filter jmfFilter;				// filter för jmf-filer
+	private Filter snittFilter;				// filter för snitt-filer
 	private JMenuItem addComp, removeComp;	// menyalternativ för att lägga till och ta bort tävling
 	private JMenuItem saveToHTML, quit;		// spara snittlistan som webbsida och avsluta
 	private JMenuItem saveCompareFile;		// sparar en snittlista som kan användas vid jämförelse
@@ -62,7 +60,7 @@ public class SnittWindow extends JFrame {
 		fileChooser = new JFileChooser();
 		skvFilter = new Filter(new String[]{"skv"}, "Semikolonseparerad fil");
 		htmFilter = new Filter(new String[]{"htm", "html"}, "Webbsida");
-		jmfFilter = new Filter(new String[]{"jmf"}, "Jämförelsefil för snittlista");
+		snittFilter = new Filter(new String[]{"snitt"}, "Jämförelsefil för snittlista");
 		snittList = new ListPanel[4];
 		io = new IOHandler();
 		try {
@@ -192,7 +190,7 @@ public class SnittWindow extends JFrame {
 			if(e.getSource() == saveCompareFile) {
 				if(selected.size() != 0) {
 					fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
-					fileChooser.setFileFilter(jmfFilter);
+					fileChooser.setFileFilter(snittFilter);
 					int retval = fileChooser.showSaveDialog(frame);
 					if(retval == JFileChooser.APPROVE_OPTION) {
 						File file = fileChooser.getSelectedFile();
@@ -315,16 +313,18 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att ställa in snittlistans utseende */
 			else if(e.getSource() == appearance) {
-			    new AppearanceWindow(frame);
+			    new AppearanceWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
-				new CompareWindow(frame, tab.getSelectedIndex());
+				new SortWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
 			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
+			    new CompareWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
+			    /*
 			    fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
-				fileChooser.setFileFilter(jmfFilter);
+				fileChooser.setFileFilter(snittFilter);
 				int retval = fileChooser.showOpenDialog(frame);
 				if(retval == JFileChooser.APPROVE_OPTION) {
 				    File file = fileChooser.getSelectedFile();
@@ -333,14 +333,18 @@ public class SnittWindow extends JFrame {
 				    String name = file.getName();
 				    String path = file.getPath();
 				    
-				    try {
-				        // TODO io.readMeanFile(path);
-				    } catch (Exception ex) {
-				        JOptionPane.showMessageDialog(frame, "Filen " + name + " gick ej att läsa in korrekt.", "Varning", JOptionPane.ERROR_MESSAGE);
+				    if(name.endsWith(".snitt")) {
+				        try {
+				            //TODO io.readMeanFile(path);
+				        } catch (Exception ex) {
+				            JOptionPane.showMessageDialog(frame, "Filen " + name + " gick ej att läsa in korrekt.", "Varning", JOptionPane.ERROR_MESSAGE);
+				        }
+				    } else {
+				        JOptionPane.showMessageDialog(frame, "Filen måste ha ändelsen .snitt", "Varning", JOptionPane.WARNING_MESSAGE);
 				    }
 				} else if(retval == JFileChooser.CANCEL_OPTION) {
 				    JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
-				}
+				}*/
 			}
 			/** tar fram antal starter i de olika klasserna */
 			else if(e.getSource() == classStarts) {

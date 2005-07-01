@@ -86,13 +86,17 @@ class ResultInputWindow {
 		this.surface = surface;
 		startNbrMap.clear();
 		inputPanel = new JPanel();
+		GridLayout gridLayout;
 		if(boxData[0] && boxData[1]) {
-			inputPanel.setLayout(new GridLayout(4+nbrRounds+2,2));
+		    gridLayout = new GridLayout(4+nbrRounds+2,2);
 		} else if(boxData[0] || boxData[1]) {
-			inputPanel.setLayout(new GridLayout(4+nbrRounds+1,2));
+		    gridLayout = new GridLayout(4+nbrRounds+1,2);
 		} else {
-			inputPanel.setLayout(new GridLayout(4+nbrRounds,2));
+		    gridLayout = new GridLayout(4+nbrRounds,2);
 		}
+		gridLayout.setHgap(2);
+		gridLayout.setVgap(2);
+		inputPanel.setLayout(gridLayout);
 		person = new JLabel();
 		JLabel[] varvLabel = new JLabel[nbrRounds];
 		varvResult = new JTextField[nbrRounds];

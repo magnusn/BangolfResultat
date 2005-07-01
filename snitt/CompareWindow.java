@@ -1,131 +1,158 @@
+/*
+ * Created on 2005-jul-01
+ * 
+ * Created by: Magnus
+ */
 package snitt;
 
-import gui.ListPanel;
+import gui.SearchWindow;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import datastruct.Filter;
 import datastruct.IOHandler;
 
-
-import java.util.HashMap;
-import java.util.Vector;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-/** klassen som beskriver fönstret där man bestämmer sorteringsordningen */
+/**
+ * CompareWindow - beskriver fönstret där man väljer fil att jämföra snittlistan med
+ */
 public class CompareWindow extends JDialog {
-	private HashMap map;			// håller reda på vilket sorteringsalternativ som tillhör en viss siffra
-	private Vector[] v;				// har koll på hur listorna skall sorteras
-	private int tabIndex;			// anger vilken flik som är vald i snitthanterarfönstret
-	private JDialog compareDialog;	// sorteringsfönstret
-	private ListPanel compare;		// panelen där man kan välja hur snittlistan skall sorteras
-	private IOHandler io;			// sköter skrivning till filer och inläsning från filer
-	private JMenuItem quit;			// menyalternativ för att avsluta
-	
-	/** skapar fönstret för klasshantering */
-	public CompareWindow(JFrame owner, int tabIndex) {
-		super(owner, "Sorteraren", true);
-		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		compareDialog = this;
-		this.tabIndex = tabIndex;
-		
-		io = new IOHandler();
-		map = new HashMap();
-		map.put("Namn", new Integer(Snitt.NAME));
-		map.put("Klubb", new Integer(Snitt.CLUB));
-		map.put("Tävlingar", new Integer(Snitt.COMPS));
-		map.put("Varv", new Integer(Snitt.ROUNDS));
-		map.put("Slag", new Integer(Snitt.HITSUM));
-		map.put("Snitt", new Integer(Snitt.MEAN));
-		map.put("Snitt ifjol", new Integer(Snitt.EX_MEAN));
-		map.put("Förändring", new Integer(Snitt.CHANGE));
-		try {
-			v = io.readFileList("compare", 8);
-			compare = new ListPanel(v[tabIndex*2], v[tabIndex*2 + 1]);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(compareDialog, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-			Vector v1 = new Vector();
-			Vector v2 = new Vector();
-			v1.add("Namn");
-			v1.add("Klubb");
-			v1.add("Tävlingar");
-			v2.add("Snitt");
-			v2.add("Varv");
-			v1.add("Slag");
-			v1.add("Snitt ifjol");
-			v1.add("Förändring");
-			compare = new ListPanel(v1, v2);
-		}
-		
-		compare.setSelectionText("Ej inkluderade i sorteringen:");
-		compare.setSelectedText("Sortera efter:");
-		JMenuBar bar = new JMenuBar();
-		JMenu menu = new JMenu("Arkiv");
-		menu.setMnemonic(KeyEvent.VK_A);
-		bar.add(menu);
-		MenuHandler menuHand = new MenuHandler();
-		
-		quit = new JMenuItem("Stäng sorterarfönstret", KeyEvent.VK_G);
-		quit.addActionListener(menuHand);
-		menu.add(quit);
-		compareDialog.setJMenuBar(bar);
-		
-		WindowHandler winHand = new WindowHandler();
-		compareDialog.addWindowListener(winHand);
-		compareDialog.getContentPane().add(compare);
-		compareDialog.pack();
-		compareDialog.setLocationRelativeTo(owner);
-		compareDialog.setVisible(true);
-	}
-	
-	/** klassen som tar hand om knapptryckningarna i menyn */
-	class MenuHandler implements ActionListener {
-		/** kollar vilket menyalternativ som valts */
+    private CompareWindow frame;	// detta fönster
+    private int tabIndex;			// anger vilken snittlista det gäller
+    private String[] files;			// innehåller filerna som valts
+    private JTextField choosenFile; // visar vilken fil som är vald
+    private JButton chooseButton;	// knapp för att välja fil
+    private JButton acceptButton;	// sparar och stänger ner fönstret
+    private JButton cancelButton;	// avbryter och stänger ner fönstret
+    private JButton removeButton;	// tar bort vald fil
+    
+    /** skapar ett fönster för att välja snittlista att jämföra med */
+    public CompareWindow(JFrame owner, int tabIndex, int nbrTabs) {
+        super(owner, "Välj fil att jämföra med", true);
+        this.tabIndex = tabIndex;
+        //setLayout(new GridLayout(2, 1));
+        setResizable(false);
+        this.frame = this;
+        
+        try {
+            IOHandler io = new IOHandler();
+            files = (String[]) io.load("comparefiles");
+            if(files.length != nbrTabs) {
+                String[] tempFiles = new String[nbrTabs];
+                for(int i = 0; i < nbrTabs; i++) {
+                    tempFiles[i] = new String();
+                }
+                for(int i = 0; i < files.length; i++) {
+                    tempFiles[i] = files[i];
+                }
+                files = tempFiles;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(owner, "Föregående inställningar gick ej att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
+            files = new String[nbrTabs];
+            for(int i = 0; i < nbrTabs; i++) {
+                files[i] = new String();
+            }
+        }
+        
+        ButtonHandler buttonHand = new ButtonHandler();
+        chooseButton = new JButton("Välj fil...");
+        chooseButton.addActionListener(buttonHand);
+        choosenFile = new JTextField(files[tabIndex]);
+        choosenFile.setEditable(false);
+        choosenFile.setPreferredSize(new Dimension(300,26));
+        
+        JPanel chooseFilePanel = new JPanel();
+        chooseFilePanel.add(new JLabel("Vald fil:"));
+        chooseFilePanel.add(choosenFile);
+        chooseFilePanel.add(chooseButton);
+        
+        FlowLayout flowLayout = new FlowLayout();
+        JPanel buttonPanel = new JPanel(flowLayout);
+        //flowLayout.setHgap(60);
+        acceptButton = new JButton("Ok");
+        acceptButton.setPreferredSize(new Dimension(77,26));
+        acceptButton.addActionListener(buttonHand);
+        removeButton = new JButton("Ta bort");
+        removeButton.setPreferredSize(new Dimension(77,26));
+        removeButton.addActionListener(buttonHand);
+        cancelButton = new JButton("Avbryt");
+        cancelButton.setPreferredSize(new Dimension(77,26));
+        cancelButton.addActionListener(buttonHand);
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(cancelButton);
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2,1));
+        panel.add(chooseFilePanel);
+        panel.add(buttonPanel);
+        getContentPane().add(panel);
+        
+        pack();
+        setLocationRelativeTo(owner);
+        setVisible(true);
+    }
+    
+    /** klassen som tar hand om knapptryckningarna vid val av utseende */
+	class ButtonHandler implements ActionListener {
+		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == quit) {
-				exit();
+			if(e.getSource() == chooseButton) {
+			    setCompareFile();
+			} else if (e.getSource() == acceptButton) {
+			    try {
+			        IOHandler io = new IOHandler();
+			        io.save("comparefiles", files);
+			    } catch (IOException ex) {
+			        JOptionPane.showMessageDialog(frame, "Inställningarna gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+			    }
+				setVisible(false);
+			} else if (e.getSource() == removeButton && files[tabIndex] != "") {
+			    files[tabIndex] = "";
+			    choosenFile.setText(files[tabIndex]);
+			} else if (e.getSource() == cancelButton) {
+			    frame.dispose();
 			}
 		}
 	}
-	
-	/** klassen som sköter fönsterhanteringen */
-	class WindowHandler extends WindowAdapter {
-		/** stänger ned fönstret */
-		public void windowClosing(WindowEvent e) {
-			exit();
-		}
-	}
-	
-	/** stänger ned fönstret efter att data sparats undan */
-	public void exit() {
-		v[tabIndex*2] = compare.getSelection();
-		v[tabIndex*2 + 1] = compare.getSelected();
-		String[] s = new String[v[tabIndex*2 + 1].size()];
-		try {
-		    int[][] compareBy = (int[][]) io.load("compareby");
-		    compareBy[tabIndex] = new int[s.length];
-		    for(int i = 0; i < s.length; i++) {
-				s[i] = (String)v[tabIndex*2 + 1].get(i);
-				compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
-			}
-			try {
-				io.writeFileList("compare", v);
-				io.save("compareby", compareBy);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(compareDialog, "Sparandet av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-			}
-		} catch (Exception e) {
-		    JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
-		}
-		
-		compareDialog.dispose();
-	}
+    
+	/** visar fönster för att välja fil att jämföra med */
+    private void setCompareFile() {
+        Filter snittFilter = new Filter(new String[]{"snitt"}, "Jämförelsefil för snittlista");
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
+        fileChooser.setFileFilter(snittFilter);
+        int retval = fileChooser.showOpenDialog(frame);
+        if(retval == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            SearchWindow.DIRJMF = fileChooser.getCurrentDirectory();
+            
+            String name = file.getName();
+            String path = file.getPath();
+            files[tabIndex] = path;
+            choosenFile.setText(files[tabIndex]);
+            
+            if(name.endsWith(".snitt")) {
+                
+            } else {
+                JOptionPane.showMessageDialog(frame, "Filen måste ha ändelsen .snitt", "Varning", JOptionPane.WARNING_MESSAGE);
+            }
+        } else if(retval == JFileChooser.CANCEL_OPTION) {
+            JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
+        }
+    }
 }

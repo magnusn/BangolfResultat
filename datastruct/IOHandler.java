@@ -198,7 +198,7 @@ public class IOHandler {
 	}
 	
 	/** läser in resultat från en semikolonseparerad fil med filnamnet fileName 
-			returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
+		returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
 	public Object[] inputFromSKV(String fileName) throws IOException, NoSuchElementException {
 		boolean[] editData;
 		boolean[] startData = new boolean[2];
@@ -283,7 +283,7 @@ public class IOHandler {
 	}
 	
 	/** skriver ut en lista med vilka strängar som är valda och vilka som ej är valda till filen fileName
-			utifrån innehållet i vektorn v */
+		utifrån innehållet i vektorn v */
 	public void writeFileList(String fileName, Vector[] v) throws IOException {
 		Vector[] vector = v;
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter("data/" + fileName));

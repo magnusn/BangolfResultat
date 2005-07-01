@@ -69,7 +69,7 @@ public class SearchWindow {
 	private KlassWindow klassWindow;			// klasshanterarfönstret
 	private SnittWindow snittWindow;			// snittlistshanterarfönstret
 	private String compHeader, fileNameSKV, fileNameHTM;// tävlingsrubrik, filnamn för SKV- och HTML-filerna
-	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för SKV- och HTML-filer
+	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för olika filtyper
 	
 	/** skapar huvudfönstret */
 	public SearchWindow() {
@@ -778,7 +778,7 @@ public class SearchWindow {
 		menu.saveToSKV();
 	}
 	
-	/** klassen som sköter fönsterhanteringen */
+	/** klassen som sköter fönsterhanteringen i huvudfönstret */
 	class WindowHandler extends WindowAdapter {
 		/** stänger ned fönstret */
 		public void windowClosing(WindowEvent e) {
@@ -786,7 +786,7 @@ public class SearchWindow {
 		}
 	}
 	
-	/** klassen som sköter fönsterhanteringen */
+	/** klassen som sköter fönsterhanteringen för fönstret där man matar in tävlingsinställningarna */
 	class WinHandForCompInfoDialog extends WindowAdapter {
 		/** stänger ned fönstret */
 		public void windowClosing(WindowEvent e) {

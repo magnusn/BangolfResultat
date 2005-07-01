@@ -51,8 +51,8 @@ public class Snitt {
 	/** skapar ett objekt för snitthantering, filen att skriva till är fileName */
 	public Snitt(String fileName) {
 		map = new HashMap();
-		if(!fileName.endsWith(".jmf")) {
-			fileName = fileName + ".jmf";
+		if(!fileName.endsWith(".snitt")) {
+			fileName = fileName + ".snitt";
 		}
 		this.fileName = fileName;
 		IOHandler io = new IOHandler();
