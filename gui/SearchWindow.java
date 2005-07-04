@@ -539,9 +539,6 @@ public class SearchWindow {
 							JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 						}
 					}
-					else if(retval == JFileChooser.CANCEL_OPTION) {
-						MESSAGEFIELD.setText("Användaren avbröt operationen. Ingen fil valdes.");
-					}
 				}
 			}
 			else if(e.getSource() == newComp) {
@@ -709,9 +706,6 @@ public class SearchWindow {
 					}
 				}
 			}
-			else if(retval == JFileChooser.CANCEL_OPTION) {
-				MESSAGEFIELD.setText("Användaren avbröt operationen. Ingen fil valdes.");
-			}
 		}
 		
 		/** sparar tävlingen */
@@ -765,9 +759,6 @@ public class SearchWindow {
 						JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 					}
 				}
-			}
-			else if(retval == JFileChooser.CANCEL_OPTION) {
-				MESSAGEFIELD.setText("Användaren avbröt operationen. Ingen fil valdes.");
 			}
 		}
 	}

@@ -182,9 +182,6 @@ public class SnittWindow extends JFrame {
 							makeSnitt(file.getPath(), inputHeader, listPanel);
 						}
 					}
-					else if(retval == JFileChooser.CANCEL_OPTION) {
-						JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
-					}
 				} else {
 					JOptionPane.showMessageDialog(frame, "Inga tävlingar har valts! Snittlista gick ej att skapa."
 							, "Varning", JOptionPane.ERROR_MESSAGE);
@@ -210,9 +207,6 @@ public class SnittWindow extends JFrame {
 							
 							makeCompareFile(file.getPath(), listPanel);
 						}
-					}
-					else if(retval == JFileChooser.CANCEL_OPTION) {
-						JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
 					}
 				} else {
 					JOptionPane.showMessageDialog(frame, "Inga tävlingar har valts! Snittlista gick ej att skapa."
@@ -264,9 +258,6 @@ public class SnittWindow extends JFrame {
 						}
 					}
 				}
-				else if(retval == JFileChooser.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
-				}
 				fileChooser.setMultiSelectionEnabled(false);
 			}
 			/** tar bort tävlingar */
@@ -317,7 +308,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att ställa in snittlistans utseende */
 			else if(e.getSource() == appearance) {
-			    new AppearanceWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
+			    new AppearanceWindow(frame, tab.getSelectedIndex(), tab.getTabCount()).setVisible(true);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
@@ -445,7 +436,6 @@ public class SnittWindow extends JFrame {
 					snitt.outputToHTML(list, surface, compareSurface, headerList);
 					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
 				} catch (Exception e) {
-				    e.printStackTrace(); // TODO ta bort
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}

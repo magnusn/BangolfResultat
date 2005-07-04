@@ -159,8 +159,9 @@ public class Snitt {
 	        				 boolean[] headerList) throws IOException {
 		String startRow = "<TR>";
 		String endRow = "</TR>";
-		String startCol = "<TD class=bgrleft>";
-		String startC = "<TD class=bgrcenter>";
+		String startColLeft = "<TD class=bgrleft>";
+		String startColCenter = "<TD class=bgrcenter>";
+		String startColRight = "<TD class=bgrright>";
 		String endCol = "</TD>";
 		String[] headers = new String[headerList.length];
 		headers[Snitt.NAME] = "<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol;
@@ -170,7 +171,7 @@ public class Snitt {
 		headers[Snitt.HITSUM] = "<TD class=bgrcenter WIDTH=50><B>Slag</B>" + endCol;
 		headers[Snitt.MEAN] = "<TD class=bgrcenter WIDTH=50><B>Snitt</B>" + endCol;
 		headers[Snitt.EX_MEAN] = "<TD class=bgrcenter WIDTH=80><B>Snitt ifjol</B>" + endCol;
-		headers[Snitt.CHANGE] = "<TD class=bgrcenter WIDTH=50><B>+/-</B>" + endCol;
+		headers[Snitt.CHANGE] = "<TD class=bgrcenter WIDTH=40><B>+/-</B>" + endCol;
 		LinkedList res = list;
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
@@ -179,9 +180,10 @@ public class Snitt {
 		bufferOut.write("<HEAD>");
 		bufferOut.newLine();
 		bufferOut.write("<STYLE id=\"Bangolftävlingar\"><!--table "+
-										" .bgrleft{font-size:10.0pt;text-align:left;vertical-align:super;white-space:nowrap;}"+
-										" .bgrcenter{font-size:10.0pt;text-align:center;vertical-align:super;white-space:nowrap;}"+
-										"--></STYLE>");
+		        		" .bgrleft{font-size:10.0pt;text-align:left;vertical-align:super;white-space:nowrap;}"+
+						" .bgrcenter{font-size:10.0pt;text-align:center;vertical-align:super;white-space:nowrap;}"+
+						" .bgrright{font-size:10.0pt;text-align:right;vertical-align:super;white-space:nowrap;}"+
+						"--></STYLE>");
 		bufferOut.newLine();
 		bufferOut.write("<TITLE>" + header + "</TITLE>");
 		bufferOut.newLine();
@@ -230,7 +232,7 @@ public class Snitt {
 			String color = getColor(snitt, surface);
 			
 			String compareColor, compareMean, diffValue;
-			if(oldMean != 0.00) {
+			if(oldMean > ResultList.MIN_SCORE && oldMean < ResultList.MAX_SCORE) {
 			    str = new StringTokenizer(String.valueOf(oldMean), ".");
 			    heltal = str.nextToken();
 			    decimaltal = str.nextToken();
@@ -242,6 +244,9 @@ public class Snitt {
 			    heltal = str.nextToken();
 			    decimaltal = str.nextToken();
 			    diffValue = getMean(diff, heltal, decimaltal, false, true);
+			    if(diff > 0.00) {
+			        diffValue = "+" + diffValue;
+			    }
 			} else {
 			    compareColor = "black";
 			    compareMean = "-";
@@ -259,18 +264,18 @@ public class Snitt {
 			oldPerson = person;
 			
 			String[] data = new String[headerList.length];
-			data[Snitt.NAME] = startCol + person.getName() + endCol;
-			data[Snitt.CLUB] = startCol + person.getClub() + endCol;
-			data[Snitt.COMPS] = startC + person.getComps() + endCol;
-			data[Snitt.ROUNDS] = startC + person.getRounds() + endCol;
-			data[Snitt.HITSUM] = startC + person.getHits() + endCol;
-			data[Snitt.MEAN] = startC + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
-			data[Snitt.EX_MEAN] = startC + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
-			data[Snitt.CHANGE] = startC + diffValue + endCol;
+			data[Snitt.NAME] = startColLeft + person.getName() + endCol;
+			data[Snitt.CLUB] = startColLeft + person.getClub() + endCol;
+			data[Snitt.COMPS] = startColCenter + person.getComps() + endCol;
+			data[Snitt.ROUNDS] = startColCenter + person.getRounds() + endCol;
+			data[Snitt.HITSUM] = startColCenter + person.getHits() + endCol;
+			data[Snitt.MEAN] = startColCenter + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
+			data[Snitt.EX_MEAN] = startColCenter + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
+			data[Snitt.CHANGE] = startColRight + diffValue + endCol;
 			
 			bufferOut.write(startRow);
 			bufferOut.newLine();
-			bufferOut.write(startC + "<B>" + (i - sameResult) + "</B>" + endCol);
+			bufferOut.write(startColCenter + "<B>" + (i - sameResult) + "</B>" + endCol);
 			bufferOut.newLine();
 			for(int j = 0; j < data.length; j++) {
 			    if(headerList[j]) {

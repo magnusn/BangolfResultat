@@ -83,39 +83,44 @@ public class AppearanceWindow extends JDialog {
         } else {
             headers[tabIndex][Snitt.EX_MEAN].setEnabled(false);
             headers[tabIndex][Snitt.CHANGE].setEnabled(false);
+            headers[tabIndex][Snitt.EX_MEAN].setSelected(false);
+            headers[tabIndex][Snitt.CHANGE].setSelected(false);
             headers[tabIndex][Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
             headers[tabIndex][Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
         }
-        
-        ButtonHandler buttonHand = new ButtonHandler();
         
         getContentPane().add(new JLabel("Välj vad som skall visas:"));
         for(int i = 0; i < nbrHeaders; i++) {
             getContentPane().add(headers[tabIndex][i]);
         }
         
+        ButtonHandler buttonHand = new ButtonHandler();
         acceptButton = new JButton("Verkställ");
         acceptButton.addActionListener(buttonHand);
         getContentPane().add(acceptButton);
         
         pack();
         setLocationRelativeTo(owner);
-        setVisible(true);
+    }
+    
+    /** stänger ner och sparar */
+    protected void saveAndExit() {
+        try {
+            IOHandler io = new IOHandler();
+            io.save("snittapp", headers);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(thisFrame, "Inställningarna gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+        }
+        setVisible(false);
     }
     
     /** klassen som tar hand om knapptryckningarna vid val av utseende */
-	class ButtonHandler implements ActionListener {
-		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
-		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == acceptButton) {
-			    try {
-			        IOHandler io = new IOHandler();
-			        io.save("snittapp", headers);
-			    } catch (IOException ex) {
-			        JOptionPane.showMessageDialog(thisFrame, "Inställningarna gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
-			    }
-				setVisible(false);
-			}
-		}
-	}
+    class ButtonHandler implements ActionListener {
+        /** kollar vilken knapp som tryckts ned och utför lämplig handling */
+        public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == acceptButton) {
+                saveAndExit();
+            }
+        }
+    }
 }

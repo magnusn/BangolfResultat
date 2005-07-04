@@ -34,6 +34,7 @@ public class CompareWindow extends JDialog {
     private JFrame owner;			// fönstret som skapar detta fönster
     private CompareWindow frame;	// detta fönster
     private int tabIndex;			// anger vilken snittlista det gäller
+    private int nbrTabs;			// anger antal olika snittlistor
     private static String[] files;	// innehåller filerna som valts
     private JTextField choosenFile; // visar vilken fil som är vald
     private JButton chooseButton;	// knapp för att välja fil
@@ -47,6 +48,7 @@ public class CompareWindow extends JDialog {
         setResizable(false);
         this.frame = this;
         this.owner = owner;
+        this.nbrTabs = nbrTabs;
         
         try {
             IOHandler io = new IOHandler();
@@ -131,16 +133,17 @@ public class CompareWindow extends JDialog {
 			if(e.getSource() == chooseButton) {
 			    setCompareFile();
 			} else if (e.getSource() == acceptButton) {
+			    files[tabIndex] = choosenFile.getText();
 			    try {
 			        IOHandler io = new IOHandler();
 			        io.save("comparefiles", files);
+			        new AppearanceWindow(null, tabIndex, nbrTabs).saveAndExit();
 			    } catch (IOException ex) {
 			        JOptionPane.showMessageDialog(frame, "Inställningarna gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 			    }
 				setVisible(false);
 			} else if (e.getSource() == removeButton && files[tabIndex] != "") {
-			    files[tabIndex] = "";
-			    choosenFile.setText(files[tabIndex]);
+			    choosenFile.setText("");
 			} else if (e.getSource() == cancelButton) {
 			    frame.dispose();
 			}
@@ -160,16 +163,11 @@ public class CompareWindow extends JDialog {
             
             String name = file.getName();
             String path = file.getPath();
-            files[tabIndex] = path;
-            choosenFile.setText(files[tabIndex]);
+            choosenFile.setText(path);
             
-            if(name.endsWith(".snitt")) {
-                
-            } else {
+            if(!name.endsWith(".snitt")) {
                 JOptionPane.showMessageDialog(frame, "Filen måste ha ändelsen .snitt", "Varning", JOptionPane.WARNING_MESSAGE);
             }
-        } else if(retval == JFileChooser.CANCEL_OPTION) {
-            JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
         }
     }
 }
