@@ -24,7 +24,7 @@ import datastruct.IOHandler;
  */
 public class AppearanceWindow extends JDialog {
     private JDialog thisFrame;			// refererar till detta fönster
-    private int nbrHeaders = 6;			// antal rubriker som kan väljas mellan
+    private int nbrHeaders = 8;			// antal möjliga rubriker
     private JCheckBox[][] headers;		// vektor av rubriker som kan väljas
     private JButton acceptButton;		// knapp för att bekräfta inställningarna
     private int tabIndex;				// håller reda på vilken snittlista inställningarna gäller
@@ -43,12 +43,16 @@ public class AppearanceWindow extends JDialog {
             if(headers.length != nbrTabs) {
                 JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][nbrHeaders];
                 for(int i = 0; i < nbrTabs; i++) {
-                    tempHeaders[i][0] = new JCheckBox("Klubb");
-                    tempHeaders[i][1] = new JCheckBox("Tävlingar");
-                    tempHeaders[i][2] = new JCheckBox("Varv");
-                    tempHeaders[i][3] = new JCheckBox("Slag");
-                    tempHeaders[i][4] = new JCheckBox("Snitt ifjol");
-                    tempHeaders[i][5] = new JCheckBox("Förändring");
+                    tempHeaders[i][Snitt.NAME] = new JCheckBox("Namn", true);
+                    tempHeaders[i][Snitt.NAME].setEnabled(false);
+                    tempHeaders[i][Snitt.CLUB] = new JCheckBox("Klubb", true);
+                    tempHeaders[i][Snitt.COMPS] = new JCheckBox("Tävlingar", true);
+                    tempHeaders[i][Snitt.ROUNDS] = new JCheckBox("Varv", true);
+                    tempHeaders[i][Snitt.HITSUM] = new JCheckBox("Slag", true);
+                    tempHeaders[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
+                    tempHeaders[i][Snitt.MEAN].setEnabled(false);
+                    tempHeaders[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
+                    tempHeaders[i][Snitt.CHANGE] = new JCheckBox("Förändring");
                 }
                 for(int i = 0; i < headers.length; i++) {
                     tempHeaders[i] = headers[i];
@@ -59,13 +63,28 @@ public class AppearanceWindow extends JDialog {
             JOptionPane.showMessageDialog(owner, "Föregående inställningar gick ej att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
             headers = new JCheckBox[nbrTabs][nbrHeaders];
             for(int i = 0; i < nbrTabs; i++) {
-                headers[i][0] = new JCheckBox("Klubb");
-                headers[i][1] = new JCheckBox("Tävlingar");
-                headers[i][2] = new JCheckBox("Varv");
-                headers[i][3] = new JCheckBox("Slag");
-                headers[i][4] = new JCheckBox("Snitt ifjol");
-                headers[i][5] = new JCheckBox("Förändring");
+                headers[i][Snitt.NAME] = new JCheckBox("Namn", true);
+                headers[i][Snitt.NAME].setEnabled(false);
+                headers[i][Snitt.CLUB] = new JCheckBox("Klubb", true);
+                headers[i][Snitt.COMPS] = new JCheckBox("Tävlingar", true);
+                headers[i][Snitt.ROUNDS] = new JCheckBox("Varv", true);
+                headers[i][Snitt.HITSUM] = new JCheckBox("Slag", true);
+                headers[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
+                headers[i][Snitt.MEAN].setEnabled(false);
+                headers[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
+                headers[i][Snitt.CHANGE] = new JCheckBox("Förändring");
             }
+        }
+        if(CompareWindow.getCompareFile(tabIndex) != null) {
+            headers[tabIndex][Snitt.EX_MEAN].setEnabled(true);
+            headers[tabIndex][Snitt.CHANGE].setEnabled(true);
+            headers[tabIndex][Snitt.EX_MEAN].setToolTipText(null);
+            headers[tabIndex][Snitt.CHANGE].setToolTipText(null);
+        } else {
+            headers[tabIndex][Snitt.EX_MEAN].setEnabled(false);
+            headers[tabIndex][Snitt.CHANGE].setEnabled(false);
+            headers[tabIndex][Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
+            headers[tabIndex][Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
         }
         
         ButtonHandler buttonHand = new ButtonHandler();

@@ -31,9 +31,10 @@ import datastruct.IOHandler;
  * CompareWindow - beskriver fönstret där man väljer fil att jämföra snittlistan med
  */
 public class CompareWindow extends JDialog {
+    private JFrame owner;			// fönstret som skapar detta fönster
     private CompareWindow frame;	// detta fönster
     private int tabIndex;			// anger vilken snittlista det gäller
-    private String[] files;			// innehåller filerna som valts
+    private static String[] files;	// innehåller filerna som valts
     private JTextField choosenFile; // visar vilken fil som är vald
     private JButton chooseButton;	// knapp för att välja fil
     private JButton acceptButton;	// sparar och stänger ner fönstret
@@ -43,9 +44,9 @@ public class CompareWindow extends JDialog {
     /** skapar ett fönster för att välja snittlista att jämföra med */
     public CompareWindow(JFrame owner, int nbrTabs) {
         super(owner, "Välj fil att jämföra med", true);
-        //setLayout(new GridLayout(2, 1));
         setResizable(false);
         this.frame = this;
+        this.owner = owner;
         
         try {
             IOHandler io = new IOHandler();
@@ -71,7 +72,6 @@ public class CompareWindow extends JDialog {
         ButtonHandler buttonHand = new ButtonHandler();
         chooseButton = new JButton("Välj fil...");
         chooseButton.addActionListener(buttonHand);
-        //choosenFile = new JTextField(files[tabIndex]);
         choosenFile = new JTextField();
         choosenFile.setEditable(false);
         choosenFile.setPreferredSize(new Dimension(300,26));
@@ -103,21 +103,20 @@ public class CompareWindow extends JDialog {
         getContentPane().add(panel);
         
         pack();
-        setLocationRelativeTo(owner);
-        //setVisible(true);
     }
     
     /** visar fönstret efter vilken snittlistetab som är vald */
     public void show(int tabIndex) {
         this.tabIndex = tabIndex;
         choosenFile.setText(files[tabIndex]);
+        setLocationRelativeTo(owner);
         setVisible(true);
     }
     
     /** talar om ifall en jämförelsefil är vald för snittlistan
      *  som representeras av tabIndex */
-    public String getCompareFile(int tabIndex) {
-        this.tabIndex = tabIndex;
+    protected static String getCompareFile(int tabIndex) {
+        //this.tabIndex = tabIndex;
         if(files[tabIndex].equals("") || files[tabIndex] == null) {
             return null;
         } else {

@@ -3,6 +3,7 @@ package snitt;
 import gui.ListPanel;
 import gui.SearchWindow;
 
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -144,10 +145,9 @@ public class SnittWindow extends JFrame {
 		
 		getContentPane().add(tab);
 		pack();
+		setVisible(true);
 		
 		compareWindow = new CompareWindow(frame, tab.getTabCount());
-		
-		setVisible(true);
 	}
 	
 	/** klassen som tar hand om knapptryckningarna i menyn */
@@ -375,7 +375,8 @@ public class SnittWindow extends JFrame {
 	/** producerar en snittlista med filnamnet fileName och rubriken header 
 	 *  där filerna som inläses tas från ListPanel listPanel */
 	private void makeSnitt(String fileName, String header, ListPanel listPanel) {
-		Snitt snitt = new Snitt(fileName, header, tab.getSelectedIndex());
+	    int tabIndex = tab.getSelectedIndex();
+		Snitt snitt = new Snitt(fileName, header, tabIndex);
 		int surface = -1;
 		int compareSurface = -1;
 		boolean readOk = true;
@@ -417,7 +418,7 @@ public class SnittWindow extends JFrame {
 				readOk = false;
 			}
 			if(readOk) {
-			    String compareFile = compareWindow.getCompareFile(tab.getSelectedIndex());
+			    String compareFile = CompareWindow.getCompareFile(tab.getSelectedIndex());
 			    if(compareFile != null) {
 			        try {
 			            File file = new File(compareFile);
@@ -436,9 +437,15 @@ public class SnittWindow extends JFrame {
 			if(readOk) {
 				LinkedList list = snitt.sortMap();
 				try {
-					snitt.outputToHTML(list, surface, compareSurface);
+				    JCheckBox[][] headerCheckBox = (JCheckBox[][]) io.load("snittapp");
+				    boolean[] headerList = new boolean[headerCheckBox[tabIndex].length];
+				    for(int i = 0; i < headerCheckBox[tabIndex].length; i++) {
+				        headerList[i] = headerCheckBox[tabIndex][i].isSelected();
+				    }
+					snitt.outputToHTML(list, surface, compareSurface, headerList);
 					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
 				} catch (Exception e) {
+				    e.printStackTrace(); // TODO ta bort
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}

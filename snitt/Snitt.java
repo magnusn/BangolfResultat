@@ -153,13 +153,24 @@ public class Snitt {
 		return list;
 	}
 	
-	/** skriver ut snittlistan utifrån resultatlistan list och underlaget surface */
-	public void outputToHTML(LinkedList list, int surface, int compareSurface) throws IOException {
+	/** skriver ut snittlistan utifrån resultatlistan list, underlaget surface 
+	 *  och jämförelsefilen med underlaget compareSurface (-1 vid ingen jämförelse) */
+	public void outputToHTML(LinkedList list, int surface, int compareSurface,
+	        				 boolean[] headerList) throws IOException {
 		String startRow = "<TR>";
 		String endRow = "</TR>";
 		String startCol = "<TD class=bgrleft>";
 		String startC = "<TD class=bgrcenter>";
 		String endCol = "</TD>";
+		String[] headers = new String[headerList.length];
+		headers[Snitt.NAME] = "<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol;
+		headers[Snitt.CLUB] = "<TD class=bgrleft WIDTH=95><B>Klubb</B>" + endCol;
+		headers[Snitt.COMPS] = "<TD class=bgrcenter WIDTH=60><B>Tävlingar</B>" + endCol;
+		headers[Snitt.ROUNDS] = "<TD class=bgrcenter WIDTH=50><B>Varv</B>" + endCol;
+		headers[Snitt.HITSUM] = "<TD class=bgrcenter WIDTH=50><B>Slag</B>" + endCol;
+		headers[Snitt.MEAN] = "<TD class=bgrcenter WIDTH=50><B>Snitt</B>" + endCol;
+		headers[Snitt.EX_MEAN] = "<TD class=bgrcenter WIDTH=80><B>Snitt ifjol</B>" + endCol;
+		headers[Snitt.CHANGE] = "<TD class=bgrcenter WIDTH=50><B>+/-</B>" + endCol;
 		LinkedList res = list;
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
@@ -190,18 +201,12 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write("<TD class=bgrcenter WIDTH=59><B>Ranking</B>" + endCol);
 		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol);
-		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrleft WIDTH=95><B>Klubb</B>" + endCol);
-		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrcenter WIDTH=60><B>Tävlingar</B>" + endCol);
-		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrcenter WIDTH=50><B>Varv</B>" + endCol);
-		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrcenter WIDTH=50><B>Slag</B>" + endCol);
-		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrcenter WIDTH=50><B>Snitt</B>" + endCol);
-		bufferOut.newLine();
+		for(int i = 0; i < headerList.length; i++) {
+		    if(headerList[i]) {
+		        bufferOut.write(headers[i]);
+		        bufferOut.newLine();
+		    }
+		}
 		bufferOut.write(endRow);
 		bufferOut.newLine();
 		
@@ -211,6 +216,7 @@ public class Snitt {
 		for (int i = 1; i <= res.size(); i++) {
 			Person person = (Person)res.get(i-1);
 			double snitt;
+			double oldMean = person.getOldMean();
 			if(person.getRounds() != 0) {
 				snitt = (double)person.getHits()/(double)person.getRounds();
 			} else {
@@ -219,8 +225,29 @@ public class Snitt {
 			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
 			String heltal = str.nextToken();
 			String decimaltal = str.nextToken();
-			String medel = getMean(snitt, heltal, decimaltal);
+			String medel = getMean(snitt, heltal, decimaltal, false, false);
+			snitt = Double.parseDouble(getMean(snitt, heltal, decimaltal, true, true));
 			String color = getColor(snitt, surface);
+			
+			String compareColor, compareMean, diffValue;
+			if(oldMean != 0.00) {
+			    str = new StringTokenizer(String.valueOf(oldMean), ".");
+			    heltal = str.nextToken();
+			    decimaltal = str.nextToken();
+			    compareMean = getMean(oldMean, heltal, decimaltal, false, false);
+			    compareColor = getColor(oldMean, compareSurface);
+			    
+			    double diff = snitt - oldMean;
+			    str = new StringTokenizer(String.valueOf(diff), ".");
+			    heltal = str.nextToken();
+			    decimaltal = str.nextToken();
+			    diffValue = getMean(diff, heltal, decimaltal, false, true);
+			} else {
+			    compareColor = "black";
+			    compareMean = "-";
+			    diffValue = "-";
+			}
+			
 			
 			if(oldPerson != null) {
 				if(comparator.compare(person, oldPerson) == 0) {
@@ -231,10 +258,26 @@ public class Snitt {
 			}
 			oldPerson = person;
 			
+			String[] data = new String[headerList.length];
+			data[Snitt.NAME] = startCol + person.getName() + endCol;
+			data[Snitt.CLUB] = startCol + person.getClub() + endCol;
+			data[Snitt.COMPS] = startC + person.getComps() + endCol;
+			data[Snitt.ROUNDS] = startC + person.getRounds() + endCol;
+			data[Snitt.HITSUM] = startC + person.getHits() + endCol;
+			data[Snitt.MEAN] = startC + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
+			data[Snitt.EX_MEAN] = startC + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
+			data[Snitt.CHANGE] = startC + diffValue + endCol;
+			
 			bufferOut.write(startRow);
 			bufferOut.newLine();
 			bufferOut.write(startC + "<B>" + (i - sameResult) + "</B>" + endCol);
 			bufferOut.newLine();
+			for(int j = 0; j < data.length; j++) {
+			    if(headerList[j]) {
+			        bufferOut.write(data[j]);
+			        bufferOut.newLine();
+			    }
+			}/*
 			bufferOut.write(startCol + person.getName() + endCol);
 			bufferOut.newLine();
 			bufferOut.write(startCol + person.getClub() + endCol);
@@ -246,7 +289,7 @@ public class Snitt {
 			bufferOut.write(startC + person.getHits() + endCol);
 			bufferOut.newLine();
 			bufferOut.write(startC + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol);
-			bufferOut.newLine();
+			bufferOut.newLine();*/
 			bufferOut.write(endRow);
 			bufferOut.newLine();
 		}
@@ -289,8 +332,7 @@ public class Snitt {
 			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
 			String heltal = str.nextToken();
 			String decimaltal = str.nextToken();
-			String medel = getMean(snitt, heltal, decimaltal);
-			String color = getColor(snitt, surface);
+			String medel = getMean(snitt, heltal, decimaltal, true, true);
 			
 			bufferOut.write(person.getIdNbr() + ";" + person.getName() + ";" + person.getClub() + ";" + medel);
 			bufferOut.newLine();
@@ -326,26 +368,32 @@ public class Snitt {
 		return surface;
 	}
 	
-	/** returnerar snittet som en sträng i önskvärt format */
-	private String getMean(double snitt, String heltal, String decimaltal) {
+	/** returnerar värdet snitt som en sträng i önskvärt format */
+	private String getMean(double snitt, String heltal, String decimaltal, boolean dot, boolean diff) {
 	    String medel;
-		if(snitt != 0.00) {
+	    String separator;
+	    if(dot) {
+	        separator = ".";
+	    } else {
+	        separator = ",";
+	    }
+		if(snitt != 0.00 | diff) {
 			if(decimaltal.length() > 2) {
 				if(Integer.parseInt(decimaltal.substring(2,3)) >= 5) {
 					if(Integer.parseInt(decimaltal.substring(0,2)) == 99) {
-						medel = (Integer.parseInt(heltal) + 1) + "," + "00";
+						medel = (Integer.parseInt(heltal) + 1) + separator + "00";
 					} else if(Integer.parseInt(decimaltal.substring(1,2)) == 9) {
-						medel = heltal + "," + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
+						medel = heltal + separator + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
 					} else {
-						medel = heltal + "," + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
+						medel = heltal + separator + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
 					}
 				} else {
-					medel = heltal + "," + decimaltal.substring(0,2);
+					medel = heltal + separator + decimaltal.substring(0,2);
 				}
 			} else if(decimaltal.length() > 1) {
-				medel = heltal + "," + decimaltal.substring(0,2);
+				medel = heltal + separator + decimaltal.substring(0,2);
 			} else {
-				medel = heltal + "," + decimaltal.substring(0,1) + "0";
+				medel = heltal + separator + decimaltal.substring(0,1) + "0";
 			}
 		} else {
 			medel = "-";
