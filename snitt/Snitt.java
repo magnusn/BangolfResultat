@@ -154,7 +154,7 @@ public class Snitt {
 	}
 	
 	/** skriver ut snittlistan utifrån resultatlistan list och underlaget surface */
-	public void outputToHTML(LinkedList list, int surface) throws IOException {
+	public void outputToHTML(LinkedList list, int surface, int compareSurface) throws IOException {
 		String startRow = "<TR>";
 		String endRow = "</TR>";
 		String startCol = "<TD class=bgrleft>";
@@ -298,6 +298,32 @@ public class Snitt {
 		
 		bufferOut.flush();
 		bufferOut.close();
+	}
+	
+	/** läser jämförelsefilens snittlista fileName */
+	public int readCompareFile(String fileName) throws FileNotFoundException, IOException {
+	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+		int surface = Integer.parseInt(fileIn.readLine());
+		String inLine = fileIn.readLine();
+		
+		while (inLine != null) {
+			String identity;
+			double mean;
+			
+			StringTokenizer inString = new StringTokenizer(inLine, ";");
+			if(inString.countTokens() != 0) {
+				identity = inString.nextToken();
+				inString.nextToken();
+				inString.nextToken();
+				mean = Double.parseDouble(inString.nextToken());
+				if(map.containsKey(identity)) {
+				    Person p = (Person) map.get(identity);
+				    p.setOldMean(mean);
+				}
+			}
+			inLine = fileIn.readLine();
+		}
+		return surface;
 	}
 	
 	/** returnerar snittet som en sträng i önskvärt format */

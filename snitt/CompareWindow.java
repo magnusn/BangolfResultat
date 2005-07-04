@@ -41,9 +41,8 @@ public class CompareWindow extends JDialog {
     private JButton removeButton;	// tar bort vald fil
     
     /** skapar ett fönster för att välja snittlista att jämföra med */
-    public CompareWindow(JFrame owner, int tabIndex, int nbrTabs) {
+    public CompareWindow(JFrame owner, int nbrTabs) {
         super(owner, "Välj fil att jämföra med", true);
-        this.tabIndex = tabIndex;
         //setLayout(new GridLayout(2, 1));
         setResizable(false);
         this.frame = this;
@@ -72,7 +71,8 @@ public class CompareWindow extends JDialog {
         ButtonHandler buttonHand = new ButtonHandler();
         chooseButton = new JButton("Välj fil...");
         chooseButton.addActionListener(buttonHand);
-        choosenFile = new JTextField(files[tabIndex]);
+        //choosenFile = new JTextField(files[tabIndex]);
+        choosenFile = new JTextField();
         choosenFile.setEditable(false);
         choosenFile.setPreferredSize(new Dimension(300,26));
         
@@ -104,7 +104,25 @@ public class CompareWindow extends JDialog {
         
         pack();
         setLocationRelativeTo(owner);
+        //setVisible(true);
+    }
+    
+    /** visar fönstret efter vilken snittlistetab som är vald */
+    public void show(int tabIndex) {
+        this.tabIndex = tabIndex;
+        choosenFile.setText(files[tabIndex]);
         setVisible(true);
+    }
+    
+    /** talar om ifall en jämförelsefil är vald för snittlistan
+     *  som representeras av tabIndex */
+    public String getCompareFile(int tabIndex) {
+        this.tabIndex = tabIndex;
+        if(files[tabIndex].equals("") || files[tabIndex] == null) {
+            return null;
+        } else {
+            return files[tabIndex];
+        }
     }
     
     /** klassen som tar hand om knapptryckningarna vid val av utseende */

@@ -31,6 +31,7 @@ import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
+    private CompareWindow compareWindow;	// fönster för att välja snittlista att jämföra med
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
 	private JFrame frame;					// snittlistsfönstret
@@ -143,6 +144,9 @@ public class SnittWindow extends JFrame {
 		
 		getContentPane().add(tab);
 		pack();
+		
+		compareWindow = new CompareWindow(frame, tab.getTabCount());
+		
 		setVisible(true);
 	}
 	
@@ -186,7 +190,7 @@ public class SnittWindow extends JFrame {
 							, "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			/** sparar snittlistan som webbsida */
+			/** sparar snittlistan som jämförelsefil */
 			if(e.getSource() == saveCompareFile) {
 				if(selected.size() != 0) {
 					fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
@@ -321,30 +325,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
-			    new CompareWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
-			    /*
-			    fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
-				fileChooser.setFileFilter(snittFilter);
-				int retval = fileChooser.showOpenDialog(frame);
-				if(retval == JFileChooser.APPROVE_OPTION) {
-				    File file = fileChooser.getSelectedFile();
-				    SearchWindow.DIRJMF = fileChooser.getCurrentDirectory();
-				    
-				    String name = file.getName();
-				    String path = file.getPath();
-				    
-				    if(name.endsWith(".snitt")) {
-				        try {
-				            //TODO io.readMeanFile(path);
-				        } catch (Exception ex) {
-				            JOptionPane.showMessageDialog(frame, "Filen " + name + " gick ej att läsa in korrekt.", "Varning", JOptionPane.ERROR_MESSAGE);
-				        }
-				    } else {
-				        JOptionPane.showMessageDialog(frame, "Filen måste ha ändelsen .snitt", "Varning", JOptionPane.WARNING_MESSAGE);
-				    }
-				} else if(retval == JFileChooser.CANCEL_OPTION) {
-				    JOptionPane.showMessageDialog(frame, "Användaren avbröt operationen. Ingen fil valdes.");
-				}*/
+			    compareWindow.show(tab.getSelectedIndex());
 			}
 			/** tar fram antal starter i de olika klasserna */
 			else if(e.getSource() == classStarts) {
@@ -396,6 +377,7 @@ public class SnittWindow extends JFrame {
 	private void makeSnitt(String fileName, String header, ListPanel listPanel) {
 		Snitt snitt = new Snitt(fileName, header, tab.getSelectedIndex());
 		int surface = -1;
+		int compareSurface = -1;
 		boolean readOk = true;
 		if(listPanel == snittList[0]) {
 			surface = ResultList.FILT;
@@ -435,9 +417,26 @@ public class SnittWindow extends JFrame {
 				readOk = false;
 			}
 			if(readOk) {
+			    String compareFile = compareWindow.getCompareFile(tab.getSelectedIndex());
+			    if(compareFile != null) {
+			        try {
+			            File file = new File(compareFile);
+			            if(file.exists()) {
+			                compareSurface = snitt.readCompareFile(compareFile);
+			            } else {
+			                JOptionPane.showMessageDialog(frame, "Vald jämförelsefil existerar inte", "Varning", JOptionPane.ERROR_MESSAGE);
+			                readOk = false;
+			            }
+			        } catch (Exception e) {
+			            JOptionPane.showMessageDialog(frame, "Inläsningen av snittlista att jämföra med misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			            readOk = false;
+			        }
+			    }
+			}
+			if(readOk) {
 				LinkedList list = snitt.sortMap();
 				try {
-					snitt.outputToHTML(list, surface);
+					snitt.outputToHTML(list, surface, compareSurface);
 					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
@@ -446,8 +445,8 @@ public class SnittWindow extends JFrame {
 		}
 	}
 	
-	/** producerar en snittlista med filnamnet fileName och rubriken header 
-	 *  där filerna som inläses tas från ListPanel listPanel */
+	/** producerar en snittlista att använda som jämförelse med filnamnet fileName 
+	 * 	och där filerna som läses in tas från ListPanel listPanel */
 	private void makeCompareFile(String fileName, ListPanel listPanel) {
 		Snitt snitt = new Snitt(fileName);
 		int surface = -1;
