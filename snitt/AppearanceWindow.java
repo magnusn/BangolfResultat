@@ -29,24 +29,10 @@ public class AppearanceWindow extends JDialog {
         super(owner, "Utseende", true);
         this.tabIndex = tabIndex;
         this.snittData = snittData;
-        setLayout(new GridLayout(snittData.getNbrHeaders() + 2, 1));
+        setLayout(new GridLayout(SnittData.NBR_HEADERS + 2, 1));
         setResizable(false);
         
         headers = snittData.getAppearanceHeaders(tabIndex);
-        if(snittData.getCompareFile(tabIndex) != null) {
-            headers[Snitt.EX_MEAN].setEnabled(true);
-            headers[Snitt.CHANGE].setEnabled(true);
-            headers[Snitt.EX_MEAN].setToolTipText(null);
-            headers[Snitt.CHANGE].setToolTipText(null);
-        } else {
-            headers[Snitt.EX_MEAN].setEnabled(false);
-            headers[Snitt.CHANGE].setEnabled(false);
-            headers[Snitt.EX_MEAN].setSelected(false);
-            headers[Snitt.CHANGE].setSelected(false);
-            headers[Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
-            headers[Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
-        }
-        
         getContentPane().add(new JLabel("Välj vad som skall visas:"));
         for(int i = 0; i < headers.length; i++) {
             getContentPane().add(headers[i]);

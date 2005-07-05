@@ -30,8 +30,8 @@ public class Snitt {
 	public static final int ROUNDS = 3;	// siffran för varv som används vid sortering
 	public static final int HITSUM = 4;	// siffran för slagsumma som används vid sortering
 	public static final int MEAN = 5;	// siffran för snitt som används vid sortering
-	public static final int EX_MEAN=6;	// siffran för fjolårssnitt som används vid sortering
-	public static final int CHANGE=7;	// siffran för förändringen som används vid sortering
+	public static final int EX_MEAN = 6;// siffran för fjolårssnitt som används vid sortering
+	public static final int CHANGE = 7;	// siffran för förändringen som används vid sortering
 	private int[][] compare;			// vektorn som håller reda på vad snittlistan skall sorteras efter
 	private int tabIndex;				// talar om vilken snittlistsflik som är vald
 	
@@ -78,7 +78,6 @@ public class Snitt {
 					name = inString.nextToken();
 					club = inString.nextToken();
 					inString.nextToken();
-					identity = name + " " + club;
 					inString.nextToken();
 					inString.nextToken();
 					inString.nextToken();
@@ -217,18 +216,13 @@ public class Snitt {
 		SnittComparator comparator = new SnittComparator();
 		for (int i = 1; i <= res.size(); i++) {
 			Person person = (Person)res.get(i-1);
-			double snitt;
+			double snitt = person.getTwoDecimalMean();
 			double oldMean = person.getOldMean();
-			if(person.getRounds() != 0) {
-				snitt = (double)person.getHits()/(double)person.getRounds();
-			} else {
-				snitt = 0.00;
-			}
+			
 			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
 			String heltal = str.nextToken();
 			String decimaltal = str.nextToken();
-			String medel = getMean(snitt, heltal, decimaltal, false, false);
-			snitt = Double.parseDouble(getMean(snitt, heltal, decimaltal, true, true));
+			String medel = SnittData.getValueWithTwoDecimals(snitt, heltal, decimaltal, false);
 			String color = getColor(snitt, surface);
 			
 			String compareColor, compareMean, diffValue;
@@ -236,14 +230,14 @@ public class Snitt {
 			    str = new StringTokenizer(String.valueOf(oldMean), ".");
 			    heltal = str.nextToken();
 			    decimaltal = str.nextToken();
-			    compareMean = getMean(oldMean, heltal, decimaltal, false, false);
+			    compareMean = SnittData.getValueWithTwoDecimals(oldMean, heltal, decimaltal, false);
 			    compareColor = getColor(oldMean, compareSurface);
 			    
-			    double diff = snitt - oldMean;
+			    double diff = person.getDiff();
 			    str = new StringTokenizer(String.valueOf(diff), ".");
 			    heltal = str.nextToken();
 			    decimaltal = str.nextToken();
-			    diffValue = getMean(diff, heltal, decimaltal, false, true);
+			    diffValue = SnittData.getValueWithTwoDecimals(diff, heltal, decimaltal, false);
 			    if(diff > 0.00) {
 			        diffValue = "+" + diffValue;
 			    }
@@ -252,7 +246,9 @@ public class Snitt {
 			    compareMean = "-";
 			    diffValue = "-";
 			}
-			
+			if(snitt == Person.NO_VALUE) {
+			    diffValue = "-";
+			}
 			
 			if(oldPerson != null) {
 				if(comparator.compare(person, oldPerson) == 0) {
@@ -282,19 +278,7 @@ public class Snitt {
 			        bufferOut.write(data[j]);
 			        bufferOut.newLine();
 			    }
-			}/*
-			bufferOut.write(startCol + person.getName() + endCol);
-			bufferOut.newLine();
-			bufferOut.write(startCol + person.getClub() + endCol);
-			bufferOut.newLine();
-			bufferOut.write(startC + person.getComps() + endCol);
-			bufferOut.newLine();
-			bufferOut.write(startC + person.getRounds() + endCol);
-			bufferOut.newLine();
-			bufferOut.write(startC + person.getHits() + endCol);
-			bufferOut.newLine();
-			bufferOut.write(startC + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol);
-			bufferOut.newLine();*/
+			}
 			bufferOut.write(endRow);
 			bufferOut.newLine();
 		}
@@ -329,15 +313,11 @@ public class Snitt {
 		for (int i = 1; i <= res.size(); i++) {
 			Person person = (Person)res.get(i-1);
 			double snitt;
-			if(person.getRounds() != 0) {
-				snitt = (double)person.getHits()/(double)person.getRounds();
-			} else {
-				snitt = 0.00;
-			}
+			snitt = person.getMean();
 			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
 			String heltal = str.nextToken();
 			String decimaltal = str.nextToken();
-			String medel = getMean(snitt, heltal, decimaltal, true, true);
+			String medel = SnittData.getValueWithTwoDecimals(snitt, heltal, decimaltal, true);
 			
 			bufferOut.write(person.getIdNbr() + ";" + person.getName() + ";" + person.getClub() + ";" + medel);
 			bufferOut.newLine();
@@ -354,56 +334,30 @@ public class Snitt {
 		String inLine = fileIn.readLine();
 		
 		while (inLine != null) {
-			String identity;
-			double mean;
+			String identity, heltal, decimaltal;
+			double oldMean;
 			
 			StringTokenizer inString = new StringTokenizer(inLine, ";");
+			StringTokenizer str;
 			if(inString.countTokens() != 0) {
 				identity = inString.nextToken();
 				inString.nextToken();
 				inString.nextToken();
-				mean = Double.parseDouble(inString.nextToken());
+				oldMean = Double.parseDouble(inString.nextToken());
 				if(map.containsKey(identity)) {
 				    Person p = (Person) map.get(identity);
-				    p.setOldMean(mean);
+				    double mean = p.getMean();
+				    if(mean != Person.NO_VALUE && oldMean != Person.NO_VALUE) {
+				        double diff = p.getTwoDecimalMean() - oldMean;
+				        p.setDiff(diff);
+				    }
+				    
+				    p.setOldMean(oldMean);
 				}
 			}
 			inLine = fileIn.readLine();
 		}
 		return surface;
-	}
-	
-	/** returnerar värdet snitt som en sträng i önskvärt format */
-	private String getMean(double snitt, String heltal, String decimaltal, boolean dot, boolean diff) {
-	    String medel;
-	    String separator;
-	    if(dot) {
-	        separator = ".";
-	    } else {
-	        separator = ",";
-	    }
-		if(snitt != 0.00 | diff) {
-			if(decimaltal.length() > 2) {
-				if(Integer.parseInt(decimaltal.substring(2,3)) >= 5) {
-					if(Integer.parseInt(decimaltal.substring(0,2)) == 99) {
-						medel = (Integer.parseInt(heltal) + 1) + separator + "00";
-					} else if(Integer.parseInt(decimaltal.substring(1,2)) == 9) {
-						medel = heltal + separator + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
-					} else {
-						medel = heltal + separator + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
-					}
-				} else {
-					medel = heltal + separator + decimaltal.substring(0,2);
-				}
-			} else if(decimaltal.length() > 1) {
-				medel = heltal + separator + decimaltal.substring(0,2);
-			} else {
-				medel = heltal + separator + decimaltal.substring(0,1) + "0";
-			}
-		} else {
-			medel = "-";
-		}
-		return medel;
 	}
 	
 	/** tar reda på vilken färg snittet snitt skall ha utifrån underlaget surface */
@@ -468,31 +422,26 @@ public class Snitt {
 		public int compare(Object lhs, Object rhs) {
 			Person left = (Person) lhs;
 			Person right = (Person) rhs;
-			Object[] leftCompareBy = new Object[6];
-			Object[] rightCompareBy = new Object[6];
+			Object[] leftCompareBy = new Object[SnittData.NBR_HEADERS];
+			Object[] rightCompareBy = new Object[SnittData.NBR_HEADERS];
 			
 			leftCompareBy[NAME] = left.getName();
 			leftCompareBy[CLUB] = left.getClub();
 			leftCompareBy[COMPS] = new Integer(left.getComps());
 			leftCompareBy[ROUNDS] = new Integer(left.getRounds());
 			leftCompareBy[HITSUM] = new Integer(left.getHits());
+			leftCompareBy[MEAN] = new Integer((int) (left.getMean() * 100000));
+			leftCompareBy[EX_MEAN] = new Integer((int) (left.getOldMean() * 100));
+			leftCompareBy[CHANGE] = new Integer((int) (left.getDiff() * 100));
 			rightCompareBy[NAME] = right.getName();
 			rightCompareBy[CLUB] = right.getClub();
 			rightCompareBy[COMPS] = new Integer(right.getComps());
 			rightCompareBy[ROUNDS] = new Integer(right.getRounds());
 			rightCompareBy[HITSUM] = new Integer(right.getHits());
-			if(((Integer)rightCompareBy[ROUNDS]).intValue() != 0) {
-				double rightMean = ((double)right.getHits()) / ((double)right.getRounds());
-				rightCompareBy[MEAN] = new Integer((int) (100000*rightMean));
-			} else {
-				rightCompareBy[MEAN] = new Integer(127 * 100000);
-			}
-			if(((Integer)leftCompareBy[ROUNDS]).intValue() != 0) {
-				double leftMean = ((double)left.getHits()) / ((double)left.getRounds());
-				leftCompareBy[MEAN] = new Integer((int) (100000*leftMean));
-			} else {
-				leftCompareBy[MEAN] = new Integer(127 * 100000);
-			}
+			rightCompareBy[MEAN] = new Integer((int) (right.getMean() * 100000));
+			rightCompareBy[EX_MEAN] = new Integer((int) (right.getOldMean() * 100));
+			rightCompareBy[CHANGE] = new Integer((int) (right.getDiff() * 100));
+			
 			IOHandler io = new IOHandler();
 			loadCompareBy(io);
 			for(int i = 0; i < compare[tabIndex].length; i++) {

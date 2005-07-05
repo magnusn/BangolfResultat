@@ -29,11 +29,9 @@ import datastruct.Filter;
  * CompareWindow - beskriver fönstret där man väljer fil att jämföra snittlistan med
  */
 public class CompareWindow extends JDialog {
-    private JFrame owner;			// fönstret som skapar detta fönster
     private SnittData snittData;	// håller reda på inställningarna
     private CompareWindow frame;	// detta fönster
     private int tabIndex;			// anger vilken snittlista det gäller
-    //private String[] files;			// innehåller filerna som valts
     private JTextField choosenFile; // visar vilken fil som är vald
     private JButton chooseButton;	// knapp för att välja fil
     private JButton acceptButton;	// sparar och stänger ner fönstret
@@ -45,7 +43,6 @@ public class CompareWindow extends JDialog {
         super(owner, "Välj fil att jämföra med", true);
         setResizable(false);
         this.frame = this;
-        this.owner = owner;
         this.tabIndex = tabIndex;
         this.snittData = snittData;
         
@@ -86,25 +83,6 @@ public class CompareWindow extends JDialog {
         setLocationRelativeTo(owner);
         setVisible(true);
     }
-    
-    
-    /** visar fönstret efter vilken snittlistetab som är vald */
-    /*public void show(int tabIndex) {
-        this.tabIndex = tabIndex;
-        choosenFile.setText(files[tabIndex]);
-        
-    }*/
-    
-    /** talar om ifall en jämförelsefil är vald för snittlistan
-     *  som representeras av tabIndex */
-    /*protected static String getCompareFile(int tabIndex) {
-        //this.tabIndex = tabIndex;
-        if(files[tabIndex].equals("") || files[tabIndex] == null) {
-            return null;
-        } else {
-            return files[tabIndex];
-        }
-    }*/
     
     /** klassen som tar hand om knapptryckningarna vid val av utseende */
 	class ButtonHandler implements ActionListener {

@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.swing.JCheckBox;
 
 import datastruct.IOHandler;
+import datastruct.Person;
 
 /**
  * SnittData - beskriver inställningarna för snittlistorna
@@ -19,7 +20,7 @@ public class SnittData {
     private JCheckBox[][] headers;	// talar om vad som skall visas i snittlistan
     private String[] files;			// innehåller adresser till jämförelsefilerna
     private int nbrTabs;			// anger antal olika snittlistor
-    private int nbrHeaders = 8;		// antal möjliga rubriker
+    protected static final int NBR_HEADERS = 8;	// antal möjliga rubriker
     
     /** skapar en klass för snittlistornas inställningar */
     protected SnittData(int nbrTabs) {
@@ -32,7 +33,7 @@ public class SnittData {
         try {
             headers = (JCheckBox[][]) io.load("snittapp");
             if(headers.length != nbrTabs) {
-                JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][nbrHeaders];
+                JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][NBR_HEADERS];
                 for(int i = 0; i < nbrTabs; i++) {
                     tempHeaders[i][Snitt.NAME] = new JCheckBox("Namn", true);
                     tempHeaders[i][Snitt.NAME].setEnabled(false);
@@ -43,7 +44,7 @@ public class SnittData {
                     tempHeaders[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
                     tempHeaders[i][Snitt.MEAN].setEnabled(false);
                     tempHeaders[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-                    tempHeaders[i][Snitt.CHANGE] = new JCheckBox("Förändring");
+                    tempHeaders[i][Snitt.CHANGE] = new JCheckBox("+/-");
                 }
                 for(int i = 0; i < headers.length; i++) {
                     tempHeaders[i] = headers[i];
@@ -52,7 +53,7 @@ public class SnittData {
             }
             return true;
         } catch (Exception e) {
-            headers = new JCheckBox[nbrTabs][nbrHeaders];
+            headers = new JCheckBox[nbrTabs][NBR_HEADERS];
             for(int i = 0; i < nbrTabs; i++) {
                 headers[i][Snitt.NAME] = new JCheckBox("Namn", true);
                 headers[i][Snitt.NAME].setEnabled(false);
@@ -63,7 +64,7 @@ public class SnittData {
                 headers[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
                 headers[i][Snitt.MEAN].setEnabled(false);
                 headers[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-                headers[i][Snitt.CHANGE] = new JCheckBox("Förändring");
+                headers[i][Snitt.CHANGE] = new JCheckBox("+/-");
             }
         }
         return false;
@@ -95,7 +96,6 @@ public class SnittData {
             }
             return true;
         } catch (Exception e) {
-            
             files = new String[nbrTabs];
             for(int i = 0; i < nbrTabs; i++) {
                 files[i] = new String();
@@ -135,11 +135,63 @@ public class SnittData {
     
     /** sätter adressen fileName för jämförelsefilen till snittlisefliken tabIndex */
     protected void setCompareFile(String fileName, int tabIndex) {
-        files[tabIndex] = fileName;
+        if(!fileName.equals(files[tabIndex])) {
+            files[tabIndex] = fileName;
+            initAppearanceHeaders(tabIndex);
+        }
     }
     
-    /** returnerar antal möjliga rubriker */
-    protected int getNbrHeaders() {
-        return nbrHeaders;
+    /** ställer automatiskt in utseendet efter att jämförelsefilen har ändrats */
+    private void initAppearanceHeaders(int tabIndex) {
+        if(getCompareFile(tabIndex) != null) {
+            headers[tabIndex][Snitt.EX_MEAN].setEnabled(true);
+            headers[tabIndex][Snitt.CHANGE].setEnabled(true);
+            headers[tabIndex][Snitt.EX_MEAN].setSelected(true);
+            headers[tabIndex][Snitt.CHANGE].setSelected(true);
+            headers[tabIndex][Snitt.EX_MEAN].setToolTipText(null);
+            headers[tabIndex][Snitt.CHANGE].setToolTipText(null);
+        } else {
+            headers[tabIndex][Snitt.EX_MEAN].setEnabled(false);
+            headers[tabIndex][Snitt.CHANGE].setEnabled(false);
+            headers[tabIndex][Snitt.EX_MEAN].setSelected(false);
+            headers[tabIndex][Snitt.CHANGE].setSelected(false);
+            headers[tabIndex][Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
+            headers[tabIndex][Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
+        }
     }
+    
+    /** returnerar värdet value med två decimaler i form av en sträng, 
+	 *  heltal anger heltalssiffrorna, decimaltal anger decimaltalssiffrorna
+	 *  och om dot är true blir det en punkt emellan annars kommatecken */
+	public static String getValueWithTwoDecimals(double value, String heltal, String decimaltal, boolean dot) {
+	    String valueAsString;
+	    String separator;
+	    if(dot) {
+	        separator = ".";
+	    } else {
+	        separator = ",";
+	    }
+		if(value != Person.NO_VALUE) {
+			if(decimaltal.length() > 2) {
+				if(Integer.parseInt(decimaltal.substring(2,3)) >= 5) {
+					if(Integer.parseInt(decimaltal.substring(0,2)) == 99) {
+						valueAsString = (Integer.parseInt(heltal) + 1) + separator + "00";
+					} else if(Integer.parseInt(decimaltal.substring(1,2)) == 9) {
+						valueAsString = heltal + separator + (Integer.parseInt(decimaltal.substring(0,1)) + 1) + "0";
+					} else {
+						valueAsString = heltal + separator + decimaltal.substring(0,1) + (Integer.parseInt(decimaltal.substring(1,2))+1);
+					}
+				} else {
+					valueAsString = heltal + separator + decimaltal.substring(0,2);
+				}
+			} else if(decimaltal.length() > 1) {
+				valueAsString = heltal + separator + decimaltal.substring(0,2);
+			} else {
+				valueAsString = heltal + separator + decimaltal.substring(0,1) + "0";
+			}
+		} else {
+			valueAsString = "-";
+		}
+		return valueAsString;
+	}
 }

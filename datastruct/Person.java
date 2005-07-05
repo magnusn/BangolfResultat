@@ -1,11 +1,18 @@
 package datastruct;
+
+import java.util.StringTokenizer;
+
+import snitt.SnittData;
+
 /** beskriver tävlingsinformation för en person */
 public class Person {
 	private String name,club;		// namn och klubb
 	private int idNbr;				// programmets identifikationsnummer för personen
 	private int comps,rounds,hits;	// antal tävlingar, varv och slag
 	private double oldMean;			// fjolårssnitt
-	public static final double NO_OLD_MEAN = -1; // värde då inget fjolårssnitt är satt
+	private double diff;			// differensen mellan årets snitt och fjolårets
+	private double twoDecimalMean;	// snitt med två decimalers noggrannhet
+	public static final double NO_VALUE = 127; // då giltigt värde saknas
 	
 	/** skapar resultat för en person med namnet name och klubben club 
 			antal tävlingar comps, antal varv rounds och antal slag hits */
@@ -16,7 +23,9 @@ public class Person {
 		this.comps = comps;
 		this.rounds = rounds;
 		this.hits = hits;
-		this.oldMean = Person.NO_OLD_MEAN;
+		this.oldMean = Person.NO_VALUE;
+		this.diff = Person.NO_VALUE;
+		this.twoDecimalMean = Person.NO_VALUE;
 	}
 	
 	/** returnerar identifikationsnumret */
@@ -47,6 +56,15 @@ public class Person {
 	/** returnerar antalet slag */
 	public int getHits() {
 		return hits;
+	}
+	
+	/** returnerar snittet */
+	public double getMean() {
+	    if(rounds != 0) {
+			return (double)hits/(double)rounds;
+		} else {
+			return Person.NO_VALUE;
+		}
 	}
 	
 	/** ökar antalet tävlingar med 1 */
@@ -82,5 +100,25 @@ public class Person {
 	/** returnerar fjolårssnittet */
 	public double getOldMean() {
 	    return oldMean;
+	}
+	
+	/** sätter differensen mellan årets och fjolårets snitt till diff */
+	public void setDiff(double diff) {
+	    this.diff = diff;
+	}
+	
+	/** returnerar differensen mellan årets och fjolårets snitt */
+	public double getDiff() {
+	    return diff;
+	}
+	
+	/** returnerar snittet med två decimalers noggrannhet */
+	public double getTwoDecimalMean() {
+	    double mean = getMean();
+	    StringTokenizer str = new StringTokenizer(String.valueOf(mean), ".");
+        String heltal = str.nextToken();
+        String decimaltal = str.nextToken();
+        String meanValue = SnittData.getValueWithTwoDecimals(mean, heltal, decimaltal, true);
+	    return Double.parseDouble(meanValue);
 	}
 }

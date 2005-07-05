@@ -437,10 +437,10 @@ public class SnittWindow extends JFrame {
 			if(readOk) {
 				LinkedList list = snitt.sortMap();
 				try {
-				    JCheckBox[][] headerCheckBox = (JCheckBox[][]) io.load("snittapp");
-				    boolean[] headerList = new boolean[headerCheckBox[tabIndex].length];
-				    for(int i = 0; i < headerCheckBox[tabIndex].length; i++) {
-				        headerList[i] = headerCheckBox[tabIndex][i].isSelected();
+				    JCheckBox[] headerCheckBox = snittData.getAppearanceHeaders(tabIndex);
+				    boolean[] headerList = new boolean[headerCheckBox.length];
+				    for(int i = 0; i < headerCheckBox.length; i++) {
+				        headerList[i] = headerCheckBox[i].isSelected();
 				    }
 					snitt.outputToHTML(list, surface, compareSurface, headerList);
 					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
