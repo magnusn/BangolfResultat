@@ -26,7 +26,7 @@ class KlassWindow extends JFrame {
 	private JMenuItem addKlass, removeKlass, quit;	// menyalternativ för att lägga till eller ta bort klasser samt avsluta
 	
 	/** skapar fönstret för klasshantering */
-	public KlassWindow() {
+	public KlassWindow(JFrame owner) {
 		super("Klasshanteraren");
 		frame = this;
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -67,6 +67,7 @@ class KlassWindow extends JFrame {
 		frame.addWindowListener(winHand);
 		frame.getContentPane().add(klass);
 		frame.pack();
+		frame.setLocationRelativeTo(owner);
 		frame.setVisible(true);
 	}
 	

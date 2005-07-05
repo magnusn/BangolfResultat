@@ -32,7 +32,7 @@ import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
-    private CompareWindow compareWindow;	// fönster för att välja snittlista att jämföra med
+    private SnittData snittData;			// lagrar inställningarna för snittlistorna
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
 	private JFrame frame;					// snittlistsfönstret
@@ -52,7 +52,7 @@ public class SnittWindow extends JFrame {
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	
 	/** skapar snitthanterarfönstret */
-	public SnittWindow(HashMap personNameTracker) {
+	public SnittWindow(JFrame owner, HashMap personNameTracker) {
 		super("Snittlistshanteraren");
 		frame = this;
 		this.personNameTracker = personNameTracker;
@@ -145,9 +145,18 @@ public class SnittWindow extends JFrame {
 		
 		getContentPane().add(tab);
 		pack();
+		setLocationRelativeTo(owner);
 		setVisible(true);
 		
-		compareWindow = new CompareWindow(frame, tab.getTabCount());
+		snittData = new SnittData(tab.getTabCount());
+		if(!snittData.readAppearanceSettings()) {
+		    JOptionPane.showMessageDialog(frame, "Föregående inställningar för snittlistans utseende gick ej" +
+		    		" att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		if(!snittData.readCompareFiles()) {
+		    JOptionPane.showMessageDialog(frame, "Jämförelsefilernas adresser kunde ej läsas in",
+		            "Varning", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	/** klassen som tar hand om knapptryckningarna i menyn */
@@ -308,7 +317,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att ställa in snittlistans utseende */
 			else if(e.getSource() == appearance) {
-			    new AppearanceWindow(frame, tab.getSelectedIndex(), tab.getTabCount()).setVisible(true);
+			    new AppearanceWindow(frame, tab.getSelectedIndex(), snittData);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
@@ -316,7 +325,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
-			    compareWindow.show(tab.getSelectedIndex());
+			    new CompareWindow(frame, tab.getSelectedIndex(), snittData);
 			}
 			/** tar fram antal starter i de olika klasserna */
 			else if(e.getSource() == classStarts) {
@@ -409,7 +418,7 @@ public class SnittWindow extends JFrame {
 				readOk = false;
 			}
 			if(readOk) {
-			    String compareFile = CompareWindow.getCompareFile(tab.getSelectedIndex());
+			    String compareFile = snittData.getCompareFile(tab.getSelectedIndex());
 			    if(compareFile != null) {
 			        try {
 			            File file = new File(compareFile);
@@ -502,6 +511,15 @@ public class SnittWindow extends JFrame {
 	
 	/** sköter om nedstängandet av snitthanterarfönstret */
 	public void exit() {
+	    if(!snittData.saveCompareFiles()) {
+	        JOptionPane.showMessageDialog(frame, "Inställningarna för jämförelsefilerna gick ej att spara",
+	                "Varning", JOptionPane.ERROR_MESSAGE);
+	    }
+	    if(!snittData.saveAppearanceSettings()) {
+	        JOptionPane.showMessageDialog(frame, "Utseendeinställningarna gick ej att spara",
+	                "Varning", JOptionPane.ERROR_MESSAGE);
+	    }
+	    
 		Vector[] v = new Vector[8];
 		for(int i = 0; i < snittList.length; i++) {
 			v[i*2] = snittList[i].getSelection();

@@ -591,8 +591,7 @@ public class SearchWindow {
 			else if(e.getSource() == klassStart) {
 				if(!KLASSOPEN) {
 					KLASSOPEN = true;
-					klassWindow = new KlassWindow();
-					klassWindow.setLocationRelativeTo(frame);
+					klassWindow = new KlassWindow(frame);
 				} else {
 					klassWindow.setVisible(true);
 				}
@@ -600,8 +599,7 @@ public class SearchWindow {
 			else if(e.getSource() == snittStart) {
 				if(!SNITTOPEN) {
 					SNITTOPEN = true;
-					snittWindow = new SnittWindow(personNameTracker);
-					snittWindow.setLocationRelativeTo(frame);
+					snittWindow = new SnittWindow(frame, personNameTracker);
 				} else {
 					snittWindow.setVisible(true);
 				}
