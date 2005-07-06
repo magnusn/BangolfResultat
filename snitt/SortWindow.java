@@ -25,6 +25,7 @@ public class SortWindow extends JDialog {
 	private HashMap map;			// håller reda på vilket sorteringsalternativ som tillhör en viss siffra
 	private Vector[] v;				// har koll på hur listorna skall sorteras
 	private int tabIndex;			// anger vilken flik som är vald i snitthanterarfönstret
+	private int nbrTabs;			// antal olika flikar med snittlistor
 	private JDialog compareDialog;	// sorteringsfönstret
 	private ListPanel compare;		// panelen där man kan välja hur snittlistan skall sorteras
 	private IOHandler io;			// sköter skrivning till filer och inläsning från filer
@@ -36,6 +37,7 @@ public class SortWindow extends JDialog {
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		compareDialog = this;
 		this.tabIndex = tabIndex;
+		this.nbrTabs = nbrTabs;
 		
 		io = new IOHandler();
 		map = new HashMap();
@@ -46,12 +48,13 @@ public class SortWindow extends JDialog {
 		map.put("Slag", new Integer(Snitt.HITSUM));
 		map.put("Snitt", new Integer(Snitt.MEAN));
 		map.put("Snitt ifjol", new Integer(Snitt.EX_MEAN));
-		map.put("Förändring", new Integer(Snitt.CHANGE));
+		map.put("+/-", new Integer(Snitt.CHANGE));
 		try {
 			v = io.readFileList("compare", nbrTabs*2);
 			compare = new ListPanel(v[tabIndex*2], v[tabIndex*2 + 1]);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(compareDialog, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(owner, "Inläsningen av sorteringslistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			v = new Vector[nbrTabs*2];
 			Vector v1 = new Vector();
 			Vector v2 = new Vector();
 			v1.add("Namn");
@@ -61,7 +64,11 @@ public class SortWindow extends JDialog {
 			v2.add("Varv");
 			v1.add("Slag");
 			v1.add("Snitt ifjol");
-			v1.add("Förändring");
+			v1.add("+/-");
+			for(int i = 0; i < nbrTabs; i++) {
+			    v[i*2] = v1;
+			    v[i*2+1] = v2;
+			}
 			compare = new ListPanel(v1, v2);
 		}
 		
@@ -109,21 +116,32 @@ public class SortWindow extends JDialog {
 		v[tabIndex*2] = compare.getSelection();
 		v[tabIndex*2 + 1] = compare.getSelected();
 		String[] s = new String[v[tabIndex*2 + 1].size()];
+		int[][] compareBy;
 		try {
-		    int[][] compareBy = (int[][]) io.load("compareby");
+		    compareBy = (int[][]) io.load("compareby");
 		    compareBy[tabIndex] = new int[s.length];
 		    for(int i = 0; i < s.length; i++) {
 				s[i] = (String)v[tabIndex*2 + 1].get(i);
 				compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
 			}
-			try {
-				io.writeFileList("compare", v);
-				io.save("compareby", compareBy);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(compareDialog, "Sparandet av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-			}
 		} catch (Exception e) {
+		    compareBy = new int[nbrTabs][2];
+		    for(int i = 0; i < compareBy[tabIndex].length; i++) {
+		        compareBy[i][0] = Snitt.MEAN;
+		        compareBy[i][1] = Snitt.ROUNDS;
+		    }
 		    JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		try {
+		    io.save("compareby", compareBy);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(compareDialog, "Sparandet av sorteringsordning misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		try {
+			io.writeFileList("compare", v);
+		} catch (Exception e) {
+		    e.printStackTrace();
+			JOptionPane.showMessageDialog(compareDialog, "Sparandet av sorteringslistorna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		compareDialog.dispose();
