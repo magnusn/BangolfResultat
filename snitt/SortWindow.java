@@ -11,7 +11,6 @@ import javax.swing.JMenuBar;
 
 import datastruct.IOHandler;
 
-
 import java.util.HashMap;
 import java.util.Vector;
 import java.awt.event.ActionListener;
@@ -23,7 +22,7 @@ import java.awt.event.KeyEvent;
 /** klassen som beskriver fönstret där man bestämmer sorteringsordningen */
 public class SortWindow extends JDialog {
 	private HashMap map;			// håller reda på vilket sorteringsalternativ som tillhör en viss siffra
-	private Vector[] v;				// har koll på hur listorna skall sorteras
+	private Vector[] sortVector;	// har koll på hur listorna skall sorteras
 	private int tabIndex;			// anger vilken flik som är vald i snitthanterarfönstret
 	private int nbrTabs;			// antal olika flikar med snittlistor
 	private JDialog compareDialog;	// sorteringsfönstret
@@ -31,7 +30,7 @@ public class SortWindow extends JDialog {
 	private IOHandler io;			// sköter skrivning till filer och inläsning från filer
 	private JMenuItem quit;			// menyalternativ för att avsluta
 	
-	/** skapar fönstret för klasshantering */
+	/** skapar fönstret för att sköta sorteringen av snittlistan */
 	public SortWindow(JFrame owner, int tabIndex, int nbrTabs) {
 		super(owner, "Sorteraren", true);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -50,26 +49,32 @@ public class SortWindow extends JDialog {
 		map.put("Snitt ifjol", new Integer(Snitt.EX_MEAN));
 		map.put("+/-", new Integer(Snitt.CHANGE));
 		try {
-			v = io.readFileList("compare", nbrTabs*2);
-			compare = new ListPanel(v[tabIndex*2], v[tabIndex*2 + 1]);
+			sortVector = io.readFileList("compare", nbrTabs*2);
+			if(sortVector.length != nbrTabs*2) {
+			    Vector[] tempVector = new Vector[nbrTabs*2];
+			    Vector selectionVector = getSelectionStartVector();
+				Vector selectedVector = getSelectedStartVector();
+			    for(int i = 0; i < nbrTabs; i++) {
+			        tempVector[i*2] = selectionVector;
+			        tempVector[i*2+1] = selectedVector;
+			    }
+			    for(int i = 0; i < sortVector.length; i++) {
+			        tempVector[i] = sortVector[i];
+			    }
+			    sortVector = tempVector;
+			}
+			compare = new ListPanel(sortVector[tabIndex*2], sortVector[tabIndex*2 + 1]);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(owner, "Inläsningen av sorteringslistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-			v = new Vector[nbrTabs*2];
-			Vector v1 = new Vector();
-			Vector v2 = new Vector();
-			v1.add("Namn");
-			v1.add("Klubb");
-			v1.add("Tävlingar");
-			v2.add("Snitt");
-			v2.add("Varv");
-			v1.add("Slag");
-			v1.add("Snitt ifjol");
-			v1.add("+/-");
+			sortVector = new Vector[nbrTabs*2];
+			
+			Vector selectionVector = getSelectionStartVector();
+			Vector selectedVector = getSelectedStartVector();
 			for(int i = 0; i < nbrTabs; i++) {
-			    v[i*2] = v1;
-			    v[i*2+1] = v2;
+			    sortVector[i*2] = selectionVector;
+			    sortVector[i*2+1] = selectedVector;
 			}
-			compare = new ListPanel(v1, v2);
+			compare = new ListPanel(selectionVector, selectedVector);
 		}
 		
 		compare.setSelectionText("Ej inkluderade i sorteringen:");
@@ -93,6 +98,26 @@ public class SortWindow extends JDialog {
 		compareDialog.setVisible(true);
 	}
 	
+	/** returnerar standardinställningens vektor för det valbara fältet */
+	private Vector getSelectionStartVector() {
+	    Vector vector = new Vector();
+		vector.add("Namn");
+		vector.add("Klubb");
+		vector.add("Tävlingar");
+		vector.add("Slag");
+		vector.add("Snitt ifjol");
+		vector.add("+/-");
+		return vector;
+	}
+	
+	/** returnerar standardinställningens vektor för det valda fältet */
+	private Vector getSelectedStartVector() {
+	    Vector vector = new Vector();
+		vector.add("Snitt");
+		vector.add("Varv");
+		return vector;
+	}
+	
 	/** klassen som tar hand om knapptryckningarna i menyn */
 	class MenuHandler implements ActionListener {
 		/** kollar vilket menyalternativ som valts */
@@ -113,15 +138,15 @@ public class SortWindow extends JDialog {
 	
 	/** stänger ned fönstret efter att data sparats undan */
 	public void exit() {
-		v[tabIndex*2] = compare.getSelection();
-		v[tabIndex*2 + 1] = compare.getSelected();
-		String[] s = new String[v[tabIndex*2 + 1].size()];
+		sortVector[tabIndex*2] = compare.getSelection();
+		sortVector[tabIndex*2 + 1] = compare.getSelected();
+		String[] s = new String[sortVector[tabIndex*2 + 1].size()];
 		int[][] compareBy;
 		try {
 		    compareBy = (int[][]) io.load("compareby");
 		    compareBy[tabIndex] = new int[s.length];
 		    for(int i = 0; i < s.length; i++) {
-				s[i] = (String)v[tabIndex*2 + 1].get(i);
+				s[i] = (String)sortVector[tabIndex*2 + 1].get(i);
 				compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
 			}
 		} catch (Exception e) {
@@ -138,7 +163,7 @@ public class SortWindow extends JDialog {
 			JOptionPane.showMessageDialog(compareDialog, "Sparandet av sorteringsordning misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
-			io.writeFileList("compare", v);
+			io.writeFileList("compare", sortVector);
 		} catch (Exception e) {
 		    e.printStackTrace();
 			JOptionPane.showMessageDialog(compareDialog, "Sparandet av sorteringslistorna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
