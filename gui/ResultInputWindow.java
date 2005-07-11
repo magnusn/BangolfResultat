@@ -10,6 +10,7 @@ import javax.swing.JComboBox;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -25,7 +26,7 @@ import datastruct.ResultList;
 
 /** klassen som beskriver indatafönstret och resultatinmatningsfönstret */
 class ResultInputWindow {
-	private HashMap startNbrMap, licenseMap;// startnummer och licensnummer mappar för att undvika dubletter
+	private HashMap startNbrMap, licenseMap;// startnummer- och licensnummermappar för att undvika dubletter
 	private HashMap licenseIDMap;			// håller reda på vilket id licensnumret tillhör
 	private HashMap personTracker;			// har koll på personernas identifikationsnummer
 	private HashMap personNameTracker;		// används för att få fram personernas namn utifrån id
@@ -61,6 +62,12 @@ class ResultInputWindow {
 		try {
 			licenseMap = (HashMap) io.load("licensemap");
 			licenseIDMap = (HashMap) io.load("licensenamemap");
+			if(!licenseMap.isEmpty()) {
+			    LinkedList list = new LinkedList(licenseMap.values());
+			    if(list.getFirst() instanceof Integer) {
+			        throw new Exception("Gammalt licensnummerformat, nytt register skapas");
+			    }
+			}
 		} catch (Exception e) {
 			licenseMap = new HashMap();
 			licenseIDMap = new HashMap();
@@ -164,14 +171,15 @@ class ResultInputWindow {
 		inputPanel.add(inputCancel);
 		inputPanel.add(inputErase);
 		inputPanel.add(inputRemove);
+		/*
 		if(firstTime) {
 			RESULTLIST = new ResultList(nbrRounds, surface, boxData);
 			BOARD = new ScoreBoardWindow(RESULTLIST);
-			frame.getContentPane().add(searchPanel, BorderLayout.WEST);
-			frame.getContentPane().add(BOARD.getScrollPane(), BorderLayout.CENTER);
-			frame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
+			//frame.getContentPane().add(searchPanel, BorderLayout.WEST); TODO skall bara göras en gång och ta bort firstTime!
+			//frame.getContentPane().add(BOARD.getScrollPane(), BorderLayout.CENTER);
+			//frame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 			firstTime = false;
-		} else if(init) {
+		}*/ if(init) {
 			BOARD.setup(RESULTLIST);
 		} else {
 			RESULTLIST = new ResultList(nbrRounds, surface, boxData);

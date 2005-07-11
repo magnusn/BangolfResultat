@@ -2,6 +2,7 @@ package gui;
 
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -296,6 +297,7 @@ public class SearchWindow {
 		resultInput = new ResultInputWindow(frame, searchPanel, statusPanel, resBar, personTracker, personNameTracker);
 		lapSumDialog = new LapSumDialog(frame);
 		compInfoDialog = new CompInfoDialog(frame, lapSumDialog, resultInput);
+		compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
 		inputNameLabel = resultInput.getNameLabel();
 		
 		fileChooser = new JFileChooser();
@@ -312,6 +314,23 @@ public class SearchWindow {
 			DIRSNITT = null;
 			DIRJMF = null;
 		}
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(760,406));
+		frame.getContentPane().add(searchPanel, BorderLayout.WEST);
+		//frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		frame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
+		
+		ResultInputWindow.RESULTLIST = new ResultList(2, 0, new boolean[]{false, false});
+		ResultInputWindow.BOARD = new ScoreBoardWindow(ResultInputWindow.RESULTLIST);
+		// TODO fixa så att det startas upp på bra sätt!
+		frame.getContentPane().add(ResultInputWindow.BOARD.getScrollPane(), BorderLayout.CENTER);
+		resultInput.setupResultInputPanel(false, new boolean[]{false, false}, 2, 0);
+		lapSumDialog.setNbrRounds(2);
+		lapSumDialog.setEditData(new boolean[2-1]);
+		
+		frame.pack();
+		frame.setVisible(true);
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */
@@ -551,9 +570,10 @@ public class SearchWindow {
 					}
 				}
 				if(!CHANGE || val == JOptionPane.NO_OPTION) {
+				    /*
 					if(compInfoDialog.getWindowListeners().length==0) {
 						compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
-					}
+					}*/ // TODO
 					compInfoDialog.setLocationRelativeTo(frame);
 					compInfoDialog.setVisible(true);
 					if(!compInfoDialogClosed) {
