@@ -67,8 +67,6 @@ public class CompInfoDialog extends JDialog {
 		varvPanel.add(varvButton);
 		this.getContentPane().add(varvPanel);
 		this.pack();
-		//this.setLocationRelativeTo(owner); TODO
-		//this.setVisible(true);
 	}
 	
 	/** tar hand om indatan från tävlingsinställningarna */
@@ -88,8 +86,7 @@ public class CompInfoDialog extends JDialog {
 		
 		mainWindow.setupResultInputPanel(false, boxData, nbrRounds, surface);
 		this.setVisible(false);
-		owner.pack(); //TODO
-		//owner.setVisible(true);
+		owner.pack();
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */

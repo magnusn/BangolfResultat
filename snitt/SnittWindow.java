@@ -11,13 +11,16 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JFileChooser;
+import javax.swing.JTextField;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedList;
+import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -37,6 +40,7 @@ public class SnittWindow extends JFrame {
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
 	private JFrame frame;					// snittlistsfönstret
 	private JTabbedPane tab;				// tab för de olika snitthanterarpanelerna
+	private JTextField messageField;		// informationsfält
 	private ListPanel[] snittList;			// filt, eb, betong, blandad;
 	private JFileChooser fileChooser;		// filväljare
 	private IOHandler io;					// sköter in- och utdata
@@ -143,7 +147,11 @@ public class SnittWindow extends JFrame {
 		tab.addTab("Betong", snittList[2]);
 		tab.addTab("Blandad", snittList[3]);
 		
-		getContentPane().add(tab);
+		messageField = new JTextField();
+		messageField.setEditable(false);
+		messageField.setFocusable(false);
+		getContentPane().add(tab, BorderLayout.CENTER);
+		getContentPane().add(messageField, BorderLayout.SOUTH);
 		pack();
 		setLocationRelativeTo(owner);
 		setVisible(true);
@@ -157,6 +165,19 @@ public class SnittWindow extends JFrame {
 		    JOptionPane.showMessageDialog(frame, "Jämförelsefilernas adresser kunde ej läsas in",
 		            "Varning", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	
+	/**
+	 * visar meddelandet message
+	 * @param message - meddelandet som visas längst ner i snittlistsfönstret
+	 */
+	private void setMessage(String message) {
+	    long currentTime = System.currentTimeMillis();
+	    Date date = new Date(currentTime);
+	    String time = date.toString();
+	    time = time.substring(time.indexOf(":") - 2, time.lastIndexOf(":") + 3);
+	    messageField.setText(time + " " + message);
 	}
 	
 	/** klassen som tar hand om knapptryckningarna i menyn */
@@ -443,7 +464,7 @@ public class SnittWindow extends JFrame {
 				        headerList[i] = headerCheckBox[i].isSelected();
 				    }
 					snitt.outputToHTML(list, surface, compareSurface, headerList);
-					JOptionPane.showMessageDialog(frame, "Snittlistan är sparad som webbsida.");
+					setMessage("Snittlistan är sparad som webbsida.");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
@@ -493,7 +514,7 @@ public class SnittWindow extends JFrame {
 				LinkedList list = snitt.sortMap();
 				try {
 					snitt.outputToCompareFile(list, surface);
-					JOptionPane.showMessageDialog(frame, "Jämförelselistan är sparad.");
+					setMessage("Jämförelselistan är sparad.");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}

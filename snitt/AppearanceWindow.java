@@ -39,7 +39,7 @@ public class AppearanceWindow extends JDialog {
         }
         
         ButtonHandler buttonHand = new ButtonHandler();
-        acceptButton = new JButton("Verkställ");
+        acceptButton = new JButton("Ok");
         acceptButton.addActionListener(buttonHand);
         getContentPane().add(acceptButton);
         

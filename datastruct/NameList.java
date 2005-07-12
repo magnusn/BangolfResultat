@@ -20,8 +20,22 @@ public class NameList {
 		map = new HashMap();
 	}
 	
+	/** 
+	 * @param name - namnet på personen
+	 * @param club - klubben som personen spelar för
+	 * @return true om personen finns med i listan
+	 */
+	public boolean containsPerson(String name, String club) {
+	    String identity = name+", "+club;
+	    if(map.containsKey(identity)) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+	
 	/** lägger till en person med namnet name och klubben club i listan, 
-			returnerar true om personen inte finns i listan och annars false */
+		returnerar true om personen inte finns i listan och annars false */
 	public boolean add(String name, String club) {
 		String identity = name+", "+club;
 		if(!map.containsKey(identity)) {
@@ -33,7 +47,7 @@ public class NameList {
 	}
 	
 	/** tar bort en person med namnet name och klubben club från listan,
-			returnerar true om personen finns i listan och annars false */
+		returnerar true om personen finns i listan och annars false */
 	public boolean remove(String name, String club) {
 		String identity = name+", "+club;
 		if(map.containsKey(identity)) {

@@ -2,7 +2,6 @@ package gui;
 
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -65,12 +64,14 @@ public class SearchWindow {
 	public static boolean SNITTOPEN, KLASSOPEN;	// talar om ifall motsvarande fönster är öppet
 	private boolean warningHTM;					// varnar för att inte skriva till ej önskvärd fil
 	private boolean compInfoDialogClosed;		// talar om ifall indatafönstret har stängts ner utan användande av knappen Ok
+	private boolean competitionOpened;			// true om någon tävling har öppnats
 	public static boolean CHANGE;				// håller reda på om ändringar har skett som bör sparas
 	public static Image ICON;					// programmets ikon
 	private KlassWindow klassWindow;			// klasshanterarfönstret
 	private SnittWindow snittWindow;			// snittlistshanterarfönstret
 	private String compHeader, fileNameSKV, fileNameHTM;// tävlingsrubrik, filnamn för SKV- och HTML-filerna
 	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för olika filtyper
+	public static final int DUMMY_STARTUP = 0;	// antal varv som anges vid "dum"-starten
 	
 	/** skapar huvudfönstret */
 	public SearchWindow() {
@@ -98,6 +99,7 @@ public class SearchWindow {
 		fileNameHTM = null;
 		warningHTM = false;
 		CHANGE = false;
+		competitionOpened = false;
 		
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		WindowHandler window = new WindowHandler();
@@ -216,15 +218,21 @@ public class SearchWindow {
 		openFromSKV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		saveToSKV = new JMenuItem("Spara tävling", KeyEvent.VK_S);
 		saveToSKV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		saveToSKV.setEnabled(false);
 		saveAsSKV = new JMenuItem("Spara tävling som...", KeyEvent.VK_M);
+		saveAsSKV.setEnabled(false);
 		saveToHTML = new JMenuItem("Skapa webbsida", KeyEvent.VK_W);
 		saveToHTML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		saveToHTML.setEnabled(false);
 		saveAsHTML = new JMenuItem("Skapa webbsida som...", KeyEvent.VK_B);
+		saveAsHTML.setEnabled(false);
 		quit = new JMenuItem("Avsluta", KeyEvent.VK_A);
 		headerItem = new JMenuItem("Ange tävlingens rubrik...", KeyEvent.VK_R);
 		headerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+		headerItem.setEnabled(false);
 		editItem = new JMenuItem("Delsummor och placering...", KeyEvent.VK_D);
 		editItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+		editItem.setEnabled(false);
 		klassStart = new JMenuItem("Hantera klasser...", KeyEvent.VK_H);
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		snittStart = new JMenuItem("Hantera snittlistan...", KeyEvent.VK_H);
@@ -284,7 +292,7 @@ public class SearchWindow {
 		
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BorderLayout());
-		MESSAGEFIELD = new JTextField("Ny tävling har öppnats.");
+		MESSAGEFIELD = new JTextField("Starta ny tävling genom att klicka på Arkiv -> Ny tävling...");
 		MESSAGEFIELD.setEditable(false);
 		MESSAGEFIELD.setFocusable(false);
 		STATUSFIELD = new JTextField();
@@ -298,7 +306,6 @@ public class SearchWindow {
 		lapSumDialog = new LapSumDialog(frame);
 		compInfoDialog = new CompInfoDialog(frame, this);
 		compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
-		inputNameLabel = resultInput.getNameLabel();
 		
 		fileChooser = new JFileChooser();
 		skvFilter = new Filter(new String[]{"skv"}, "Semikolonseparerad fil");
@@ -315,20 +322,31 @@ public class SearchWindow {
 			DIRJMF = null;
 		}
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setPreferredSize(new Dimension(760,406));
 		frame.getContentPane().add(searchPanel, BorderLayout.WEST);
-		//frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		frame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
-		
-		ResultInputWindow.RESULTLIST = new ResultList(2, 0, new boolean[]{false, false});
-		ResultInputWindow.BOARD = new ScoreBoardWindow(ResultInputWindow.RESULTLIST);
-		// TODO fixa så att det startas upp på bra sätt!
-		frame.getContentPane().add(ResultInputWindow.BOARD.getScrollPane(), BorderLayout.CENTER);
-		setupResultInputPanel(false, new boolean[]{false, false}, 2, 0);
-		
+		dummyStartUp();
 		frame.pack();
 		frame.setVisible(true);
+	}
+	
+	/** gör menyalternativen under Redigera och de olika alternativen för att spara tillgängliga */
+	private void enableDisabledMenus() {
+	    headerItem.setEnabled(true);
+		editItem.setEnabled(true);
+	    saveToSKV.setEnabled(true);
+		saveAsSKV.setEnabled(true);
+		saveToHTML.setEnabled(true);
+		saveAsHTML.setEnabled(true);
+		competitionOpened = true;
+	}
+	
+	/** öppnar en ny tävling bara för att få igång programmet korrekt */
+	private void dummyStartUp() {
+	    ResultInputWindow.RESULTLIST = new ResultList(2, 0, new boolean[]{false, false});
+		ResultInputWindow.BOARD = new ScoreBoardWindow(ResultInputWindow.RESULTLIST);
+		frame.getContentPane().add(ResultInputWindow.BOARD.getScrollPane(), BorderLayout.CENTER);
+		setupResultInputPanel(false, new boolean[]{false, false}, DUMMY_STARTUP, 0);
+		inputNameLabel = resultInput.getNameLabel();
 	}
 	
 	/** ställer in resultatinmatningsfönstret och fönstret för delsummor, init är true om 
@@ -337,8 +355,10 @@ public class SearchWindow {
 	 *  tävlingens underlag */
 	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
 	    resultInput.setupResultInputPanel(init, boxData, nbrRounds, surface);
-	    lapSumDialog.setNbrRounds(nbrRounds);
-		lapSumDialog.setEditData(new boolean[nbrRounds-1]);
+	    if(nbrRounds != DUMMY_STARTUP) {
+	        lapSumDialog.setNbrRounds(nbrRounds);
+	        lapSumDialog.setEditData(new boolean[nbrRounds-1]);
+	    }
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */
@@ -561,6 +581,7 @@ public class SearchWindow {
 							CHANGE = false;
 							STATUSFIELD.setText("");
 							MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
+							enableDisabledMenus();
 						} catch (Exception f) {
 							System.out.println(f);
 							JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
@@ -578,10 +599,6 @@ public class SearchWindow {
 					}
 				}
 				if(!CHANGE || val == JOptionPane.NO_OPTION) {
-				    /*
-					if(compInfoDialog.getWindowListeners().length==0) {
-						compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
-					}*/ // TODO
 					compInfoDialog.setLocationRelativeTo(frame);
 					compInfoDialog.setVisible(true);
 					if(!compInfoDialogClosed) {
@@ -594,6 +611,7 @@ public class SearchWindow {
 						MESSAGEFIELD.setText("Ny tävling har öppnats.");
 						ScoreBoardWindow.setHeader(compHeader);
 						inputNameLabel = resultInput.getNameLabel();
+						enableDisabledMenus();
 					} else {
 						compInfoDialogClosed = false;
 					}
@@ -816,13 +834,14 @@ public class SearchWindow {
 	private void setPopup(JButton b) {
 		searchField.selectAll();
 		searchField.requestFocus();
-		resultInput.setPopup(b);
+		resultInput.setPopup(b, competitionOpened);
 	}
 	
 	/** lägger till och tar bort personen från namnlistan, lägger till om add är true */
 	private void handlePlayer(boolean add) {
 		boolean done = false;
 		boolean visit = false;
+		int confirmValue =  JOptionPane.NO_OPTION;
 		String nameString = nameField.getText().trim();
 		String clubString = clubField.getText().trim();
 		if(!nameString.equals("") && !clubString.equals("")) {
@@ -834,9 +853,20 @@ public class SearchWindow {
 				name.sortedNames();
 				visit = true;
 			} else {
-				done = name.remove(nameString, clubString);
-				name.sortedNames();
-				visit = true;
+			    if(name.containsPerson(nameString, clubString)) {
+			        confirmValue = JOptionPane.showConfirmDialog(frame, "Är du säker på att du vill ta bort "
+			                + nameString + ", " + clubString + ", permanent?");
+			        if(confirmValue == JOptionPane.YES_OPTION) {
+			            done = name.remove(nameString, clubString);
+			            name.sortedNames();
+			            visit = true;
+			        } else if (confirmValue == JOptionPane.NO_OPTION) {
+			            nameField.setText("");
+			            clubField.setText("");
+			        }
+			    } else {
+			        visit = true;
+			    }
 			}
 		} else {
 			JOptionPane.showMessageDialog(frame, "Fälten måste innehålla mer än blanksteg!");
@@ -854,13 +884,13 @@ public class SearchWindow {
 			nameField.setText("");
 			clubField.setText("");
 		} else if(visit) {
-			if(!add) {
-				JOptionPane.showMessageDialog(frame, nameString + ", " + clubString + 
-				", gick inte att ta bort från sökningsfältet. Kolla så att rätt namn och klubb är angiven.");
-			} else {
-				JOptionPane.showMessageDialog(frame, nameString + ", " + clubString + 
-				", gick inte att lägga till i sökningsfältet. Kolla så att personen inte redan finns där.");
-			}
+		    if(!add) {
+		        JOptionPane.showMessageDialog(frame, nameString + ", " + clubString + 
+		        ", gick inte att ta bort från sökningsfältet. Kolla så att rätt namn och klubb är angiven.");		        
+		    } else {
+		        JOptionPane.showMessageDialog(frame, nameString + ", " + clubString + 
+		        ", gick inte att lägga till i sökningsfältet. Kolla så att personen inte redan finns där.");
+		    }
 		}
 	}
 	

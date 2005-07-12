@@ -7,7 +7,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,7 +44,6 @@ class ResultInputWindow {
 	private JButton inputOk,inputCancel,inputErase,inputRemove; // OK, avbryt, radera och ta bort är vad dessa knappar sköter om
 	private JLabel person;										// visar namnet på personen som valts vid resultatinmatningsfönstret
 	private JMenuBar bar;										// meny för att ändra namn och klubb
-	private boolean firstTime;									// anger om det är första gången som setupResultInputPanel() körs
 	private boolean[] boxData;									// talar om ifall startnummer och licensnummer har valts
 	
 	/** skapar indatafönstret och får in huvudfönstret mainFrame, sökpanelen searchPanel och fönstret för
@@ -72,7 +70,6 @@ class ResultInputWindow {
 			licenseMap = new HashMap();
 			licenseIDMap = new HashMap();
 		}
-		//firstTime = true; TODO ta bort?
 	}
 	
 	/** returnerar etiketten som visar spelarens namn vid inmatning av resultat */
@@ -88,145 +85,157 @@ class ResultInputWindow {
 	
 	/** skapar resultatinmatningsfönstret, init är true om ingen ny resultatlista behöver skapas */
 	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
-		this.boxData = boxData;
-		this.nbrRounds = nbrRounds;
-		this.surface = surface;
-		startNbrMap.clear();
-		inputPanel = new JPanel();
-		GridLayout gridLayout;
-		if(boxData[0] && boxData[1]) {
-		    gridLayout = new GridLayout(4+nbrRounds+2,2);
-		} else if(boxData[0] || boxData[1]) {
-		    gridLayout = new GridLayout(4+nbrRounds+1,2);
-		} else {
-		    gridLayout = new GridLayout(4+nbrRounds,2);
-		}
-		gridLayout.setHgap(2);
-		gridLayout.setVgap(2);
-		inputPanel.setLayout(gridLayout);
-		person = new JLabel();
-		JLabel[] varvLabel = new JLabel[nbrRounds];
-		varvResult = new JTextField[nbrRounds];
-		
-		try {
-			classes = (String[])io.load("klasstring");
-		} catch (Exception e) {
-			classes = new String[3];
-			classes[0] = "Klass 1";
-			classes[1] = "Klass 2";
-			classes[2] = "Klass 3";
-		}
-		klassChoice = new JComboBox(classes);
-		inputPanel.add(person);
-		inputPanel.add(klassChoice);
-		EnterKeyHandler enterHandler = new EnterKeyHandler();
-		JLabel startNrLabel = new JLabel("Startnummer:");
-		JLabel licenseNrLabel = new JLabel("Licensnummer:");
-		startNbrField = new JTextField();
-		licenseNbrField = new JTextField();
-		startNbrField.addKeyListener(enterHandler);
-		licenseNbrField.addKeyListener(enterHandler);
-		if(boxData[1]) {
-			inputPanel.add(licenseNrLabel);
-			inputPanel.add(licenseNbrField);
-		}
-		if(boxData[0]) {
-			inputPanel.add(startNrLabel);
-			inputPanel.add(startNbrField);
-		}
-		for(int i = 0; i < varvLabel.length; i++) {
-			varvLabel[i] = new JLabel("Varv " + (i+1) + ":");
-			varvResult[i] = new JTextField();
-			varvResult[i].addKeyListener(enterHandler);
-			inputPanel.add(varvLabel[i]);
-			inputPanel.add(varvResult[i]);
-		}
-		popup = new JDialog(frame, "Notera resultat", true);
-		popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		popup.setJMenuBar(bar);
-		
-		JLabel prioLabel = new JLabel("Ange prio vid behov:");
-		prio = new JTextField();
-		prio.addKeyListener(enterHandler);
-		inputOk = new JButton("Ok");
-		inputOk.setMnemonic(KeyEvent.VK_O);
-		inputErase = new JButton("Radera");
-		inputErase.setMnemonic(KeyEvent.VK_R);
-		inputRemove = new JButton("Ta bort");
-		inputRemove.setMnemonic(KeyEvent.VK_T);
-		inputCancel = new JButton("Avbryt");
-		inputCancel.setMnemonic(KeyEvent.VK_A);
-		ResultHandler resHand = new ResultHandler();
-		inputOk.addActionListener(resHand);
-		inputOk.addKeyListener(enterHandler);
-		inputErase.addActionListener(resHand);
-		inputErase.addKeyListener(enterHandler);
-		inputRemove.addActionListener(resHand);
-		inputRemove.addKeyListener(enterHandler);
-		inputCancel.addActionListener(resHand);
-		inputCancel.addKeyListener(enterHandler);
-		inputPanel.add(prioLabel);
-		inputPanel.add(prio);
-		inputPanel.add(inputOk);
-		inputPanel.add(inputCancel);
-		inputPanel.add(inputErase);
-		inputPanel.add(inputRemove);
-		/*
-		if(firstTime) {
-			RESULTLIST = new ResultList(nbrRounds, surface, boxData);
-			BOARD = new ScoreBoardWindow(RESULTLIST);
-			//frame.getContentPane().add(searchPanel, BorderLayout.WEST); TODO skall bara göras en gång och ta bort firstTime!
-			//frame.getContentPane().add(BOARD.getScrollPane(), BorderLayout.CENTER);
-			//frame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
-			firstTime = false;
-		}*/ if(init) {
-			BOARD.setup(RESULTLIST);
-		} else {
-			RESULTLIST = new ResultList(nbrRounds, surface, boxData);
-			BOARD.setup(RESULTLIST);
-		}
+	    if(nbrRounds == SearchWindow.DUMMY_STARTUP) {
+	        inputPanel = new JPanel();
+	        person = new JLabel();
+	        inputPanel.add(person);
+	        klassChoice = new JComboBox();
+	        
+	        popup = new JDialog(frame, "Redigera", true);
+	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	        popup.setJMenuBar(bar);
+	        /*
+	        if(init) {
+	            BOARD.setup(RESULTLIST);
+	        } else {
+	            RESULTLIST = new ResultList(nbrRounds, surface, boxData);
+	            BOARD.setup(RESULTLIST);
+	        }*/
+	    } else {
+	        this.boxData = boxData;
+	        this.nbrRounds = nbrRounds;
+	        this.surface = surface;
+	        startNbrMap.clear();
+	        inputPanel = new JPanel();
+	        GridLayout gridLayout;
+	        if(boxData[0] && boxData[1]) {
+	            gridLayout = new GridLayout(4+nbrRounds+2,2);
+	        } else if(boxData[0] || boxData[1]) {
+	            gridLayout = new GridLayout(4+nbrRounds+1,2);
+	        } else {
+	            gridLayout = new GridLayout(4+nbrRounds,2);
+	        }
+	        gridLayout.setHgap(2);
+	        gridLayout.setVgap(2);
+	        inputPanel.setLayout(gridLayout);
+	        person = new JLabel();
+	        JLabel[] varvLabel = new JLabel[nbrRounds];
+	        varvResult = new JTextField[nbrRounds];
+	        
+	        try {
+	            classes = (String[])io.load("klasstring");
+	        } catch (Exception e) {
+	            classes = new String[3];
+	            classes[0] = "Klass 1";
+	            classes[1] = "Klass 2";
+	            classes[2] = "Klass 3";
+	        }
+	        klassChoice = new JComboBox(classes);
+	        inputPanel.add(person);
+	        inputPanel.add(klassChoice);
+	        EnterKeyHandler enterHandler = new EnterKeyHandler();
+	        JLabel startNrLabel = new JLabel("Startnummer:");
+	        JLabel licenseNrLabel = new JLabel("Licensnummer:");
+	        startNbrField = new JTextField();
+	        licenseNbrField = new JTextField();
+	        startNbrField.addKeyListener(enterHandler);
+	        licenseNbrField.addKeyListener(enterHandler);
+	        if(boxData[1]) {
+	            inputPanel.add(licenseNrLabel);
+	            inputPanel.add(licenseNbrField);
+	        }
+	        if(boxData[0]) {
+	            inputPanel.add(startNrLabel);
+	            inputPanel.add(startNbrField);
+	        }
+	        for(int i = 0; i < varvLabel.length; i++) {
+	            varvLabel[i] = new JLabel("Varv " + (i+1) + ":");
+	            varvResult[i] = new JTextField();
+	            varvResult[i].addKeyListener(enterHandler);
+	            inputPanel.add(varvLabel[i]);
+	            inputPanel.add(varvResult[i]);
+	        }
+	        popup = new JDialog(frame, "Notera resultat", true);
+	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	        popup.setJMenuBar(bar);
+	        
+	        JLabel prioLabel = new JLabel("Ange prio vid behov:");
+	        prio = new JTextField();
+	        prio.addKeyListener(enterHandler);
+	        inputOk = new JButton("Ok");
+	        inputOk.setMnemonic(KeyEvent.VK_O);
+	        inputErase = new JButton("Radera");
+	        inputErase.setMnemonic(KeyEvent.VK_R);
+	        inputRemove = new JButton("Ta bort");
+	        inputRemove.setMnemonic(KeyEvent.VK_T);
+	        inputCancel = new JButton("Avbryt");
+	        inputCancel.setMnemonic(KeyEvent.VK_A);
+	        ResultHandler resHand = new ResultHandler();
+	        inputOk.addActionListener(resHand);
+	        inputOk.addKeyListener(enterHandler);
+	        inputErase.addActionListener(resHand);
+	        inputErase.addKeyListener(enterHandler);
+	        inputRemove.addActionListener(resHand);
+	        inputRemove.addKeyListener(enterHandler);
+	        inputCancel.addActionListener(resHand);
+	        inputCancel.addKeyListener(enterHandler);
+	        inputPanel.add(prioLabel);
+	        inputPanel.add(prio);
+	        inputPanel.add(inputOk);
+	        inputPanel.add(inputCancel);
+	        inputPanel.add(inputErase);
+	        inputPanel.add(inputRemove);
+	        if(init) {
+	            BOARD.setup(RESULTLIST);
+	        } else {
+	            RESULTLIST = new ResultList(nbrRounds, surface, boxData);
+	            BOARD.setup(RESULTLIST);
+	        }
+	    }
 	}
 	
 	/** ställer in resultatinmatningsfönstret efter personen som har valts genom att trycka på knappen button */
-	public void setPopup(JButton button) {
+	public void setPopup(JButton button, boolean competitionOpened) {
 		popup.getContentPane().add(inputPanel);
 		person.setText(button.getText().substring(3, button.getText().length()));
-		StringTokenizer str = new StringTokenizer(person.getText(), ",");
-		String name = str.nextToken();
-		String club = str.nextToken().trim();
-		int[] results;
-		String identity = name + ", " + club;
-		Integer personID = ((Integer) personTracker.get(identity));
-		if(licenseMap.containsKey(personID)) {
-			licenseNbrField.setText((String)licenseMap.get(personID));
-		} else {
-			licenseNbrField.setText("");
-		}
-		PersonResult pr = RESULTLIST.getPerson(personID.intValue());
-		if(pr != null) {
-			klassChoice.setSelectedItem(pr.getKlass());
-			results = pr.getResultList();
-			startNbrField.setText(String.valueOf(pr.getStartNr()));
-			int prioNbr = pr.getPrio();
-			if(prioNbr != Integer.MAX_VALUE) {
-				prio.setText(String.valueOf(prioNbr));
-			} else {
-				prio.setText("");
-			}
-		} else {
-			klassChoice.setSelectedIndex(klassChoice.getSelectedIndex());
-			results = new int[nbrRounds];
-			startNbrField.setText("");
-			prio.setText("");
-		}
-		for(int i = 0; i < nbrRounds; i++) {
-			if(results[i] == ResultList.NO_RESULT_THIS_ROUND) {
-				varvResult[i].setText("-");
-			} else if(results[i] != 0) {
-				varvResult[i].setText(String.valueOf(results[i]));
-			} else {
-				varvResult[i].setText("");
-			}
+		if(competitionOpened) {
+		    StringTokenizer str = new StringTokenizer(person.getText(), ",");
+		    String name = str.nextToken();
+		    String club = str.nextToken().trim();
+		    int[] results;
+		    String identity = name + ", " + club;
+		    Integer personID = ((Integer) personTracker.get(identity));
+		    if(licenseMap.containsKey(personID)) {
+		        licenseNbrField.setText((String)licenseMap.get(personID));
+		    } else {
+		        licenseNbrField.setText("");
+		    }
+		    PersonResult pr = RESULTLIST.getPerson(personID.intValue());
+		    if(pr != null) {
+		        klassChoice.setSelectedItem(pr.getKlass());
+		        results = pr.getResultList();
+		        startNbrField.setText(String.valueOf(pr.getStartNr()));
+		        int prioNbr = pr.getPrio();
+		        if(prioNbr != Integer.MAX_VALUE) {
+		            prio.setText(String.valueOf(prioNbr));
+		        } else {
+		            prio.setText("");
+		        }
+		    } else {
+		        klassChoice.setSelectedIndex(klassChoice.getSelectedIndex());
+		        results = new int[nbrRounds];
+		        startNbrField.setText("");
+		        prio.setText("");
+		    }
+		    for(int i = 0; i < nbrRounds; i++) {
+		        if(results[i] == ResultList.NO_RESULT_THIS_ROUND) {
+		            varvResult[i].setText("-");
+		        } else if(results[i] != 0) {
+		            varvResult[i].setText(String.valueOf(results[i]));
+		        } else {
+		            varvResult[i].setText("");
+		        }
+		    }
 		}
 		popup.pack();
 		popup.setLocationRelativeTo(frame);
