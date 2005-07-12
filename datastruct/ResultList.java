@@ -482,10 +482,9 @@ public class ResultList {
 	
 	/** klassen som sköter sorteringen av resultatlistan */
 	class ResultComparator implements Comparator {
-		/**
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 *	bestämmer skillnaden mellan lhs och rhs genom att sortera i ordningen
+		/**	bestämmer skillnaden mellan lhs och rhs genom att sortera i ordningen
 		 *	klass, avklarade varv, summa, prioritet och differens
+		 *	@see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		public int compare(Object lhs, Object rhs) {
 			PersonResult left = (PersonResult) lhs;
@@ -499,6 +498,18 @@ public class ResultList {
 			int roundsPlayedLeft = left.getNbrRoundsPlayed();
 			int roundsPlayedRight = right.getNbrRoundsPlayed();
 			int sumRight, sumLeft;
+			/*
+			if(roundsPlayedLeft == 0) {
+			    sumLeft = 127;
+			} else {
+			    sumLeft = left.getSum(roundsLeft);
+			}
+			if(roundsPlayedRight == 0) {
+			    sumRight = 127;
+			} else {
+			    sumRight = right.getSum(roundsRight);
+			}*/
+			/** sortera på snitt för att se bra ut när någon står över ett varv */
 			if(roundsPlayedLeft != 0) {
 				sumLeft = (int) (10000*((double)left.getSum(roundsLeft)/(double)roundsPlayedLeft));
 			} else {

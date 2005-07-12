@@ -84,7 +84,7 @@ public class Snitt {
 					rounds = Integer.parseInt(inString.nextToken());
 					for(int j = 0; j < rounds; j++) {
 					    int nbrHits = Integer.parseInt(inString.nextToken());
-					    if(nbrHits < ResultList.MAX_SCORE && nbrHits > ResultList.MIN_SCORE) {
+					    if(nbrHits <= ResultList.MAX_SCORE && nbrHits >= ResultList.MIN_SCORE) {
 					        result += nbrHits;
 					        playedRounds++;
 					    }

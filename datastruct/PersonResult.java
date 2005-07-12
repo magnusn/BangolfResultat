@@ -9,9 +9,9 @@ public class PersonResult {
 	private int personID;					// nummer för identifiering av personen
 	private int[] results;					// vektor med resultaten på varje varv
 	
-	/** skapar ett resultat till personen med namnet name och klubben club med startnumret startNbr och licensnumret idNbr
-			results är resultaten på varje varv, rounds antal varv, klass klassen, prio prioriteten
-			och nbrRoundsFinished antal varv som är slutförda */
+	/** skapar ett resultat till personen med namnet name, klubben club, startnumret startNbr, 
+	 *  licensnumret idNbr där results är resultaten på varje varv, rounds antal varv, klass klassen, 
+	 * 	prio prioriteten och nbrRoundsFinished antal varv som är slutförda */
 	public PersonResult(int startNbr, String name, String club, String idNbr, int[] results, 
 						int rounds, String klass, int prio, int nbrRoundsFinished, int personID) {
 		min = Integer.MAX_VALUE;
@@ -58,7 +58,7 @@ public class PersonResult {
 	public int getSum(int untilRound) {
 		int temp = 0;
 		for(int i = 0; i < untilRound; i++) {
-			if(results[i] < ResultList.MAX_SCORE && results[i] > ResultList.MIN_SCORE) {
+			if(results[i] <= ResultList.MAX_SCORE && results[i] >= ResultList.MIN_SCORE) {
 				temp += results[i];
 			}
 		}
@@ -89,7 +89,7 @@ public class PersonResult {
 	public int getNbrRoundsPlayed() {
 		int nbrRoundsPlayed = nbrRoundsFinished;
 		for(int i = 0; i < results.length; i++) {
-			if(results[i] < ResultList.MAX_SCORE && results[i] > ResultList.MIN_SCORE) {
+			if(results[i] > ResultList.MAX_SCORE || results[i] < ResultList.MIN_SCORE) {
 				nbrRoundsPlayed--;
 			}
 		}
@@ -110,17 +110,20 @@ public class PersonResult {
 	private void setMinMax() {
 		for(int i = 0; i < results.length; i++) {
 			int value = results[i];
-			if(value > max) {
-				max = value;
-			}
-			if(value < min) {
-				min = value;
+			if(value <= ResultList.MAX_SCORE && value >= ResultList.MIN_SCORE) {
+			    if(value > max) {
+			        max = value;
+			    }
+			    if(value < min) {
+			        min = value;
+			    }
 			}
 		}
 	}
 	
 	/** ändrar persondatan */
-	public void changeResults(int startNbr, String name, String club, String licenseNbr, int[] results, String klass, int prio, int nbrRoundsFinished) {
+	public void changeResults(int startNbr, String name, String club, String licenseNbr, 
+	        int[] results, String klass, int prio, int nbrRoundsFinished) {
 		this.startNbr = startNbr;
 		this.name = name;
 		this.club = club;

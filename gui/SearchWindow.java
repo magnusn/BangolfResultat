@@ -296,7 +296,7 @@ public class SearchWindow {
 		statusPanel.add(STATUSFIELD, BorderLayout.WEST);
 		resultInput = new ResultInputWindow(frame, searchPanel, statusPanel, resBar, personTracker, personNameTracker);
 		lapSumDialog = new LapSumDialog(frame);
-		compInfoDialog = new CompInfoDialog(frame, lapSumDialog, resultInput);
+		compInfoDialog = new CompInfoDialog(frame, this);
 		compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
 		inputNameLabel = resultInput.getNameLabel();
 		
@@ -325,12 +325,20 @@ public class SearchWindow {
 		ResultInputWindow.BOARD = new ScoreBoardWindow(ResultInputWindow.RESULTLIST);
 		// TODO fixa så att det startas upp på bra sätt!
 		frame.getContentPane().add(ResultInputWindow.BOARD.getScrollPane(), BorderLayout.CENTER);
-		resultInput.setupResultInputPanel(false, new boolean[]{false, false}, 2, 0);
-		lapSumDialog.setNbrRounds(2);
-		lapSumDialog.setEditData(new boolean[2-1]);
+		setupResultInputPanel(false, new boolean[]{false, false}, 2, 0);
 		
 		frame.pack();
 		frame.setVisible(true);
+	}
+	
+	/** ställer in resultatinmatningsfönstret och fönstret för delsummor, init är true om 
+	 *  ingen ny resultatlista behöver skapas, boxData[0] talar om ifall startnummer skall vara med,
+	 *  boxData[1] säger om licensnummer skall vara med, nbrRounds är antal varv och surface anger
+	 *  tävlingens underlag */
+	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
+	    resultInput.setupResultInputPanel(init, boxData, nbrRounds, surface);
+	    lapSumDialog.setNbrRounds(nbrRounds);
+		lapSumDialog.setEditData(new boolean[nbrRounds-1]);
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */

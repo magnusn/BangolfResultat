@@ -19,8 +19,7 @@ import datastruct.ResultList;
 
 /** klassen som beskriver fönstret där tävlingens inställningar ställs in */
 public class CompInfoDialog extends JDialog {
-	private ResultInputWindow resultInput;  // fönstret som sköter resultatinmatningen
-	private LapSumDialog lapSumDialog;		// fönstret som används för att välja delsummor och placering
+	private SearchWindow mainWindow;		// huvudfönstret som visar allting
 	private JFrame owner;					// huvudfönstret
 	private boolean[] boxData;				// talar om ifall startnummer och licensnummer har valts
 	private JCheckBox[] startBox;			// för att välja startnummer samt licensnummer
@@ -31,11 +30,10 @@ public class CompInfoDialog extends JDialog {
 	private JComboBox surfaceChoice,numberRoundsChoice; // de grafiska komponenterna där man väljer underlag och antal varv
 	
 	/** skapar fönstret för tävlingsinställningar */
-	public CompInfoDialog(JFrame owner, LapSumDialog lapSumDialog, ResultInputWindow resultInput) {
+	public CompInfoDialog(JFrame owner, SearchWindow mainWindow) {
 		super(owner, "Indatafönster", true);
 		this.owner = owner;
-		this.lapSumDialog = lapSumDialog;
-		this.resultInput = resultInput;
+		this.mainWindow = mainWindow;
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		JPanel varvPanel = new JPanel();
 		JLabel varvLabel2 = new JLabel("Ange antal varv som tävlingen är på:");
@@ -87,9 +85,8 @@ public class CompInfoDialog extends JDialog {
 		for(int i = 0; i < boxData.length; i++) {
 			boxData[i] = startBox[i].isSelected();
 		}
-		resultInput.setupResultInputPanel(false, boxData, nbrRounds, surface);
-		lapSumDialog.setNbrRounds(nbrRounds);
-		lapSumDialog.setEditData(new boolean[nbrRounds-1]);
+		
+		mainWindow.setupResultInputPanel(false, boxData, nbrRounds, surface);
 		this.setVisible(false);
 		owner.pack(); //TODO
 		//owner.setVisible(true);

@@ -72,7 +72,7 @@ class ResultInputWindow {
 			licenseMap = new HashMap();
 			licenseIDMap = new HashMap();
 		}
-		firstTime = true;
+		//firstTime = true; TODO ta bort?
 	}
 	
 	/** returnerar etiketten som visar spelarens namn vid inmatning av resultat */
@@ -385,7 +385,8 @@ class ResultInputWindow {
 				JOptionPane.showMessageDialog(popup, "Kan ej mata in resultat för varv där föregående varv saknas!");
 			} else if (nbrRoundsToRead != -1) {
 				for(int i = 0; i < nbrRoundsToRead; i++) {
-					if((results[i] < 18 || results[i] > 126) && results[i] != ResultList.NO_RESULT_THIS_ROUND) {
+					if((results[i] < ResultList.MIN_SCORE || results[i] > ResultList.MAX_SCORE) 
+					        && results[i] != ResultList.NO_RESULT_THIS_ROUND) {
 						goodValues = false;
 					}
 				}
