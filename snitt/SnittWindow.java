@@ -13,12 +13,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.LinkedList;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -169,14 +168,19 @@ public class SnittWindow extends JFrame {
 	
 	
 	/**
-	 * visar meddelandet message
+	 * visar meddelandet message i statusfältet
 	 * @param message - meddelandet som visas längst ner i snittlistsfönstret
 	 */
-	private void setMessage(String message) {
-	    long currentTime = System.currentTimeMillis();
-	    Date date = new Date(currentTime);
-	    String time = date.toString();
-	    time = time.substring(time.indexOf(":") - 2, time.lastIndexOf(":") + 3);
+	private void setMessage(String message, boolean showTime) {
+	    String time;
+	    if(showTime) {
+	        long currentTime = System.currentTimeMillis();
+		    Date date = new Date(currentTime);
+		    time = date.toString();
+		    time = time.substring(time.indexOf(":") - 2, time.lastIndexOf(":") + 3);
+	    } else {
+	        time = "";
+	    }
 	    messageField.setText(time + " " + message);
 	}
 	
@@ -191,6 +195,7 @@ public class SnittWindow extends JFrame {
 			if(e.getSource() == saveToHTML) {
 				if(selected.size() != 0) {
 					fileChooser.setCurrentDirectory(SearchWindow.DIRSNITT);
+					fileChooser.setSelectedFile(new File(""));
 					fileChooser.setFileFilter(htmFilter);
 					int retval = fileChooser.showSaveDialog(frame);
 					if(retval == JFileChooser.APPROVE_OPTION) {
@@ -221,6 +226,7 @@ public class SnittWindow extends JFrame {
 			if(e.getSource() == saveCompareFile) {
 				if(selected.size() != 0) {
 					fileChooser.setCurrentDirectory(SearchWindow.DIRJMF);
+					fileChooser.setSelectedFile(new File(""));
 					fileChooser.setFileFilter(snittFilter);
 					int retval = fileChooser.showSaveDialog(frame);
 					if(retval == JFileChooser.APPROVE_OPTION) {
@@ -289,6 +295,7 @@ public class SnittWindow extends JFrame {
 					}
 				}
 				fileChooser.setMultiSelectionEnabled(false);
+				setMessage("", false);
 			}
 			/** tar bort tävlingar */
 			else if(e.getSource() == removeComp) {
@@ -331,6 +338,7 @@ public class SnittWindow extends JFrame {
 				} else {
 					JOptionPane.showMessageDialog(frame, "Inga tävlingar har markerats", "Tävlingar ej borttagna", JOptionPane.ERROR_MESSAGE);
 				}
+				setMessage("", false);
 			}
 			/** stänger fönstret */
 			else if(e.getSource() == quit) {
@@ -339,14 +347,17 @@ public class SnittWindow extends JFrame {
 			/** visar fönster för att ställa in snittlistans utseende */
 			else if(e.getSource() == appearance) {
 			    new AppearanceWindow(frame, tab.getSelectedIndex(), snittData);
+			    setMessage("", false);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
 				new SortWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
+				setMessage("", false);
 			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
 			    new CompareWindow(frame, tab.getSelectedIndex(), snittData);
+			    setMessage("", false);
 			}
 			/** tar fram antal starter i de olika klasserna */
 			else if(e.getSource() == classStarts) {
@@ -373,14 +384,16 @@ public class SnittWindow extends JFrame {
 							readOk = false;
 						}
 						if(readOk) {
-							Set set = map.entrySet();
-							Iterator iterator = set.iterator();
+						    LinkedList list = new LinkedList();
+							list.addAll(map.keySet());
+							Collections.sort(list);
+							Iterator iterator = list.iterator();
 							String classCount = "";
 							while(iterator.hasNext()) {
-								Map.Entry entry = (Map.Entry)iterator.next();
-								classCount = classCount + entry.getKey() +": " +entry.getValue()+"\n";
+								String entry = (String)iterator.next();
+								classCount = classCount + entry + ": " + map.get(entry) + "\n";
 							}
-							JOptionPane.showMessageDialog(frame, classCount);
+							JOptionPane.showMessageDialog(frame, classCount, "Klasstarter", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 					if(!readOk) {
@@ -389,6 +402,7 @@ public class SnittWindow extends JFrame {
 				} else {
 					JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra eftersom inga tävlingar har markerats.", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
+				setMessage("", false);
 			}
 		}
 	}
@@ -464,7 +478,7 @@ public class SnittWindow extends JFrame {
 				        headerList[i] = headerCheckBox[i].isSelected();
 				    }
 					snitt.outputToHTML(list, surface, compareSurface, headerList);
-					setMessage("Snittlistan är sparad som webbsida.");
+					setMessage("Snittlistan är sparad som webbsida.", true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
@@ -514,7 +528,7 @@ public class SnittWindow extends JFrame {
 				LinkedList list = snitt.sortMap();
 				try {
 					snitt.outputToCompareFile(list, surface);
-					setMessage("Jämförelselistan är sparad.");
+					setMessage("Jämförelselistan är sparad.", true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}

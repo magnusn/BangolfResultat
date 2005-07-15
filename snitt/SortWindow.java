@@ -58,8 +58,10 @@ public class SortWindow extends JDialog {
 			        tempVector[i*2] = selectionVector;
 			        tempVector[i*2+1] = selectedVector;
 			    }
-			    for(int i = 0; i < sortVector.length; i++) {
-			        tempVector[i] = sortVector[i];
+			    if(sortVector[0].size() + sortVector[1].size() == tempVector[0].size() + tempVector[1].size()) {
+			        for(int i = 0; i < sortVector.length; i++) {
+			            tempVector[i] = sortVector[i];
+			        }
 			    }
 			    sortVector = tempVector;
 			}

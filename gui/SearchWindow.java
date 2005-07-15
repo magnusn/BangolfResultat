@@ -557,6 +557,7 @@ public class SearchWindow {
 				}
 				if(!CHANGE || val == JOptionPane.NO_OPTION) {
 					fileChooser.setCurrentDirectory(DIRSKV);
+					fileChooser.setSelectedFile(new File(""));
 					fileChooser.setFileFilter(skvFilter);
 					int retval = fileChooser.showOpenDialog(frame);
 					if(retval == JFileChooser.APPROVE_OPTION) {
@@ -705,6 +706,7 @@ public class SearchWindow {
 		/** sparar tävlingen som HTML-fil */
 		private void saveAsHTML() {
 			fileChooser.setCurrentDirectory(DIRHTM);
+			fileChooser.setSelectedFile(new File(""));
 			fileChooser.setFileFilter(htmFilter);
 			int retval = fileChooser.showSaveDialog(frame);
 			if(retval == JFileChooser.APPROVE_OPTION) {
@@ -771,6 +773,7 @@ public class SearchWindow {
 		/** sparar tävlingen under angivet filnamn */
 		private void saveAsSKV() {
 			fileChooser.setCurrentDirectory(DIRSKV);
+			fileChooser.setSelectedFile(new File(""));
 			fileChooser.setFileFilter(skvFilter);
 			int retval = fileChooser.showSaveDialog(frame);
 			if(retval == JFileChooser.APPROVE_OPTION) {

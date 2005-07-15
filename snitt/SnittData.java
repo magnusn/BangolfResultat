@@ -46,8 +46,10 @@ public class SnittData {
                     tempHeaders[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
                     tempHeaders[i][Snitt.CHANGE] = new JCheckBox("+/-");
                 }
-                for(int i = 0; i < headers.length; i++) {
-                    tempHeaders[i] = headers[i];
+                if(headers[0].length == tempHeaders[0].length) {
+                    for(int i = 0; i < headers.length; i++) {
+                        tempHeaders[i] = headers[i];
+                    }
                 }
                 headers = tempHeaders;
             }
