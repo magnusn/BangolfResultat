@@ -247,7 +247,7 @@ public class ResultList {
 						if(lapSum[varv-2]) {
 							j++;
 							output[i+k][j] = String.valueOf(pr.getSum(varv));
-							outputStyle[i+k][j] = getColor(pr.getSum(varv), varv);
+							outputStyle[i+k][j] = "S:a" + getColor(pr.getSum(varv), varv);
 						}
 					}
 					varv++;
@@ -257,7 +257,7 @@ public class ResultList {
 			if(nbrRoundsFinished != 0) {
 				if(nbrRoundsPlayed != 0) {
 					output[i+k][j] = String.valueOf(pr.getSum(nbrRoundsFinished));
-					outputStyle[i+k][j] = getColor(pr.getSum(nbrRoundsFinished), nbrRoundsPlayed);
+					outputStyle[i+k][j] = "S:a" + getColor(pr.getSum(nbrRoundsFinished), nbrRoundsPlayed);
 				} else {
 					output[i+k][j] = "-";
 					outputStyle[i+k][j] = "black";

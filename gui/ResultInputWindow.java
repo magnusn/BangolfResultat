@@ -393,10 +393,12 @@ class ResultInputWindow {
 			if(nbrRoundsToRead != -1 && nbrRoundsToRead < nbrReadableInputs) {
 				JOptionPane.showMessageDialog(popup, "Kan ej mata in resultat för varv där föregående varv saknas!");
 			} else if (nbrRoundsToRead != -1) {
+			    LinkedList lapList = new LinkedList();
 				for(int i = 0; i < nbrRoundsToRead; i++) {
 					if((results[i] < ResultList.MIN_SCORE || results[i] > ResultList.MAX_SCORE) 
 					        && results[i] != ResultList.NO_RESULT_THIS_ROUND) {
 						goodValues = false;
+						lapList.add(new Integer(i+1));
 					}
 				}
 				if(goodValues) {
@@ -409,7 +411,15 @@ class ResultInputWindow {
 						}
 					}
 				} else {
-					JOptionPane.showMessageDialog(popup, "Resultatet för ett varv måste ligga mellan 18 och 126!");
+				    String faultyLaps = "";
+				    for(int i = 0; i < lapList.size(); i++) {
+				        faultyLaps += lapList.get(i).toString();
+				        if(i+1 != lapList.size()) {
+				            faultyLaps += ", ";
+				        }
+				    }
+					JOptionPane.showMessageDialog(popup, "Resultatet för ett varv måste ligga mellan 18 och 126!\n" +
+							"Följande varvs resultat gör inte det: " + faultyLaps + ".");
 				}
 				if(goodValues) {
 					String klass = (String)klassChoice.getSelectedItem();

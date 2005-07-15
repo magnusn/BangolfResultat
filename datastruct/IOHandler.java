@@ -29,17 +29,19 @@ public class IOHandler {
 		String startRow = "<TR>";
 		String endRow = "</TR>";
 		String startCol;
-		String startColStartNbr = "<TD CLASS=bgrcenter WIDTH=50>";
-		String startColPlaceNbr = "<TD CLASS=bgrcenter WIDTH=50>";
+		String startColEmpty = "<TD>";
+		String startColStartNbr = "<TD CLASS=bgrright WIDTH=50>";
+		String startColPlaceNbr = "<TD CLASS=bgrright WIDTH=50>";
 		String startColLicense = "<TD CLASS=bgrleft WIDTH=110>";
 		String startColName = "<TD CLASS=bgrleft WIDTH=160>";
 		String startColClub = "<TD CLASS=bgrleft WIDTH=95>";
 		String startColResult;
 		if(res.getNbrRounds() <= 5) {
-			startColResult = "<TD CLASS=bgrcenter WIDTH=45>";
+			startColResult = "<TD CLASS=bgrcenter WIDTH=50>";
 		} else {
 			startColResult = "<TD CLASS=bgrcenter WIDTH=28>";
 		}
+		String startColSum = "<TD CLASS=bgrright WIDTH=40>";
 		String endCol = "</TD>";
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
@@ -50,6 +52,7 @@ public class IOHandler {
 		bufferOut.write("<STYLE ID=\"Bangolftävlingar\"><!--table "+
 		" .bgrleft{font-size:10.0pt;text-align:left;vertical-align:super;white-space:nowrap;}"+
 		" .bgrcenter{font-size:10.0pt;text-align:center;vertical-align:super;white-space:nowrap;}"+
+		" .bgrright{font-size:10.0pt;text-align:right;vertical-align:super;white-space:nowrap;}"+
 		"--></STYLE>");
 		bufferOut.newLine();
 		bufferOut.write("<TITLE>" + header + "</TITLE>");
@@ -66,7 +69,7 @@ public class IOHandler {
 		String[][] output = res.getOutput();
 		String[][] outputStyle = res.getOutputStyle();
 		
-		bufferOut.write("<TABLE CELLPADDING=0 CELLSPACING=1>");
+		bufferOut.write("<TABLE CELLPADDING=1 CELLSPACING=1>");
 		bufferOut.newLine();
 		
 		for(int i = 0; i < output.length; i++) {
@@ -86,22 +89,26 @@ public class IOHandler {
 						boldStart = "<B style='font-size:12.0pt'>";
 						boldStop = "</B>";
 						outputStyle[i][j] = "black";
-					}
+					} 
 					if(output[i][j] == null) {
 						output[i][j] = "";
-					}
-					if(j == 0) {
+						startCol = startColEmpty;
+					} else if(j == 0) {
 						startCol = startColName;
 					} else if(j == 1) {
 						startCol = startColClub;
 					} else if(j == 2 && extras[1]) {
-						startCol = startColStartNbr;
-					} else if((j == 2 && extras[2]) || (j == 3 && (extras[1] && extras[2]))) {
 						startCol = startColLicense;
-					} else if((j == output[i].length-1 && !extras[0]) || (j == output[i].length-2 && extras[0])) {
+					} else if((j == 2 && extras[2]) || (j == 3 && (extras[1] && extras[2]))) {
+						startCol = startColStartNbr;
+					} else if((j == output[i].length-1 && extras[0]) || (j == output[i].length-2 && extras[0])) {
 						startCol = startColPlaceNbr;
 					} else {
 						startCol = startColResult;
+					}
+					if(outputStyle[i][j].startsWith("S:a") || output[i][j].startsWith("S:a")) {
+					    startCol = startColSum;
+					    outputStyle[i][j] = outputStyle[i][j].replaceFirst("S:a", "");
 					}
 					bufferOut.write(startCol + boldStart + "<FONT COLOR=\""+outputStyle[i][j]+"\">"+ 
 							output[i][j] +"</FONT>" + boldStop + endCol);

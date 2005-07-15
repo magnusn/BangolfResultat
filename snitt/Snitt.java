@@ -165,12 +165,13 @@ public class Snitt {
 		String[] headers = new String[headerList.length];
 		headers[Snitt.NAME] = "<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol;
 		headers[Snitt.CLUB] = "<TD class=bgrleft WIDTH=95><B>Klubb</B>" + endCol;
-		headers[Snitt.COMPS] = "<TD class=bgrcenter WIDTH=60><B>Tävlingar</B>" + endCol;
-		headers[Snitt.ROUNDS] = "<TD class=bgrcenter WIDTH=50><B>Varv</B>" + endCol;
-		headers[Snitt.HITSUM] = "<TD class=bgrcenter WIDTH=50><B>Slag</B>" + endCol;
+		headers[Snitt.COMPS] = "<TD class=bgrright WIDTH=60><B>Tävlingar</B>" + endCol;
+		headers[Snitt.ROUNDS] = "<TD class=bgrright WIDTH=50><B>Varv</B>" + endCol;
+		headers[Snitt.HITSUM] = "<TD class=bgrright WIDTH=50><B>Slag</B>" + endCol;
 		headers[Snitt.MEAN] = "<TD class=bgrcenter WIDTH=50><B>Snitt</B>" + endCol;
-		headers[Snitt.EX_MEAN] = "<TD class=bgrcenter WIDTH=80><B>Snitt ifjol</B>" + endCol;
-		headers[Snitt.CHANGE] = "<TD class=bgrcenter WIDTH=40><B>+/-</B>" + endCol;
+		headers[Snitt.EX_MEAN] = "<TD class=bgrcenter WIDTH=65><B>Snitt ifjol</B>" + endCol;
+		headers[Snitt.CHANGE] = "<TD class=bgrright WIDTH=45><B>+/-</B>" + endCol;
+		
 		LinkedList res = list;
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
@@ -196,11 +197,11 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write("<H1 style='font-size:14.0pt;font-weight:800;font-style:normal'>" + header + "</H1>");
 		bufferOut.newLine();
-		bufferOut.write("<TABLE CELLPADDING=0 CELLSPACING=1>");
+		bufferOut.write("<TABLE CELLPADDING=1 CELLSPACING=1>");
 		bufferOut.newLine();
 		bufferOut.write(startRow);
 		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrcenter WIDTH=59><B>Ranking</B>" + endCol);
+		bufferOut.write("<TD class=bgrright WIDTH=59><B>Ranking&nbsp;</B>" + endCol);
 		bufferOut.newLine();
 		for(int i = 0; i < headerList.length; i++) {
 		    if(headerList[i]) {
@@ -262,16 +263,16 @@ public class Snitt {
 			String[] data = new String[headerList.length];
 			data[Snitt.NAME] = startColLeft + person.getName() + endCol;
 			data[Snitt.CLUB] = startColLeft + person.getClub() + endCol;
-			data[Snitt.COMPS] = startColCenter + person.getComps() + endCol;
-			data[Snitt.ROUNDS] = startColCenter + person.getRounds() + endCol;
-			data[Snitt.HITSUM] = startColCenter + person.getHits() + endCol;
+			data[Snitt.COMPS] = startColRight + person.getComps() + endCol;
+			data[Snitt.ROUNDS] = startColRight + person.getRounds() + endCol;
+			data[Snitt.HITSUM] = startColRight + person.getHits() + endCol;
 			data[Snitt.MEAN] = startColCenter + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
 			data[Snitt.EX_MEAN] = startColCenter + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
 			data[Snitt.CHANGE] = startColRight + diffValue + endCol;
 			
 			bufferOut.write(startRow);
 			bufferOut.newLine();
-			bufferOut.write(startColCenter + "<B>" + (i - sameResult) + "</B>" + endCol);
+			bufferOut.write(startColRight + "<B>" + (i - sameResult) + "&nbsp;</B>" + endCol);
 			bufferOut.newLine();
 			for(int j = 0; j < data.length; j++) {
 			    if(headerList[j]) {
