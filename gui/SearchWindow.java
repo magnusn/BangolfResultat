@@ -29,6 +29,7 @@ import java.awt.Image;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
+import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.NameList;
@@ -57,10 +58,12 @@ public class SearchWindow {
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
 	private JMenuItem headerItem, saveAsSKV, saveAsHTML;// sätter tävlingens namn, spara som för SKV- och HTML-filer
 	private JMenuItem changeName, changeClub;			// ändra namn och klubb på en spelare
+	private JMenuItem numberOrientation;				// alternativ för sifferorienteringen
 	private JLabel inputNameLabel;				// innehåller namnet på den person som resultat skrivs in för
 	private JFileChooser fileChooser;			// filväljare
 	private Filter skvFilter, htmFilter;		// filter för skv- och htmfiler
 	private IOHandler io;						// sköter skrivning till och läsning från filer
+	private DataManager dataManager;			// håller reda på inställningar
 	public static boolean SNITTOPEN, KLASSOPEN;	// talar om ifall motsvarande fönster är öppet
 	private boolean warningHTM;					// varnar för att inte skriva till ej önskvärd fil
 	private boolean compInfoDialogClosed;		// talar om ifall indatafönstret har stängts ner utan användande av knappen Ok
@@ -100,6 +103,12 @@ public class SearchWindow {
 		warningHTM = false;
 		CHANGE = false;
 		competitionOpened = false;
+		
+		dataManager = new DataManager();
+		if(!dataManager.loadOrientation()) {
+		    JOptionPane.showMessageDialog(null, "Tidigare sifferorienteringsinställningar gick ej att läsa in",
+                    "Varning", JOptionPane.ERROR_MESSAGE);
+		}
 		
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		WindowHandler window = new WindowHandler();
@@ -233,6 +242,8 @@ public class SearchWindow {
 		editItem = new JMenuItem("Delsummor och placering...", KeyEvent.VK_D);
 		editItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
 		editItem.setEnabled(false);
+		numberOrientation = new JMenuItem("Ändra sifferorienteringen...", KeyEvent.VK_O);
+		numberOrientation.setEnabled(false);
 		klassStart = new JMenuItem("Hantera klasser...", KeyEvent.VK_H);
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		snittStart = new JMenuItem("Hantera snittlistan...", KeyEvent.VK_H);
@@ -247,6 +258,7 @@ public class SearchWindow {
 		quit.addActionListener(menuHand);
 		headerItem.addActionListener(menuHand);
 		editItem.addActionListener(menuHand);
+		numberOrientation.addActionListener(menuHand);
 		klassStart.addActionListener(menuHand);
 		snittStart.addActionListener(menuHand);
 		about.addActionListener(menuHand);
@@ -259,6 +271,7 @@ public class SearchWindow {
 		menu.add(quit);
 		edit.add(headerItem);
 		edit.add(editItem);
+		edit.add(numberOrientation);
 		klassMenu.add(klassStart);
 		snittMenu.add(snittStart);
 		help.add(about);
@@ -333,6 +346,7 @@ public class SearchWindow {
 	private void enableDisabledMenus() {
 	    headerItem.setEnabled(true);
 		editItem.setEnabled(true);
+		numberOrientation.setEnabled(true);
 	    saveToSKV.setEnabled(true);
 		saveAsSKV.setEnabled(true);
 		saveToHTML.setEnabled(true);
@@ -457,16 +471,20 @@ public class SearchWindow {
 	
 	/** sparar filer som programmet använder sig av */
 	private void save() {
+	    if(!dataManager.saveOrientation()) {
+	        JOptionPane.showMessageDialog(frame, "Orienteringsinställningarna gick ej att spara",
+                    "Varning", JOptionPane.ERROR_MESSAGE);
+	    }
 		try {
 			io.save("licensemap", resultInput.getLicenseMap());
 			io.save("licensenamemap", resultInput.getLicenseIDMap());
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Listan över licensnummer gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Listan över licensnummer gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			name.writeNames();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Namnlistan gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Namnlistan gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.save("dirskv", DIRSKV);
@@ -474,13 +492,13 @@ public class SearchWindow {
 			io.save("dirsnitt", DIRSNITT);
 			io.save("dirjmf", DIRJMF);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Senast använda mappar gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Senast använda mappar gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.save("ptrack", personTracker);
 			io.save("pnametrack", personNameTracker);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Intern ID-lista gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Intern ID-lista gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -526,7 +544,8 @@ public class SearchWindow {
 							}
 						}
 						if(doit) {
-							io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader);
+						    int align = dataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+							io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
 							warningHTM = false;
 							MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
 						} else {
@@ -635,6 +654,9 @@ public class SearchWindow {
 					MESSAGEFIELD.setText("");
 				}
 			}
+			else if(e.getSource() == numberOrientation) {
+			    new AlignmentWindow(frame, AlignmentWindow.COMP_OWNER, dataManager);
+			}
 			else if(e.getSource() == klassStart) {
 				if(!KLASSOPEN) {
 					KLASSOPEN = true;
@@ -742,7 +764,8 @@ public class SearchWindow {
 						}
 					}
 					try {
-						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader);
+					    int align = dataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
 						warningHTM = false;
 						CHANGE = true;
 						MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");

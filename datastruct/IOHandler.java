@@ -1,5 +1,7 @@
 package datastruct;
 
+import gui.AlignmentWindow;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
@@ -23,25 +25,33 @@ public class IOHandler {
 	}
 	
 	/** skriver ut en html-sida med filnamnet fileName och med rubriken header utifrån resultatlistan result */
-	public void outputToHTML(String fileName, ResultList result, String header) throws IOException {
+	public void outputToHTML(String fileName, ResultList result, String header, int align) throws IOException {
 		ResultList res = result;
 		boolean[] extras = res.getExtras();
+		String alignment;
+		if(align == AlignmentWindow.LEFT) {
+		    alignment = "bgrleft";
+		} else if (align == AlignmentWindow.CENTER) {
+		    alignment = "bgrcenter";
+		} else {
+		    alignment = "bgrright";
+		}
 		String startRow = "<TR>";
 		String endRow = "</TR>";
 		String startCol;
 		String startColEmpty = "<TD>";
-		String startColStartNbr = "<TD CLASS=bgrright WIDTH=50>";
-		String startColPlaceNbr = "<TD CLASS=bgrright WIDTH=50>";
+		String startColStartNbr = "<TD CLASS=" + alignment + " WIDTH=50>";
+		String startColPlaceNbr = "<TD CLASS=" + alignment + " WIDTH=50>";
 		String startColLicense = "<TD CLASS=bgrleft WIDTH=110>";
 		String startColName = "<TD CLASS=bgrleft WIDTH=160>";
 		String startColClub = "<TD CLASS=bgrleft WIDTH=95>";
 		String startColResult;
 		if(res.getNbrRounds() <= 5) {
-			startColResult = "<TD CLASS=bgrcenter WIDTH=50>";
+			startColResult = "<TD CLASS=" + alignment + " WIDTH=50>";
 		} else {
-			startColResult = "<TD CLASS=bgrcenter WIDTH=28>";
+			startColResult = "<TD CLASS=" + alignment + " WIDTH=28>";
 		}
-		String startColSum = "<TD CLASS=bgrright WIDTH=40>";
+		String startColSum = "<TD CLASS=" + alignment + " WIDTH=30>";
 		String endCol = "</TD>";
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
