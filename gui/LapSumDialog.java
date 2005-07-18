@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /** klassen som beskriver fönstret där man anger vilka delsummor samt om placering skall visas */
@@ -24,6 +25,7 @@ public class LapSumDialog extends JDialog {
 	/** skapar fönster för inställning av delsummor och placering */
 	public LapSumDialog(JFrame owner) {
 		super(owner, "Delsummor och placering", true);
+		setResizable(false);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		lapSumHand = new LapSumHandler();
 	}
@@ -57,8 +59,9 @@ public class LapSumDialog extends JDialog {
 	
 	/** returnerar panelen för delsummor och placering efter att ha ställt in den efter antal varv */
 	public JPanel lapSumPanel() {
-		lapSumPanel.setLayout(new GridLayout(nbrRounds, 1));
+		lapSumPanel.setLayout(new GridLayout(nbrRounds + 1, 1));
 		lapSumPanel.removeAll();
+		lapSumPanel.add(new JLabel("Ange om följande skall visas:"));
 		for(int i = 0; i < nbrRounds-2; i++) {
 			lapSumPanel.add(lapBox[i]);
 		}

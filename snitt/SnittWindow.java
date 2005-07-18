@@ -1,5 +1,6 @@
 package snitt;
 
+import gui.AlignmentWindow;
 import gui.ListPanel;
 import gui.SearchWindow;
 
@@ -28,12 +29,14 @@ import java.io.File;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
+import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
+    private DataManager dataManager;		// håller kolla på vissa inställningar
     private SnittData snittData;			// lagrar inställningarna för snittlistorna
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
@@ -51,14 +54,16 @@ public class SnittWindow extends JFrame {
 	private JMenuItem sort, classStarts; 	// välja sorteringsordning, ta reda på antal klasstarter
 	private JMenuItem appearance;			// ställer in vad som skall visas på snittlistans webbsida
 	private JMenuItem compareFileChooser;	// väljer fil att jämföra snittet med
+	private JMenuItem numberAlignment;		// för att ställa in sifferorienteringen
 	private String[] headers;				// rubriker för snittlistorna
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	
 	/** skapar snitthanterarfönstret */
-	public SnittWindow(JFrame owner, HashMap personNameTracker) {
+	public SnittWindow(JFrame owner, HashMap personNameTracker, DataManager dataManager) {
 		super("Snittlistshanteraren");
 		frame = this;
 		this.personNameTracker = personNameTracker;
+		this.dataManager = dataManager;
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setIconImage(SearchWindow.ICON);
 		
@@ -115,8 +120,9 @@ public class SnittWindow extends JFrame {
 		saveCompareFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.CTRL_MASK));
 		quit = new JMenuItem("Stäng snitthanterarfönstret", KeyEvent.VK_G);
 		appearance = new JMenuItem("Utseende...", KeyEvent.VK_U);
-		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_O);
+		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_S);
 		compareFileChooser = new JMenuItem("Välj fil att jämföra med...", KeyEvent.VK_V);
+		numberAlignment = new JMenuItem("Sifferorientering...", KeyEvent.VK_O);
 		classStarts = new JMenuItem("Klasstarter", KeyEvent.VK_K);
 		addComp.addActionListener(menuHand);
 		removeComp.addActionListener(menuHand);
@@ -126,6 +132,7 @@ public class SnittWindow extends JFrame {
 		appearance.addActionListener(menuHand);
 		sort.addActionListener(menuHand);
 		compareFileChooser.addActionListener(menuHand);
+		numberAlignment.addActionListener(menuHand);
 		classStarts.addActionListener(menuHand);
 		menu.add(addComp);
 		menu.add(removeComp);
@@ -133,6 +140,7 @@ public class SnittWindow extends JFrame {
 		menu.add(saveCompareFile);
 		menu.add(quit);
 		edit.add(appearance);
+		edit.add(numberAlignment);
 		edit.add(sort);
 		edit.add(compareFileChooser);
 		compute.add(classStarts);
@@ -349,6 +357,11 @@ public class SnittWindow extends JFrame {
 			    new AppearanceWindow(frame, tab.getSelectedIndex(), snittData);
 			    setMessage("", false);
 			}
+			/** visar fönster för att ställa in justeringen av fälten med siffror */
+			else if(e.getSource() == numberAlignment) {
+			    new AlignmentWindow(frame, AlignmentWindow.SNITT_OWNER, dataManager);
+			    setMessage("", false);
+			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
 			else if(e.getSource() == sort) {
 				new SortWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
@@ -477,7 +490,8 @@ public class SnittWindow extends JFrame {
 				    for(int i = 0; i < headerCheckBox.length; i++) {
 				        headerList[i] = headerCheckBox[i].isSelected();
 				    }
-					snitt.outputToHTML(list, surface, compareSurface, headerList);
+				    int align = DataManager.getOrientation(AlignmentWindow.SNITT_OWNER);
+					snitt.outputToHTML(list, surface, compareSurface, headerList, align);
 					setMessage("Snittlistan är sparad som webbsida.", true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);

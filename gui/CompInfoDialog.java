@@ -32,6 +32,7 @@ public class CompInfoDialog extends JDialog {
 	/** skapar fönstret för tävlingsinställningar */
 	public CompInfoDialog(JFrame owner, SearchWindow mainWindow) {
 		super(owner, "Indatafönster", true);
+		setResizable(false);
 		this.owner = owner;
 		this.mainWindow = mainWindow;
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

@@ -14,6 +14,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -32,13 +33,14 @@ public class AlignmentWindow extends JDialog {
     public static final int CENTER = 1;		// heltalsvärde för centrerat
     public static final int RIGHT = 2;		// heltalsvärde för högerjusterat
     public static final int NBR_OWNERS = 2;	// antal olika sifferorienteringsfönster
-    private static final int NBR_ORIENT = 3;// antal olika orienteringsmöjligheter
+    private static final int NBR_ALIGN = 3;	// antal olika orienteringsmöjligheter
     public static final int COMP_OWNER = 0;	// nummer för inställningar för en vanlig tävling
     public static final int SNITT_OWNER = 1;// nummer för inställningar för snittlista
     
     /** skapar ett sifferorienteringsfönster till ägaren owner */
     public AlignmentWindow(JFrame owner, int nbrOfOwner, DataManager dataManager) {
-        super(owner, "Sifferorientering");
+        super(owner, "Sifferorientering", true);
+        setResizable(false);
         thisWindow = this;
         this.nbrOfOwner = nbrOfOwner;
         this.dataManager = dataManager;
@@ -49,16 +51,23 @@ public class AlignmentWindow extends JDialog {
         accept.addActionListener(buttonHand);
         cancel.addActionListener(buttonHand);
         
-        JPanel mainPanel = new JPanel(new GridLayout(NBR_ORIENT,1));
-        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+        GridLayout mainLayout = new GridLayout(NBR_ALIGN+1,1);
+        mainLayout.setHgap(1);
+        mainLayout.setVgap(1);
+        GridLayout buttonLayout = new GridLayout(1,2);
+        buttonLayout.setHgap(1);
+        buttonLayout.setVgap(1);
+        JPanel mainPanel = new JPanel(mainLayout);
+        JPanel buttonPanel = new JPanel(buttonLayout);
         ButtonGroup buttonGroup = new ButtonGroup();
         
-        orientation = new JRadioButton[NBR_ORIENT];
+        orientation = new JRadioButton[NBR_ALIGN];
         orientation[LEFT] = new JRadioButton("Vänsterjusterat");
         orientation[CENTER] = new JRadioButton("Centrerat");
         orientation[RIGHT] = new JRadioButton("Högerjusterat");
-        orientation[dataManager.getOrientation(nbrOfOwner)].setSelected(true);
+        orientation[DataManager.getOrientation(nbrOfOwner)].setSelected(true);
         
+        mainPanel.add(new JLabel("Ställ in önskad sifferjustering:"));
         for(int i = 0; i < orientation.length; i++) {
             buttonGroup.add(orientation[i]);
             mainPanel.add(orientation[i]);
@@ -87,7 +96,12 @@ public class AlignmentWindow extends JDialog {
 			    } else {
 			        alignment = RIGHT;
 			    }
-			    dataManager.setOrientation(alignment, nbrOfOwner);
+			    if(DataManager.getOrientation(nbrOfOwner) != alignment) {
+			        dataManager.setOrientation(alignment, nbrOfOwner);
+			        if(nbrOfOwner == AlignmentWindow.COMP_OWNER) {
+			            ResultInputWindow.BOARD.update(true);
+			        }
+			    }
 			    
 			    thisWindow.dispose();
 			} else if (e.getSource() == cancel) {

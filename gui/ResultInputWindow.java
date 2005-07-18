@@ -22,7 +22,6 @@ import datastruct.IOHandler;
 import datastruct.PersonResult;
 import datastruct.ResultList;
 
-
 /** klassen som beskriver indatafönstret och resultatinmatningsfönstret */
 class ResultInputWindow {
 	private HashMap startNbrMap, licenseMap;// startnummer- och licensnummermappar för att undvika dubletter
@@ -94,13 +93,6 @@ class ResultInputWindow {
 	        popup = new JDialog(frame, "Redigera", true);
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
-	        /*
-	        if(init) {
-	            BOARD.setup(RESULTLIST);
-	        } else {
-	            RESULTLIST = new ResultList(nbrRounds, surface, boxData);
-	            BOARD.setup(RESULTLIST);
-	        }*/
 	    } else {
 	        this.boxData = boxData;
 	        this.nbrRounds = nbrRounds;
@@ -422,7 +414,10 @@ class ResultInputWindow {
 							"Följande varvs resultat gör inte det: " + faultyLaps + ".");
 				}
 				if(goodValues) {
-					String klass = (String)klassChoice.getSelectedItem();
+					String klass = (String) klassChoice.getSelectedItem();
+					if(klass == null) {
+					    klass = "";
+					}
 					String identity = name + ", " + club;
 					RESULTLIST.addResult(startNr,name,club,licenseNr,results,nbrRounds,klass,prioNr,nbrRoundsToRead,personID.intValue());
 					SearchWindow.CHANGE = true;
@@ -465,6 +460,14 @@ class ResultInputWindow {
 	/** returnerar HashMapen som håller reda på id för ett visst licensnummer */
 	public HashMap getLicenseIDMap() {
 		return licenseIDMap;
+	}
+	
+	/** tar bort personen med ID:t personID från licensmapparna */
+	public void removeFromLicenseMap(Integer personID) {
+	    if(licenseMap.containsKey(personID)) {
+	        String licenseNbr = (String) licenseMap.remove(personID);
+	        licenseIDMap.remove(licenseNbr);
+	    }
 	}
 	
 	/** anpassar licensnumren och resultatlistan till nytt namn eller ny klubb */

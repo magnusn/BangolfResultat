@@ -242,7 +242,7 @@ public class SearchWindow {
 		editItem = new JMenuItem("Delsummor och placering...", KeyEvent.VK_D);
 		editItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
 		editItem.setEnabled(false);
-		numberOrientation = new JMenuItem("Ändra sifferorienteringen...", KeyEvent.VK_O);
+		numberOrientation = new JMenuItem("Sifferorientering...", KeyEvent.VK_O);
 		numberOrientation.setEnabled(false);
 		klassStart = new JMenuItem("Hantera klasser...", KeyEvent.VK_H);
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
@@ -544,7 +544,7 @@ public class SearchWindow {
 							}
 						}
 						if(doit) {
-						    int align = dataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+						    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
 							io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
 							warningHTM = false;
 							MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
@@ -668,7 +668,7 @@ public class SearchWindow {
 			else if(e.getSource() == snittStart) {
 				if(!SNITTOPEN) {
 					SNITTOPEN = true;
-					snittWindow = new SnittWindow(frame, personNameTracker);
+					snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
 				} else {
 					snittWindow.setVisible(true);
 				}
@@ -764,7 +764,7 @@ public class SearchWindow {
 						}
 					}
 					try {
-					    int align = dataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+					    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
 						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
 						warningHTM = false;
 						CHANGE = true;
@@ -884,6 +884,10 @@ public class SearchWindow {
 			                + nameString + ", " + clubString + ", permanent?");
 			        if(confirmValue == JOptionPane.YES_OPTION) {
 			            done = name.remove(nameString, clubString);
+			            if(done) {
+			                resultInput.removeFromLicenseMap((Integer) personTracker.get(nameString + 
+			                        ", " + clubString));
+			            }
 			            name.sortedNames();
 			            visit = true;
 			        } else if (confirmValue == JOptionPane.NO_OPTION) {

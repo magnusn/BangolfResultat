@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import datastruct.DataManager;
 import datastruct.ResultList;
-
 
 /** beskriver fönstret som visar de inmatade resultaten */
 class ScoreBoardWindow {
@@ -21,6 +21,7 @@ class ScoreBoardWindow {
 	private ResultList result;			// resultatlistan
 	private JLabel[][] label;			// matrisen av etiketter som visar resultaten
 	private static JLabel headerLabel;	// rubriketikett
+	private int align;					// talar om hur sifferorienteringen skall se ut
 	
 	/** skapar ett resultatfönster för resultatlistan result */
 	public ScoreBoardWindow(ResultList result) {
@@ -30,6 +31,7 @@ class ScoreBoardWindow {
 		label = new JLabel[65][cols];
 		headerLabel = new JLabel();
 		this.result = result;
+		this.align = getAlignment();
 		
 		gridbag = new GridBagLayout();
 		c = new GridBagConstraints();
@@ -106,6 +108,23 @@ class ScoreBoardWindow {
 				label[i][j].setForeground(color);
 			}
 		}
+		
+		if(align != getAlignment()) {
+		    boolean licenseNbr = result.getExtras()[2];
+		    align = getAlignment();
+		    c.anchor = align;
+		    for(int i = 0; i < label.length; i++) {
+		        c.gridwidth = 1;
+		        for(int j = 0; j < label[i].length; j++) {
+		            if((j == 2 && !licenseNbr) || j > 2) {
+						gridbag.setConstraints(label[i][j], c);
+					}
+		            if(j+2 == cols) {
+						c.gridwidth = GridBagConstraints.REMAINDER;
+					}
+		        }
+		    }
+		}
 	}
 	
 	/** raderar alla etiketters innehåll */
@@ -122,6 +141,9 @@ class ScoreBoardWindow {
 		JLabel[][] temp = label;
 		label = new JLabel[temp.length+50][temp[0].length];
 		
+		boolean licenseNbr = result.getExtras()[2];
+	    align = getAlignment();
+		
 		for(int i = 0; i < label.length; i++) {
 			c.gridwidth = 1;
 			for(int j = 0; j < label[i].length; j++) {
@@ -131,8 +153,8 @@ class ScoreBoardWindow {
 					label[i][j] = new JLabel();
 					if(j == 0) {
 						c.anchor = GridBagConstraints.WEST;
-					} else if(j == 2) {
-						c.anchor = GridBagConstraints.CENTER;
+					} else if((j == 2 && !licenseNbr) || j == 3) {
+						c.anchor = align;
 					}
 					gridbag.setConstraints(label[i][j], c);
 					board.add(label[i][j]);
@@ -146,14 +168,16 @@ class ScoreBoardWindow {
 	
 	/** ställer in layouten för etikettrutnätet label */
 	private void setLabelLayout(JLabel[][] label) {
+	    boolean licenseNbr = result.getExtras()[2];
+	    align = getAlignment();
 		for(int i = 0; i < label.length; i++) {
 			c.gridwidth = 1;
 			for(int j = 0; j < cols; j++) {
 				label[i][j] = new JLabel();
 				if(j == 0) {
 					c.anchor = GridBagConstraints.WEST;
-				} else if(j == 2) {
-					c.anchor = GridBagConstraints.CENTER;
+				} else if((j == 2 && !licenseNbr) || j == 3) {
+					c.anchor = align;
 				}
 				gridbag.setConstraints(label[i][j], c);
 				board.add(label[i][j]);
@@ -162,6 +186,19 @@ class ScoreBoardWindow {
 				}
 			}
 		}
+	}
+	
+	/** tar reda på hur siffrorna skall vara orienterade */
+	private int getAlignment() {
+	    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+	    if(align == AlignmentWindow.LEFT) {
+	        align = GridBagConstraints.WEST;
+	    } else if(align == AlignmentWindow.CENTER) {
+	        align = GridBagConstraints.CENTER;
+	    } else {
+	        align = GridBagConstraints.EAST;
+	    }
+	    return align;
 	}
 	
 	/** sätter rubriken till header */

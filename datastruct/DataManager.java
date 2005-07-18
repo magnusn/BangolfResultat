@@ -16,7 +16,7 @@ import java.io.FileWriter;
  * DataManager - håller reda på olika inställningar
  */
 public class DataManager {
-    private int[] orientation;
+    private static int[] orientation;	// håller reda på sifferorienteringen
     
     /** skapar en klass för att hålla reda på inställningar */
     public DataManager() {
@@ -76,7 +76,7 @@ public class DataManager {
      * 	@param nbrOfOwner - anger vilken typ av resultat inställningen gäller
      * 	@return	hur justeringen skall vara
      */
-    public int getOrientation(int nbrOfOwner) {
+    public static int getOrientation(int nbrOfOwner) {
         return orientation[nbrOfOwner];
     }
 }

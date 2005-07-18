@@ -1,5 +1,7 @@
 package snitt;
 
+import gui.AlignmentWindow;
+
 import java.util.NoSuchElementException;
 import java.util.Comparator;
 import java.util.Collections;
@@ -18,7 +20,6 @@ import javax.swing.JOptionPane;
 import datastruct.IOHandler;
 import datastruct.Person;
 import datastruct.ResultList;
-
 
 /** klassen som beskriver snitthanteringen */
 public class Snitt {
@@ -155,9 +156,18 @@ public class Snitt {
 	/** skriver ut snittlistan utifrån resultatlistan list, underlaget surface 
 	 *  och jämförelsefilen med underlaget compareSurface (-1 vid ingen jämförelse) */
 	public void outputToHTML(LinkedList list, int surface, int compareSurface,
-	        				 boolean[] headerList) throws IOException {
+	        				 boolean[] headerList, int align) throws IOException {
+	    String alignment;
+	    if(align == AlignmentWindow.LEFT) {
+	        alignment = "bgrleft";
+	    } else if(align == AlignmentWindow.CENTER) {
+	        alignment = "bgrcenter";
+	    } else {
+	        alignment = "bgrright";
+	    }
 		String startRow = "<TR>";
 		String endRow = "</TR>";
+		String startCol = "<TD class=" + alignment + ">";
 		String startColLeft = "<TD class=bgrleft>";
 		String startColCenter = "<TD class=bgrcenter>";
 		String startColRight = "<TD class=bgrright>";
@@ -165,12 +175,12 @@ public class Snitt {
 		String[] headers = new String[headerList.length];
 		headers[Snitt.NAME] = "<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol;
 		headers[Snitt.CLUB] = "<TD class=bgrleft WIDTH=95><B>Klubb</B>" + endCol;
-		headers[Snitt.COMPS] = "<TD class=bgrright WIDTH=60><B>Tävlingar</B>" + endCol;
-		headers[Snitt.ROUNDS] = "<TD class=bgrright WIDTH=50><B>Varv</B>" + endCol;
-		headers[Snitt.HITSUM] = "<TD class=bgrright WIDTH=50><B>Slag</B>" + endCol;
-		headers[Snitt.MEAN] = "<TD class=bgrcenter WIDTH=50><B>Snitt</B>" + endCol;
-		headers[Snitt.EX_MEAN] = "<TD class=bgrcenter WIDTH=65><B>Snitt ifjol</B>" + endCol;
-		headers[Snitt.CHANGE] = "<TD class=bgrright WIDTH=45><B>+/-</B>" + endCol;
+		headers[Snitt.COMPS] = "<TD class=" + alignment + " WIDTH=60><B>Tävlingar</B>" + endCol;
+		headers[Snitt.ROUNDS] = "<TD class=" + alignment + " WIDTH=50><B>Varv</B>" + endCol;
+		headers[Snitt.HITSUM] = "<TD class=" + alignment + " WIDTH=50><B>Slag</B>" + endCol;
+		headers[Snitt.MEAN] = "<TD class=" + alignment + " WIDTH=50><B>Snitt</B>" + endCol;
+		headers[Snitt.EX_MEAN] = "<TD class=" + alignment + " WIDTH=65><B>Snitt ifjol</B>" + endCol;
+		headers[Snitt.CHANGE] = "<TD class=" + alignment + " WIDTH=45><B>+/-</B>" + endCol;
 		
 		LinkedList res = list;
 		
@@ -263,12 +273,12 @@ public class Snitt {
 			String[] data = new String[headerList.length];
 			data[Snitt.NAME] = startColLeft + person.getName() + endCol;
 			data[Snitt.CLUB] = startColLeft + person.getClub() + endCol;
-			data[Snitt.COMPS] = startColRight + person.getComps() + endCol;
-			data[Snitt.ROUNDS] = startColRight + person.getRounds() + endCol;
-			data[Snitt.HITSUM] = startColRight + person.getHits() + endCol;
-			data[Snitt.MEAN] = startColCenter + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
-			data[Snitt.EX_MEAN] = startColCenter + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
-			data[Snitt.CHANGE] = startColRight + diffValue + endCol;
+			data[Snitt.COMPS] = startCol + person.getComps() + endCol;
+			data[Snitt.ROUNDS] = startCol + person.getRounds() + endCol;
+			data[Snitt.HITSUM] = startCol + person.getHits() + endCol;
+			data[Snitt.MEAN] = startCol + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
+			data[Snitt.EX_MEAN] = startCol + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
+			data[Snitt.CHANGE] = startCol + diffValue + endCol;
 			
 			bufferOut.write(startRow);
 			bufferOut.newLine();
