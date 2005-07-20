@@ -18,12 +18,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 
+import snitt.CompareFile;
+
 import datastruct.IOHandler;
 import datastruct.PersonResult;
 import datastruct.ResultList;
 
 /** klassen som beskriver indatafönstret och resultatinmatningsfönstret */
-class ResultInputWindow {
+public class ResultInputWindow {
 	private HashMap startNbrMap, licenseMap;// startnummer- och licensnummermappar för att undvika dubletter
 	private HashMap licenseIDMap;			// håller reda på vilket id licensnumret tillhör
 	private HashMap personTracker;			// har koll på personernas identifikationsnummer
@@ -38,12 +40,15 @@ class ResultInputWindow {
 	private JDialog inputDialog, popup;				// indatafönster och resultatinmatningsfönster
 	private JPanel inputPanel, searchPanel;			// behållare för indata, sökning och redigering (av delsummor och placering)
 	private JTextField prio, startNbrField, licenseNbrField; 	// inmatning av sorteringsordning, startnummer och licensnummer
+	private JTextField meanField;								// inmatning av snitt
 	private JPanel statusPanel;									// statuspanelen
 	private JTextField[] varvResult;							// inmatning av varvresultat
 	private JButton inputOk,inputCancel,inputErase,inputRemove; // OK, avbryt, radera och ta bort är vad dessa knappar sköter om
-	private JLabel person;										// visar namnet på personen som valts vid resultatinmatningsfönstret
-	private JMenuBar bar;										// meny för att ändra namn och klubb
-	private boolean[] boxData;									// talar om ifall startnummer och licensnummer har valts
+	private JLabel person;							// visar namnet på personen som valts vid resultatinmatningsfönstret
+	private JMenuBar bar;							// meny för att ändra namn och klubb
+	private boolean[] boxData;						// talar om ifall startnummer och licensnummer har valts
+	private int mode;								// anger vilket läge som gäller
+	private CompareFile compareFile;				// datastruktur för jämförelsesnittlistan
 	
 	/** skapar indatafönstret och får in huvudfönstret mainFrame, sökpanelen searchPanel och fönstret för
 			delsummorna för att kunna ställa in dessa senare när all indata som behövs har fåtts fram */
@@ -82,115 +87,154 @@ class ResultInputWindow {
 		setupResultInputPanel(true, result.getStartData(), result.getNbrRounds(), result.getSurface());
 	}
 	
-	/** skapar resultatinmatningsfönstret, init är true om ingen ny resultatlista behöver skapas */
-	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
-	    if(nbrRounds == SearchWindow.DUMMY_STARTUP) {
+	/** skapar resultatinmatningsfönstret */
+	protected void setupResultInputPanel(int mode) {
+	    this.mode = mode;
+	    if(mode == SearchWindow.MODE_DUMMY) {
 	        inputPanel = new JPanel();
 	        person = new JLabel();
 	        inputPanel.add(person);
 	        klassChoice = new JComboBox();
 	        
 	        popup = new JDialog(frame, "Redigera", true);
+	        popup.setResizable(false);
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
-	    } else {
-	        this.boxData = boxData;
-	        this.nbrRounds = nbrRounds;
-	        this.surface = surface;
-	        startNbrMap.clear();
-	        inputPanel = new JPanel();
-	        GridLayout gridLayout;
-	        if(boxData[0] && boxData[1]) {
-	            gridLayout = new GridLayout(4+nbrRounds+2,2);
-	        } else if(boxData[0] || boxData[1]) {
-	            gridLayout = new GridLayout(4+nbrRounds+1,2);
-	        } else {
-	            gridLayout = new GridLayout(4+nbrRounds,2);
-	        }
-	        gridLayout.setHgap(2);
-	        gridLayout.setVgap(2);
-	        inputPanel.setLayout(gridLayout);
+	    } else if(mode == SearchWindow.MODE_SNITT) {
+	        inputPanel = new JPanel(new GridLayout(4,2));
 	        person = new JLabel();
-	        JLabel[] varvLabel = new JLabel[nbrRounds];
-	        varvResult = new JTextField[nbrRounds];
-	        
-	        try {
-	            classes = (String[])io.load("klasstring");
-	        } catch (Exception e) {
-	            classes = new String[3];
-	            classes[0] = "Klass 1";
-	            classes[1] = "Klass 2";
-	            classes[2] = "Klass 3";
-	        }
-	        klassChoice = new JComboBox(classes);
 	        inputPanel.add(person);
-	        inputPanel.add(klassChoice);
-	        EnterKeyHandler enterHandler = new EnterKeyHandler();
-	        JLabel startNrLabel = new JLabel("Startnummer:");
-	        JLabel licenseNrLabel = new JLabel("Licensnummer:");
-	        startNbrField = new JTextField();
-	        licenseNbrField = new JTextField();
-	        startNbrField.addKeyListener(enterHandler);
-	        licenseNbrField.addKeyListener(enterHandler);
-	        if(boxData[1]) {
-	            inputPanel.add(licenseNrLabel);
-	            inputPanel.add(licenseNbrField);
-	        }
-	        if(boxData[0]) {
-	            inputPanel.add(startNrLabel);
-	            inputPanel.add(startNbrField);
-	        }
-	        for(int i = 0; i < varvLabel.length; i++) {
-	            varvLabel[i] = new JLabel("Varv " + (i+1) + ":");
-	            varvResult[i] = new JTextField();
-	            varvResult[i].addKeyListener(enterHandler);
-	            inputPanel.add(varvLabel[i]);
-	            inputPanel.add(varvResult[i]);
-	        }
-	        popup = new JDialog(frame, "Notera resultat", true);
+	        inputPanel.add(new JLabel());
+	        inputPanel.add(new JLabel("Snitt:"));
+	        meanField = new JTextField();
+	        inputPanel.add(meanField);
+	        klassChoice = new JComboBox();
+	        
+	        inputOk = new JButton("Ok");
+		    inputOk.setMnemonic(KeyEvent.VK_O);
+		    inputErase = new JButton("Radera");
+		    inputErase.setMnemonic(KeyEvent.VK_R);
+		    inputRemove = new JButton("Ta bort");
+		    inputRemove.setMnemonic(KeyEvent.VK_T);
+		    inputCancel = new JButton("Avbryt");
+		    inputCancel.setMnemonic(KeyEvent.VK_A);
+		    ResultHandler resHand = new ResultHandler();
+		    inputOk.addActionListener(resHand);
+		    inputErase.addActionListener(resHand);
+		    inputRemove.addActionListener(resHand);
+		    inputCancel.addActionListener(resHand);
+		    inputPanel.add(inputOk);
+		    inputPanel.add(inputCancel);
+		    inputPanel.add(inputErase);
+		    inputPanel.add(inputRemove);
+	        
+	        popup = new JDialog(frame, "Notera snitt", true);
+	        popup.setResizable(false);
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
-	        
-	        JLabel prioLabel = new JLabel("Ange prio vid behov:");
-	        prio = new JTextField();
-	        prio.addKeyListener(enterHandler);
-	        inputOk = new JButton("Ok");
-	        inputOk.setMnemonic(KeyEvent.VK_O);
-	        inputErase = new JButton("Radera");
-	        inputErase.setMnemonic(KeyEvent.VK_R);
-	        inputRemove = new JButton("Ta bort");
-	        inputRemove.setMnemonic(KeyEvent.VK_T);
-	        inputCancel = new JButton("Avbryt");
-	        inputCancel.setMnemonic(KeyEvent.VK_A);
-	        ResultHandler resHand = new ResultHandler();
-	        inputOk.addActionListener(resHand);
-	        inputOk.addKeyListener(enterHandler);
-	        inputErase.addActionListener(resHand);
-	        inputErase.addKeyListener(enterHandler);
-	        inputRemove.addActionListener(resHand);
-	        inputRemove.addKeyListener(enterHandler);
-	        inputCancel.addActionListener(resHand);
-	        inputCancel.addKeyListener(enterHandler);
-	        inputPanel.add(prioLabel);
-	        inputPanel.add(prio);
-	        inputPanel.add(inputOk);
-	        inputPanel.add(inputCancel);
-	        inputPanel.add(inputErase);
-	        inputPanel.add(inputRemove);
-	        if(init) {
-	            BOARD.setup(RESULTLIST);
-	        } else {
-	            RESULTLIST = new ResultList(nbrRounds, surface, boxData);
-	            BOARD.setup(RESULTLIST);
-	        }
+	    }
+	}
+	
+	/** skapar resultatinmatningsfönstret, init är true om ingen ny resultatlista behöver skapas */
+	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
+	    this.mode = SearchWindow.MODE_COMP;
+	    this.boxData = boxData;
+	    this.nbrRounds = nbrRounds;
+	    this.surface = surface;
+	    startNbrMap.clear();
+	    inputPanel = new JPanel();
+	    GridLayout gridLayout;
+	    if(boxData[0] && boxData[1]) {
+	        gridLayout = new GridLayout(4+nbrRounds+2,2);
+	    } else if(boxData[0] || boxData[1]) {
+	        gridLayout = new GridLayout(4+nbrRounds+1,2);
+	    } else {
+	        gridLayout = new GridLayout(4+nbrRounds,2);
+	    }
+	    gridLayout.setHgap(2);
+	    gridLayout.setVgap(2);
+	    inputPanel.setLayout(gridLayout);
+	    person = new JLabel();
+	    JLabel[] varvLabel = new JLabel[nbrRounds];
+	    varvResult = new JTextField[nbrRounds];
+	    
+	    try {
+	        classes = (String[])io.load("klasstring");
+	    } catch (Exception e) {
+	        classes = new String[3];
+	        classes[0] = "Klass 1";
+	        classes[1] = "Klass 2";
+	        classes[2] = "Klass 3";
+	    }
+	    klassChoice = new JComboBox(classes);
+	    inputPanel.add(person);
+	    inputPanel.add(klassChoice);
+	    EnterKeyHandler enterHandler = new EnterKeyHandler();
+	    JLabel startNrLabel = new JLabel("Startnummer:");
+	    JLabel licenseNrLabel = new JLabel("Licensnummer:");
+	    startNbrField = new JTextField();
+	    licenseNbrField = new JTextField();
+	    startNbrField.addKeyListener(enterHandler);
+	    licenseNbrField.addKeyListener(enterHandler);
+	    if(boxData[1]) {
+	        inputPanel.add(licenseNrLabel);
+	        inputPanel.add(licenseNbrField);
+	    }
+	    if(boxData[0]) {
+	        inputPanel.add(startNrLabel);
+	        inputPanel.add(startNbrField);
+	    }
+	    for(int i = 0; i < varvLabel.length; i++) {
+	        varvLabel[i] = new JLabel("Varv " + (i+1) + ":");
+	        varvResult[i] = new JTextField();
+	        varvResult[i].addKeyListener(enterHandler);
+	        inputPanel.add(varvLabel[i]);
+	        inputPanel.add(varvResult[i]);
+	    }
+	    popup = new JDialog(frame, "Notera resultat", true);
+	    popup.setResizable(false);
+	    popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	    popup.setJMenuBar(bar);
+	    
+	    JLabel prioLabel = new JLabel("Ange prio vid behov:");
+	    prio = new JTextField();
+	    prio.addKeyListener(enterHandler);
+	    inputOk = new JButton("Ok");
+	    inputOk.setMnemonic(KeyEvent.VK_O);
+	    inputErase = new JButton("Radera");
+	    inputErase.setMnemonic(KeyEvent.VK_R);
+	    inputRemove = new JButton("Ta bort");
+	    inputRemove.setMnemonic(KeyEvent.VK_T);
+	    inputCancel = new JButton("Avbryt");
+	    inputCancel.setMnemonic(KeyEvent.VK_A);
+	    ResultHandler resHand = new ResultHandler();
+	    inputOk.addActionListener(resHand);
+	    inputOk.addKeyListener(enterHandler);
+	    inputErase.addActionListener(resHand);
+	    inputErase.addKeyListener(enterHandler);
+	    inputRemove.addActionListener(resHand);
+	    inputRemove.addKeyListener(enterHandler);
+	    inputCancel.addActionListener(resHand);
+	    inputCancel.addKeyListener(enterHandler);
+	    inputPanel.add(prioLabel);
+	    inputPanel.add(prio);
+	    inputPanel.add(inputOk);
+	    inputPanel.add(inputCancel);
+	    inputPanel.add(inputErase);
+	    inputPanel.add(inputRemove);
+	    if(init) {
+	        BOARD.setup(RESULTLIST);
+	    } else {
+	        RESULTLIST = new ResultList(nbrRounds, surface, boxData);
+	        BOARD.setup(RESULTLIST);
 	    }
 	}
 	
 	/** ställer in resultatinmatningsfönstret efter personen som har valts genom att trycka på knappen button */
-	public void setPopup(JButton button, boolean competitionOpened) {
+	public void setPopup(JButton button, int mode) {
 		popup.getContentPane().add(inputPanel);
 		person.setText(button.getText().substring(3, button.getText().length()));
-		if(competitionOpened) {
+		if(mode == SearchWindow.MODE_COMP) {
 		    StringTokenizer str = new StringTokenizer(person.getText(), ",");
 		    String name = str.nextToken();
 		    String club = str.nextToken().trim();
@@ -228,6 +272,8 @@ class ResultInputWindow {
 		            varvResult[i].setText("");
 		        }
 		    }
+		} else if(mode == SearchWindow.MODE_SNITT) {
+		    
 		}
 		popup.pack();
 		popup.setLocationRelativeTo(frame);
@@ -266,20 +312,66 @@ class ResultInputWindow {
 		}
 	}
 	
+	/** ställer in jämförelselistans data */
+	protected void setCompareFile(CompareFile compareFile) {
+	    this.compareFile = compareFile;
+	}
+	
 	/** klassen som tar hand om knapptryckningarna vid inmatning av resultat */
 	class ResultHandler implements ActionListener {
 		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == inputOk) {
+			if(e.getSource() == inputOk && mode == SearchWindow.MODE_COMP) {
 				handleResultInput();
-			} else if(e.getSource() == inputRemove) {
+			} else if(e.getSource() == inputRemove && mode == SearchWindow.MODE_COMP) {
 				removeResult();
-			} else if(e.getSource() == inputErase) {
+			} else if(e.getSource() == inputErase && mode == SearchWindow.MODE_COMP) {
 				clearInputs();
 			} else if(e.getSource() == inputCancel) {
 				popup.setVisible(false);
+			} else if(e.getSource() == inputOk && mode == SearchWindow.MODE_SNITT) {
+			    handleMeanInput(true);
+			} else if(e.getSource() == inputRemove && mode == SearchWindow.MODE_SNITT) {
+			    handleMeanInput(false);
+			} else if(e.getSource() == inputErase && mode == SearchWindow.MODE_SNITT) {
+				meanField.setText("");
 			}
 		}
+	}
+	
+	/** lägger till eller tar bort ett snitt */
+	private void handleMeanInput(boolean add) {
+	    boolean done = false;
+	    StringTokenizer str = new StringTokenizer(person.getText(), ",");
+	    String name = str.nextToken();
+	    String club = str.nextToken().trim();
+	    String nameAndClub = name + ", " + club;
+	    Integer personID = ((Integer) personTracker.get(nameAndClub));
+	    
+	    if(add) {
+	        String meanFieldValue = meanField.getText();
+	        meanFieldValue = meanFieldValue.replace(',', '.');
+	        double mean;
+	        try {
+	            mean = Double.parseDouble(meanFieldValue);
+	            if(mean < ResultList.MIN_SCORE || mean > ResultList.MAX_SCORE) {
+	                throw new Exception("Ej giltigt snitt");
+	            }
+	            compareFile.addMean(personID, nameAndClub, mean);
+	            done = true;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            JOptionPane.showMessageDialog(popup, "Inget giltigt värde!");
+	        }
+	    } else {
+	        done = compareFile.removeMean(personID);
+	        if(!done) {
+	            JOptionPane.showMessageDialog(popup, "Personen gick ej att ta bort!");;
+	        }
+	    }
+	    if(done) {
+	        popup.setVisible(false);
+	    }
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */

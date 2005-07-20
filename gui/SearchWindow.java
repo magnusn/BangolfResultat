@@ -35,12 +35,14 @@ import datastruct.IOHandler;
 import datastruct.NameList;
 import datastruct.ResultList;
 
+import snitt.CompareFile;
 import snitt.SnittWindow;
 
 import java.util.StringTokenizer;
 
 /** klassen som beskriver själva huvudfönstret och delen för sökning */
 public class SearchWindow {
+    private SearchWindow searchWindow;		// detta fönster
 	private HashMap personTracker;			// håller reda på vem personen är även om någon persondata ändras
 	private HashMap personNameTracker;		// lagrar namnet som idnumret tillhör
 	private NameList name;					// namnlista som används för sökning
@@ -67,7 +69,6 @@ public class SearchWindow {
 	public static boolean SNITTOPEN, KLASSOPEN;	// talar om ifall motsvarande fönster är öppet
 	private boolean warningHTM;					// varnar för att inte skriva till ej önskvärd fil
 	private boolean compInfoDialogClosed;		// talar om ifall indatafönstret har stängts ner utan användande av knappen Ok
-	private boolean competitionOpened;			// true om någon tävling har öppnats
 	public static boolean CHANGE;				// håller reda på om ändringar har skett som bör sparas
 	public static Image ICON;					// programmets ikon
 	private KlassWindow klassWindow;			// klasshanterarfönstret
@@ -75,6 +76,10 @@ public class SearchWindow {
 	private String compHeader, fileNameSKV, fileNameHTM;// tävlingsrubrik, filnamn för SKV- och HTML-filerna
 	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för olika filtyper
 	public static final int DUMMY_STARTUP = 0;	// antal varv som anges vid "dum"-starten
+	private int mode;							// talar om vilket läger som gäller
+	public static final int MODE_DUMMY = 0;		// heltal för "dum"-läget
+	public static final int MODE_COMP = 1;		// heltal för läget där vanlig tävling matas in
+	public static final int MODE_SNITT = 2;		// heltal för läget då man skapar en jämförande snittlista
 	
 	/** skapar huvudfönstret */
 	public SearchWindow() {
@@ -102,7 +107,6 @@ public class SearchWindow {
 		fileNameHTM = null;
 		warningHTM = false;
 		CHANGE = false;
-		competitionOpened = false;
 		
 		dataManager = new DataManager();
 		if(!dataManager.loadOrientation()) {
@@ -341,6 +345,18 @@ public class SearchWindow {
 		dummyStartUp();
 		frame.pack();
 		frame.setVisible(true);
+		searchWindow = this;
+	}
+	
+	/** fixar till menyalternativen för skapandet av en jämförelsesnittlista */
+	private void enableCompareFileMenus() {
+	    headerItem.setEnabled(false);
+		editItem.setEnabled(false);
+		numberOrientation.setEnabled(false);
+	    saveToSKV.setEnabled(true);
+		saveAsSKV.setEnabled(true);
+		saveToHTML.setEnabled(false);
+		saveAsHTML.setEnabled(false);
 	}
 	
 	/** gör menyalternativen under Redigera och de olika alternativen för att spara tillgängliga */
@@ -352,15 +368,76 @@ public class SearchWindow {
 		saveAsSKV.setEnabled(true);
 		saveToHTML.setEnabled(true);
 		saveAsHTML.setEnabled(true);
-		competitionOpened = true;
+		setMode(SearchWindow.MODE_COMP, null);
+	}
+	
+	/** ställer läget till mode, alternativen är MODE_COMP, MODE_DUMMY och MODE_SNITT 
+	 * 	skickar med ett objekt o som används vid vissa tillfällen */
+	public void setMode(int mode, Object o) {
+	    int oldMode = this.mode;
+	    this.mode = mode;
+	    if(mode == SearchWindow.MODE_SNITT) {
+	        frame.setVisible(true);
+	        int surface = newCompareFile();
+	        if(surface != -1) {
+	            ((CompareFile) o).setSurface(surface);
+	            resultInput.setupResultInputPanel(mode);
+	            resultInput.setCompareFile((CompareFile) o);
+	        } else {
+	            this.mode = oldMode;
+	        }
+	    }
+	}
+	
+	/** startar upp saker för att skapa en jämförelsesnittlista */
+	private int newCompareFile() {
+	    int surface = -1;
+	    int val = JOptionPane.YES_OPTION;
+		if(CHANGE) {
+			val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
+			, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(val == JOptionPane.YES_OPTION) {
+				autoSave();
+			}
+		}
+		if(!CHANGE || val == JOptionPane.NO_OPTION) {
+		    String[] possibleValues = { "Filt", "EB", "Betong", "Blandad" };
+		    String selectedValue = (String) JOptionPane.showInputDialog(frame, "Välj underlag", "Indata", 
+		            JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+			if(selectedValue != null) {
+	            if(selectedValue.equals(possibleValues[0])) {
+	                surface = ResultList.FILT;
+	            } else if(selectedValue.equals(possibleValues[1])) {
+	                surface = ResultList.EB;
+	            } else if(selectedValue.equals(possibleValues[2])) {
+	                surface = ResultList.BETONG;
+	            } else if(selectedValue.equals(possibleValues[3])) {
+	                surface = SnittWindow.BLANDAD;
+	            }
+				compHeader = "";
+				fileNameSKV = null;
+				fileNameHTM = null;
+				warningHTM = false;
+				CHANGE = false;
+				STATUSFIELD.setText("");
+				MESSAGEFIELD.setText("Ny jämförelsesnittlista har öppnats.");
+				ScoreBoardWindow.setHeader(compHeader);
+				inputNameLabel = resultInput.getNameLabel();
+				enableCompareFileMenus();
+			} else {
+				snittWindow.setVisible(true);
+			}
+		}
+		return surface;
 	}
 	
 	/** öppnar en ny tävling bara för att få igång programmet korrekt */
 	private void dummyStartUp() {
+	    setMode(SearchWindow.MODE_DUMMY, null);
 	    ResultInputWindow.RESULTLIST = new ResultList(2, 0, new boolean[]{false, false});
 		ResultInputWindow.BOARD = new ScoreBoardWindow(ResultInputWindow.RESULTLIST);
 		frame.getContentPane().add(ResultInputWindow.BOARD.getScrollPane(), BorderLayout.CENTER);
-		setupResultInputPanel(false, new boolean[]{false, false}, DUMMY_STARTUP, 0);
+		resultInput.setupResultInputPanel(MODE_DUMMY);
 		inputNameLabel = resultInput.getNameLabel();
 	}
 	
@@ -370,10 +447,8 @@ public class SearchWindow {
 	 *  tävlingens underlag */
 	protected void setupResultInputPanel(boolean init, boolean[] boxData, int nbrRounds, int surface) {
 	    resultInput.setupResultInputPanel(init, boxData, nbrRounds, surface);
-	    if(nbrRounds != DUMMY_STARTUP) {
-	        lapSumDialog.setNbrRounds(nbrRounds);
-	        lapSumDialog.setEditData(new boolean[nbrRounds-1]);
-	    }
+	    lapSumDialog.setNbrRounds(nbrRounds);
+	    lapSumDialog.setEditData(new boolean[nbrRounds-1]);
 	}
 	
 	/** uppdaterar sökresultaten */
@@ -455,13 +530,9 @@ public class SearchWindow {
 	
 	/** talar om för resultatinmatningsfönstret vilken person som valts */
 	private void setPopup(JButton b) {
-		resultInput.setPopup(b, competitionOpened);
-	}
-	
-	/** markerar innehållet i sökfältet och begär fokus till detta */
-	private void selectSearchField() {
 	    searchField.selectAll();
 		searchField.requestFocus();
+		resultInput.setPopup(b, mode);
 	}
 
     /** lägger till och tar bort personen från namnlistan, lägger till om add är true */
@@ -598,25 +669,29 @@ public class SearchWindow {
     					if(!fileNameSKV.endsWith(".skv")) {
     						fileNameSKV = fileNameSKV + ".skv";
     					}
-    					try {
-    						Object[] o = io.inputFromSKV(fileNameSKV);
-    						compHeader = (String)o[0];
-    						fileNameHTM = (String)o[1];
-    						warningHTM = true;
-    						ResultList result = (ResultList) o[2];
-    						resultInput.init(result);
-    						resultInput.setStartNbrMap((HashMap)o[3]);
-    						lapSumDialog.setNbrRounds(result.getNbrRounds());
-    						lapSumDialog.setEditData((boolean[])o[4]);
-    						ScoreBoardWindow.setHeader(compHeader);
-    						inputNameLabel = resultInput.getNameLabel();
-    						CHANGE = false;
-    						STATUSFIELD.setText("");
-    						MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
-    						enableDisabledMenus();
-    					} catch (Exception f) {
-    						System.out.println(f);
-    						JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    					if(new File(fileNameSKV).exists()) {
+    					    try {
+    					        Object[] o = io.inputFromSKV(fileNameSKV);
+    					        compHeader = (String)o[0];
+    					        fileNameHTM = (String)o[1];
+    					        warningHTM = true;
+    					        ResultList result = (ResultList) o[2];
+    					        resultInput.init(result);
+    					        resultInput.setStartNbrMap((HashMap)o[3]);
+    					        lapSumDialog.setNbrRounds(result.getNbrRounds());
+    					        lapSumDialog.setEditData((boolean[])o[4]);
+    					        ScoreBoardWindow.setHeader(compHeader);
+    					        inputNameLabel = resultInput.getNameLabel();
+    					        CHANGE = false;
+    					        STATUSFIELD.setText("");
+    					        MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
+    					        enableDisabledMenus();
+    					    } catch (Exception f) {
+    					        System.out.println(f);
+    					        JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    					    }
+    					} else {
+    					    JOptionPane.showMessageDialog(frame, "Filen, " + fileNameSKV + ", existerar inte", "Varning", JOptionPane.ERROR_MESSAGE);
     					}
     				}
     			}
@@ -680,7 +755,7 @@ public class SearchWindow {
     		else if(e.getSource() == snittStart) {
     			if(!SNITTOPEN) {
     				SNITTOPEN = true;
-    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
+    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager, searchWindow);
     			} else {
     				snittWindow.setVisible(true);
     			}
@@ -851,7 +926,6 @@ public class SearchWindow {
     	public void actionPerformed(ActionEvent e) {
     		for(int i = 0; i < 10; i++) {
     			if(e.getSource()==button[i] && !button[i].getText().equals("")){
-    			    selectSearchField();
     				setPopup(button[i]);
     			}
     		}
@@ -897,7 +971,6 @@ public class SearchWindow {
     			searchField.setEditable(false);
     			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
     			if(!button[keyNbr].getText().equals("")) {
-    			    selectSearchField();
     				setPopup(button[keyNbr]);
     			}
     			searchField.setEditable(true);
@@ -913,7 +986,6 @@ public class SearchWindow {
     		if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
     			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
     			if(!button[keyNbr].getText().equals("")) {
-    			    selectSearchField();
     				setPopup(button[keyNbr]);
     			}
     		} else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -922,7 +994,6 @@ public class SearchWindow {
     			} else if(pressedButton == removePlayerButton) {
     				handlePlayer(false);
     			} else if(!pressedButton.getText().equals("")) {
-    			    selectSearchField();
     				setPopup(pressedButton);
     			}
     		} 
