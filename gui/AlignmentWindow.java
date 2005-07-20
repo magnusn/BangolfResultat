@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -27,7 +28,8 @@ public class AlignmentWindow extends JDialog {
     private JDialog thisWindow;				// detta fönster
     private int nbrOfOwner;					// numret för den som skapat detta fönster
     private JRadioButton[] orientation;		// radioknappar för de olika orienteringsmöjligheterna
-    private JButton accept, cancel;			// knappar för att välja de nya inställningarna eller avbryta
+    private JButton acceptButton;			// knapp för att acceptera de nya inställingarna
+    private JButton cancelButton;			// knapp för att avbryta
     private DataManager dataManager;		// håller reda på inställningarna;
     public static final int LEFT = 0;		// heltalsvärde för vänsterjusterat
     public static final int CENTER = 1;		// heltalsvärde för centrerat
@@ -46,17 +48,16 @@ public class AlignmentWindow extends JDialog {
         this.dataManager = dataManager;
         
         ButtonHandler buttonHand = new ButtonHandler();
-        accept = new JButton("Ok");
-        cancel = new JButton("Avbryt");
-        accept.addActionListener(buttonHand);
-        cancel.addActionListener(buttonHand);
+        acceptButton = new JButton("Ok");
+        cancelButton = new JButton("Avbryt");
+        acceptButton.addActionListener(buttonHand);
+        cancelButton.addActionListener(buttonHand);
+        acceptButton.setMnemonic(KeyEvent.VK_O);
+        cancelButton.setMnemonic(KeyEvent.VK_A);
         
         GridLayout mainLayout = new GridLayout(NBR_ALIGN+1,1);
-        mainLayout.setHgap(1);
         mainLayout.setVgap(1);
         GridLayout buttonLayout = new GridLayout(1,2);
-        buttonLayout.setHgap(1);
-        buttonLayout.setVgap(1);
         JPanel mainPanel = new JPanel(mainLayout);
         JPanel buttonPanel = new JPanel(buttonLayout);
         ButtonGroup buttonGroup = new ButtonGroup();
@@ -73,8 +74,8 @@ public class AlignmentWindow extends JDialog {
             mainPanel.add(orientation[i]);
         }
         
-        buttonPanel.add(accept);
-        buttonPanel.add(cancel);
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(cancelButton);
         
         getContentPane().add(mainPanel, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -87,7 +88,7 @@ public class AlignmentWindow extends JDialog {
 	class ButtonHandler implements ActionListener {
 		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == accept) {
+			if(e.getSource() == acceptButton) {
 			    int alignment;
 			    if(orientation[LEFT].isSelected()) {
 			        alignment = LEFT;
@@ -104,7 +105,7 @@ public class AlignmentWindow extends JDialog {
 			    }
 			    
 			    thisWindow.dispose();
-			} else if (e.getSource() == cancel) {
+			} else if (e.getSource() == cancelButton) {
 			    thisWindow.dispose();
 			}
 		}

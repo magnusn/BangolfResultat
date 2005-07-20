@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,11 +20,13 @@ import datastruct.ResultList;
 
 /** klassen som beskriver fönstret där tävlingens inställningar ställs in */
 public class CompInfoDialog extends JDialog {
+    private CompInfoDialog thisDialog;		// referens till detta fönster
 	private SearchWindow mainWindow;		// huvudfönstret som visar allting
 	private JFrame owner;					// huvudfönstret
 	private boolean[] boxData;				// talar om ifall startnummer och licensnummer har valts
 	private JCheckBox[] startBox;			// för att välja startnummer samt licensnummer
-	private JButton varvButton;				// OK-knapp för indatafönstret
+	private JButton acceptButton;			// OK-knapp för indatafönstret
+	private JButton cancelButton;			// knapp för att avbryta
 	private VarvHandler varvHand;			// sköter om knapparna i fönstret inmatningsfönstret
 	private int nbrRounds,surface;			// tävlingens varvantal och underlag
 	public static final int MAXROUNDS = 10;	// max antal varv för en tävling
@@ -33,6 +36,7 @@ public class CompInfoDialog extends JDialog {
 	public CompInfoDialog(JFrame owner, SearchWindow mainWindow) {
 		super(owner, "Indatafönster", true);
 		setResizable(false);
+		thisDialog = this;
 		this.owner = owner;
 		this.mainWindow = mainWindow;
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -48,11 +52,14 @@ public class CompInfoDialog extends JDialog {
 			numberRoundsChoice.addItem(String.valueOf(i));
 		}
 		varvHand = new VarvHandler();
-		varvButton = new JButton("Ok");
-		varvButton.setMnemonic(KeyEvent.VK_O);
-		varvButton.addActionListener(varvHand);
+		acceptButton = new JButton("Ok");
+		acceptButton.setMnemonic(KeyEvent.VK_O);
+		acceptButton.addActionListener(varvHand);
+		cancelButton = new JButton("Avbryt");
+		cancelButton.setMnemonic(KeyEvent.VK_A);
+		cancelButton.addActionListener(varvHand);
 		EnterKeyHandler enterHandler = new EnterKeyHandler();
-		varvButton.addKeyListener(enterHandler);
+		acceptButton.addKeyListener(enterHandler);
 		varvPanel.setLayout(new GridLayout(7,1));
 		varvPanel.add(varvLabel1);
 		varvPanel.add(surfaceChoice);
@@ -65,7 +72,10 @@ public class CompInfoDialog extends JDialog {
 		startBox[1].setMnemonic(KeyEvent.VK_L);
 		varvPanel.add(startBox[0]);
 		varvPanel.add(startBox[1]);
-		varvPanel.add(varvButton);
+		JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+		buttonPanel.add(acceptButton);
+		buttonPanel.add(cancelButton);
+		varvPanel.add(buttonPanel);
 		this.getContentPane().add(varvPanel);
 		this.pack();
 	}
@@ -104,8 +114,10 @@ public class CompInfoDialog extends JDialog {
 	class VarvHandler implements ActionListener {
 		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == varvButton) {
+			if(e.getSource() == acceptButton) {
 				handleIndata();
+			} else if(e.getSource() == cancelButton) {
+			    getWindowListeners()[0].windowClosing(new WindowEvent(thisDialog, WindowEvent.WINDOW_CLOSING));
 			}
 		}
 	}

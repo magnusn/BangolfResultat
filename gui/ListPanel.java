@@ -1,4 +1,5 @@
 package gui;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -82,14 +83,8 @@ public class ListPanel extends JPanel {
 		gridbag.setConstraints(selectionLabel, c);
 		gridbag.setConstraints(selectedLabel, c);
 		c.gridwidth = 3;
-
-		c.fill = GridBagConstraints.BOTH;
 		gridbag.setConstraints(sp1Panel, c);
-		
-		c.fill = GridBagConstraints.NONE;
 		gridbag.setConstraints(buttonPanel, c);
-		
-		c.fill = GridBagConstraints.BOTH;
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		gridbag.setConstraints(sp2Panel, c);
 		

@@ -8,6 +8,7 @@ package snitt;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -16,6 +17,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * AppearanceWindow - beskriver fönstret för att ställa in vad som skall visas i snittlistan
@@ -25,6 +27,7 @@ public class AppearanceWindow extends JDialog {
     private JCheckBox[] headers;		// vektor av rubriker som kan väljas
     private SnittData snittData;		// håller reda på inställningarna
     private JButton acceptButton;		// knapp för att bekräfta inställningarna
+    private JButton cancelButton;		// knapp för att avbryta
     private int tabIndex;				// håller reda på vilken snittlista inställningarna gäller
 
     /** skapar ett fönster med inställningar för vad som skall visas */
@@ -47,23 +50,35 @@ public class AppearanceWindow extends JDialog {
         
         ButtonHandler buttonHand = new ButtonHandler();
         acceptButton = new JButton("Ok");
+        acceptButton.setMnemonic(KeyEvent.VK_O);
         acceptButton.addActionListener(buttonHand);
-        getContentPane().add(acceptButton);
+        cancelButton = new JButton("Avbryt");
+        cancelButton.setMnemonic(KeyEvent.VK_A);
+        cancelButton.addActionListener(buttonHand);
+        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(cancelButton);
+        getContentPane().add(buttonPanel);
         
         pack();
         setLocationRelativeTo(owner);
         setVisible(true);
     }
     
+    /** stänger ner fönstret utan att ändra på några inställningar */
+    private void exitWithoutChanges() {
+        for(int i = 0; i < headers.length; i++) {
+	        headers[i].setSelected(initialSelection[i]);
+	    }
+	    snittData.setAppearanceHeaders(headers, tabIndex);
+		dispose();
+    }
+    
     /** klassen som sköter fönsterhanteringen */
 	class WindowHandler extends WindowAdapter {
 		/** stänger ned fönstret */
 		public void windowClosing(WindowEvent e) {
-		    for(int i = 0; i < headers.length; i++) {
-		        headers[i].setSelected(initialSelection[i]);
-		    }
-		    snittData.setAppearanceHeaders(headers, tabIndex);
-			dispose();
+		    exitWithoutChanges();
 		}
 	}
     
@@ -74,6 +89,8 @@ public class AppearanceWindow extends JDialog {
             if(e.getSource() == acceptButton) {
                 snittData.setAppearanceHeaders(headers, tabIndex);
                 dispose();
+            } else if(e.getSource() == cancelButton) {
+                exitWithoutChanges();
             }
         }
     }

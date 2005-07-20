@@ -45,8 +45,8 @@ public class SearchWindow {
 	private HashMap personNameTracker;		// lagrar namnet som idnumret tillhör
 	private NameList name;					// namnlista som används för sökning
 	private ResultInputWindow resultInput;	// fönstret för indata
-	private JPanel searchPanel;				// panelen för sökfältet
 	private JFrame frame;					// huvudfönster
+	private JPanel searchPanel;				// panelen för sökfältet
 	private LapSumDialog lapSumDialog; 		// redigeringsfönstret
 	private JDialog compInfoDialog;			// indatafönster
 	private JTextField searchField,nameField,clubField;	// sökfält, namn- och klubbfält för namnlistan
@@ -113,6 +113,7 @@ public class SearchWindow {
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		WindowHandler window = new WindowHandler();
 		frame.addWindowListener(window);
+		
 		JPanel buttonpanel = new JPanel();
 		searchPanel = new JPanel();
 		button = new JButton[10];
@@ -375,40 +376,6 @@ public class SearchWindow {
 	    }
 	}
 	
-	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */
-	class KeyHandler extends KeyAdapter {
-		private int searchFieldLength = 0;	// håller reda på längden på sökfältet
-		
-		/** utför lämplig handling */
-		public void keyReleased(KeyEvent e) {
-			/** om tecknet som matas in inte ligger mellan 0 och 9 så 
-			 *  uppdateras träffarna efter värdet i sökfältet searchField
-			 */
-			if(e.getKeyChar() < '0' || e.getKeyChar() > '9') {
-				searchFieldLength = searchField.getText().length();
-				updatePersonMatch();
-			/** annars ställs sökfältets värde tillbaka till det ursprungliga */
-			} else {
-				String search = searchField.getText();
-				searchField.setText(search.substring(0, searchFieldLength));
-			}
-		}
-		
-		/** ser till så att resultatinmatningsfönstret poppar upp när 
-		 * 	man trycker på någon av knapparna 0 till 9 i sökfältet
-		 */
-		public void keyPressed(KeyEvent e) {
-			if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
-				searchField.setEditable(false);
-				int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
-				if(!button[keyNbr].getText().equals("")) {
-					setPopup(button[keyNbr]);
-				}
-				searchField.setEditable(true);
-			}
-		}
-	}
-	
 	/** uppdaterar sökresultaten */
 	private void updatePersonMatch() {
 		String search = searchField.getText();
@@ -422,28 +389,6 @@ public class SearchWindow {
 				button[i].setFocusable(false);
 				button[i].setText("");
 			}
-		}
-	}
-	
-	/** klassen som tar hand om tangentbordsinmatningen på sökknapparna */
-	class ButtonKeyHandler extends KeyAdapter {
-		/** utför lämplig handling */
-		public void keyPressed(KeyEvent e) {
-			JButton pressedButton = (JButton) e.getSource();
-			if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
-				int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
-				if(!button[keyNbr].getText().equals("")) {
-					setPopup(button[keyNbr]);
-				}
-			} else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-				if(pressedButton == addPlayerButton) {
-					handlePlayer(true);
-				} else if(pressedButton == removePlayerButton) {
-					handlePlayer(false);
-				} else if(!pressedButton.getText().equals("")) {
-					setPopup(pressedButton);
-				}
-			} 
 		}
 	}
 	
@@ -502,368 +447,24 @@ public class SearchWindow {
 		}
 	}
 	
-	/** klassen som tar hand om knapptryckningarna vid sökning */
-	class SearchHandler implements ActionListener {
-		/** kollar vilken knapp som tryckts ned */
-		public void actionPerformed(ActionEvent e) {
-			for(int i = 0; i < 10; i++) {
-				if(e.getSource()==button[i] && !button[i].getText().equals("")){
-					setPopup(button[i]);
-				}
-			}
-		}
-	}
-	
-	/** klassen som tar hand om knapptryckningarna vid ändring av namnregistret */
-	class PlayerHandler implements ActionListener {
-		/** kollar vilken knapp som tryckts ned */
-		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == addPlayerButton) {
-				handlePlayer(true);
-			} else if (e.getSource() == removePlayerButton) {
-				handlePlayer(false);
-			}
-		}
-	}
-	
-	/** klassen som tar hand om knapptryckningarna i menyn */
-	class MenuHandler implements ActionListener {
-		/** kollar vilket menyalternativ som valts och utför lämplig handling */
-		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == saveToHTML) {
-				if(fileNameHTM == null) {
-					saveAsHTML();
-				} else {
-					try {
-						boolean doit = true;
-						if(warningHTM) {
-							int val = JOptionPane.showConfirmDialog(frame, "Vill du att webbsidan sparas till filen " + fileNameHTM + "?"
-							, "Spara webbsida", JOptionPane.YES_NO_OPTION);
-							if(val != JOptionPane.YES_OPTION) {
-								doit = false;
-							}
-						}
-						if(doit) {
-						    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
-							io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
-							warningHTM = false;
-							MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
-						} else {
-							saveAsHTML();
-						}
-					} catch (Exception f) {
-						JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-			else if(e.getSource() == saveAsHTML) {
-				saveAsHTML();
-			}
-			else if(e.getSource() == saveToSKV) {
-				saveToSKV();
-			}
-			else if(e.getSource() == saveAsSKV) {
-				saveAsSKV();
-			}
-			else if(e.getSource() == openFromSKV) {
-				int val = JOptionPane.YES_OPTION;
-				if(CHANGE) {
-					val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
-					, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-					if(val == JOptionPane.YES_OPTION) {
-						autoSave();
-					}
-				}
-				if(!CHANGE || val == JOptionPane.NO_OPTION) {
-					fileChooser.setCurrentDirectory(DIRSKV);
-					fileChooser.setSelectedFile(new File(""));
-					fileChooser.setFileFilter(skvFilter);
-					int retval = fileChooser.showOpenDialog(frame);
-					if(retval == JFileChooser.APPROVE_OPTION) {
-						File file = fileChooser.getSelectedFile();
-						DIRSKV = fileChooser.getCurrentDirectory();
-						fileNameSKV = file.getPath();
-						if(!fileNameSKV.endsWith(".skv")) {
-							fileNameSKV = fileNameSKV + ".skv";
-						}
-						try {
-							Object[] o = io.inputFromSKV(fileNameSKV);
-							compHeader = (String)o[0];
-							fileNameHTM = (String)o[1];
-							warningHTM = true;
-							ResultList result = (ResultList) o[2];
-							resultInput.init(result);
-							resultInput.setStartNbrMap((HashMap)o[3]);
-							lapSumDialog.setNbrRounds(result.getNbrRounds());
-							lapSumDialog.setEditData((boolean[])o[4]);
-							ScoreBoardWindow.setHeader(compHeader);
-							inputNameLabel = resultInput.getNameLabel();
-							CHANGE = false;
-							STATUSFIELD.setText("");
-							MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
-							enableDisabledMenus();
-						} catch (Exception f) {
-							System.out.println(f);
-							JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-				}
-			}
-			else if(e.getSource() == newComp) {
-				int val = JOptionPane.YES_OPTION;
-				if(CHANGE) {
-					val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
-					, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-					if(val == JOptionPane.YES_OPTION) {
-						autoSave();
-					}
-				}
-				if(!CHANGE || val == JOptionPane.NO_OPTION) {
-					compInfoDialog.setLocationRelativeTo(frame);
-					compInfoDialog.setVisible(true);
-					if(!compInfoDialogClosed) {
-						compHeader = "";
-						fileNameSKV = null;
-						fileNameHTM = null;
-						warningHTM = false;
-						CHANGE = false;
-						STATUSFIELD.setText("");
-						MESSAGEFIELD.setText("Ny tävling har öppnats.");
-						ScoreBoardWindow.setHeader(compHeader);
-						inputNameLabel = resultInput.getNameLabel();
-						enableDisabledMenus();
-					} else {
-						compInfoDialogClosed = false;
-					}
-				}
-			}
-			else if(e.getSource() == editItem) {
-				lapSumDialog.setEditWindow();
-				lapSumDialog.getContentPane().add(lapSumDialog.lapSumPanel(), BorderLayout.NORTH);
-				lapSumDialog.pack();
-				lapSumDialog.setLocationRelativeTo(frame);
-				lapSumDialog.setVisible(true);
-			}
-			else if(e.getSource() == headerItem) {
-				String tempHeader = JOptionPane.showInputDialog(frame, "Skriv in rubriken för tävlingen", ScoreBoardWindow.getHeader());
-				if(tempHeader != null) {
-					compHeader = tempHeader;
-					ScoreBoardWindow.setHeader(compHeader);
-					CHANGE = true;
-					STATUSFIELD.setText("*");
-					MESSAGEFIELD.setText("");
-				}
-			}
-			else if(e.getSource() == numberOrientation) {
-			    new AlignmentWindow(frame, AlignmentWindow.COMP_OWNER, dataManager);
-			}
-			else if(e.getSource() == klassStart) {
-				if(!KLASSOPEN) {
-					KLASSOPEN = true;
-					klassWindow = new KlassWindow(frame);
-				} else {
-					klassWindow.setVisible(true);
-				}
-			}
-			else if(e.getSource() == snittStart) {
-				if(!SNITTOPEN) {
-					SNITTOPEN = true;
-					snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
-				} else {
-					snittWindow.setVisible(true);
-				}
-			}
-			else if(e.getSource() == about) {
-				AboutWindow aboutWindow = new AboutWindow(frame);
-			}
-			else if(e.getSource() == quit) {
-				exit();
-			}
-			else if(e.getSource() == changeName) {
-				StringTokenizer inString = new StringTokenizer(inputNameLabel.getText(), ",");
-				String labelName = inString.nextToken();
-				String labelClub = inString.nextToken().trim();
-				String newName = JOptionPane.showInputDialog(frame, "Skriv in nytt namn", labelName);
-				if(newName != null && newName.trim() != "") {
-					if(name.add(newName, labelClub)) {
-						name.remove(labelName, labelClub);
-						name.sortedNames();
-						updatePersonMatch();
-						Integer personID = (Integer) personTracker.get(labelName + ", " + labelClub);
-						personTracker.remove(labelName + ", " + labelClub);
-						personTracker.put(newName + ", " + labelClub, personID);
-						personNameTracker.put(personID, newName + ", " + labelClub);
-						inputNameLabel.setText(newName + ", " + labelClub);
-						resultInput.updateNameAndClub(labelName, labelClub, newName, labelClub, personID);
-						save();
-					} else {
-						JOptionPane.showMessageDialog(frame, "Personen finns redan inlagd!");
-					}
-				}
-			}
-			else if(e.getSource() == changeClub) {
-				StringTokenizer inString = new StringTokenizer(inputNameLabel.getText(), ",");
-				String labelName = inString.nextToken();
-				String labelClub = inString.nextToken().trim();
-				String newClub = JOptionPane.showInputDialog(frame, "Skriv in ny klubb", labelClub);
-				if(newClub != null && newClub.trim() != "") {
-					if(name.add(labelName, newClub)) {
-						name.remove(labelName, labelClub);
-						name.sortedNames();
-						updatePersonMatch();
-						Integer personID = (Integer) personTracker.get(labelName + ", " + labelClub);
-						personTracker.remove(labelName + ", " + labelClub);
-						personTracker.put(labelName + ", " + newClub, personID);
-						personNameTracker.put(personID, labelName + ", " + newClub);
-						inputNameLabel.setText(labelName + ", " + newClub);
-						resultInput.updateNameAndClub(labelName, labelClub, labelName, newClub, personID);
-						save();
-					} else {
-						JOptionPane.showMessageDialog(frame, "Personen finns redan inlagd!");
-					}
-				}
-			}
-		}
-		
-		/** sparar tävlingen som HTML-fil */
-		private void saveAsHTML() {
-			fileChooser.setCurrentDirectory(DIRHTM);
-			fileChooser.setSelectedFile(new File(""));
-			fileChooser.setFileFilter(htmFilter);
-			int retval = fileChooser.showSaveDialog(frame);
-			if(retval == JFileChooser.APPROVE_OPTION) {
-				File file = fileChooser.getSelectedFile();
-				String filePath = file.getPath();
-				while(filePath.endsWith(".htm") || filePath.endsWith(".skv") || filePath.endsWith(".html")) {
-					if(filePath.endsWith(".html")) {
-						filePath = filePath.substring(0, filePath.length()-5);
-					} else {
-						filePath = filePath.substring(0, filePath.length()-4);
-					}
-				}
-				file = new File(filePath + ".htm");
-				DIRHTM = fileChooser.getCurrentDirectory();
-				int val;
-				if(file.exists()) {
-					val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
-					"Skriva över?", JOptionPane.YES_NO_OPTION);
-				} else {
-					val = JOptionPane.YES_OPTION;
-				}
-				if(val == JOptionPane.YES_OPTION) {
-					fileNameHTM = file.getPath();
-					if(compHeader.equals("")) {
-						val = JOptionPane.showConfirmDialog(frame, "Tävlingen saknar rubrik. Vill du skriva in den nu?",
-						"Sätta rubrik?", JOptionPane.YES_NO_OPTION);
-						if(val == JOptionPane.YES_OPTION) {
-							String tempHeader = JOptionPane.showInputDialog(frame, "Skriv in rubriken för tävlingen", ScoreBoardWindow.getHeader());
-							if(tempHeader != null) {
-								compHeader = tempHeader;
-								ScoreBoardWindow.setHeader(compHeader);
-							}
-						}
-					}
-					try {
-					    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
-						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
-						warningHTM = false;
-						CHANGE = true;
-						MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
-						STATUSFIELD.setText("*");
-					} catch (Exception f) {
-						JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		}
-		
-		/** sparar tävlingen */
-		private void saveToSKV() {
-			if(fileNameSKV == null) {
-				saveAsSKV();
-			} else {
-				try {
-					io.outputToSKV(fileNameSKV, fileNameHTM, resultInput.getResultList(), compHeader, lapSumDialog.getEditData());
-					CHANGE = false;
-					MESSAGEFIELD.setText("Tävlingen är sparad.");
-					STATUSFIELD.setText("");
-				} catch (Exception f) {
-					JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		}
-		
-		/** sparar tävlingen under angivet filnamn */
-		private void saveAsSKV() {
-			fileChooser.setCurrentDirectory(DIRSKV);
-			fileChooser.setSelectedFile(new File(""));
-			fileChooser.setFileFilter(skvFilter);
-			int retval = fileChooser.showSaveDialog(frame);
-			if(retval == JFileChooser.APPROVE_OPTION) {
-				File file = fileChooser.getSelectedFile();
-				String filePath = file.getPath();
-				while(filePath.endsWith(".htm") || filePath.endsWith(".skv") || filePath.endsWith(".html")) {
-					if(filePath.endsWith(".html")) {
-						filePath = filePath.substring(0, filePath.length()-5);
-					} else {
-						filePath = filePath.substring(0, filePath.length()-4);
-					}
-				}
-				file = new File(filePath + ".skv");
-				DIRSKV = fileChooser.getCurrentDirectory();
-				int val;
-				if(file.exists()) {
-					val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
-					"Skriva över?", JOptionPane.YES_NO_OPTION);
-				} else {
-					val = JOptionPane.YES_OPTION;
-				}
-				if(val == JOptionPane.YES_OPTION) {
-					fileNameSKV = file.getPath();
-					try {
-						io.outputToSKV(fileNameSKV, fileNameHTM, resultInput.getResultList(), compHeader, lapSumDialog.getEditData());
-						CHANGE = false;
-						MESSAGEFIELD.setText("Tävlingen är sparad.");
-						STATUSFIELD.setText("");
-					} catch (Exception f) {
-						JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		}
-	}
-	
 	/** sparar efter uppmaning */
 	private void autoSave() {
 		MenuHandler menu = new MenuHandler();
 		menu.saveToSKV();
 	}
 	
-	/** klassen som sköter fönsterhanteringen i huvudfönstret */
-	class WindowHandler extends WindowAdapter {
-		/** stänger ned fönstret */
-		public void windowClosing(WindowEvent e) {
-			exit();
-		}
-	}
-	
-	/** klassen som sköter fönsterhanteringen för fönstret där man matar in tävlingsinställningarna */
-	class WinHandForCompInfoDialog extends WindowAdapter {
-		/** stänger ned fönstret */
-		public void windowClosing(WindowEvent e) {
-			compInfoDialogClosed = true;
-			((CompInfoDialog)e.getSource()).setVisible(false);
-		}
-	}
-	
 	/** talar om för resultatinmatningsfönstret vilken person som valts */
 	private void setPopup(JButton b) {
-		searchField.selectAll();
-		searchField.requestFocus();
 		resultInput.setPopup(b, competitionOpened);
 	}
 	
-	/** lägger till och tar bort personen från namnlistan, lägger till om add är true */
+	/** markerar innehållet i sökfältet och begär fokus till detta */
+	private void selectSearchField() {
+	    searchField.selectAll();
+		searchField.requestFocus();
+	}
+
+    /** lägger till och tar bort personen från namnlistan, lägger till om add är true */
 	private void handlePlayer(boolean add) {
 		boolean done = false;
 		boolean visit = false;
@@ -936,4 +537,412 @@ public class SearchWindow {
 	public static void main(String[] args) {
 		SearchWindow window = new SearchWindow();
 	}
+
+    /** klassen som tar hand om knapptryckningarna i menyn */
+    class MenuHandler implements ActionListener {
+    	/** kollar vilket menyalternativ som valts och utför lämplig handling */
+    	public void actionPerformed(ActionEvent e) {
+    		if(e.getSource() == saveToHTML) {
+    			if(fileNameHTM == null) {
+    				saveAsHTML();
+    			} else {
+    				try {
+    					boolean doit = true;
+    					if(warningHTM) {
+    						int val = JOptionPane.showConfirmDialog(frame, "Vill du att webbsidan sparas till filen " + fileNameHTM + "?"
+    						, "Spara webbsida", JOptionPane.YES_NO_OPTION);
+    						if(val != JOptionPane.YES_OPTION) {
+    							doit = false;
+    						}
+    					}
+    					if(doit) {
+    					    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+    						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
+    						warningHTM = false;
+    						MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
+    					} else {
+    						saveAsHTML();
+    					}
+    				} catch (Exception f) {
+    					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    				}
+    			}
+    		}
+    		else if(e.getSource() == saveAsHTML) {
+    			saveAsHTML();
+    		}
+    		else if(e.getSource() == saveToSKV) {
+    			saveToSKV();
+    		}
+    		else if(e.getSource() == saveAsSKV) {
+    			saveAsSKV();
+    		}
+    		else if(e.getSource() == openFromSKV) {
+    			int val = JOptionPane.YES_OPTION;
+    			if(CHANGE) {
+    				val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
+    				, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    				if(val == JOptionPane.YES_OPTION) {
+    					autoSave();
+    				}
+    			}
+    			if(!CHANGE || val == JOptionPane.NO_OPTION) {
+    				fileChooser.setCurrentDirectory(DIRSKV);
+    				fileChooser.setSelectedFile(new File(""));
+    				fileChooser.setFileFilter(skvFilter);
+    				int retval = fileChooser.showOpenDialog(frame);
+    				if(retval == JFileChooser.APPROVE_OPTION) {
+    					File file = fileChooser.getSelectedFile();
+    					DIRSKV = fileChooser.getCurrentDirectory();
+    					fileNameSKV = file.getPath();
+    					if(!fileNameSKV.endsWith(".skv")) {
+    						fileNameSKV = fileNameSKV + ".skv";
+    					}
+    					try {
+    						Object[] o = io.inputFromSKV(fileNameSKV);
+    						compHeader = (String)o[0];
+    						fileNameHTM = (String)o[1];
+    						warningHTM = true;
+    						ResultList result = (ResultList) o[2];
+    						resultInput.init(result);
+    						resultInput.setStartNbrMap((HashMap)o[3]);
+    						lapSumDialog.setNbrRounds(result.getNbrRounds());
+    						lapSumDialog.setEditData((boolean[])o[4]);
+    						ScoreBoardWindow.setHeader(compHeader);
+    						inputNameLabel = resultInput.getNameLabel();
+    						CHANGE = false;
+    						STATUSFIELD.setText("");
+    						MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
+    						enableDisabledMenus();
+    					} catch (Exception f) {
+    						System.out.println(f);
+    						JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    					}
+    				}
+    			}
+    		}
+    		else if(e.getSource() == newComp) {
+    			int val = JOptionPane.YES_OPTION;
+    			if(CHANGE) {
+    				val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
+    				, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    				if(val == JOptionPane.YES_OPTION) {
+    					autoSave();
+    				}
+    			}
+    			if(!CHANGE || val == JOptionPane.NO_OPTION) {
+    				compInfoDialog.setLocationRelativeTo(frame);
+    				compInfoDialog.setVisible(true);
+    				if(!compInfoDialogClosed) {
+    					compHeader = "";
+    					fileNameSKV = null;
+    					fileNameHTM = null;
+    					warningHTM = false;
+    					CHANGE = false;
+    					STATUSFIELD.setText("");
+    					MESSAGEFIELD.setText("Ny tävling har öppnats.");
+    					ScoreBoardWindow.setHeader(compHeader);
+    					inputNameLabel = resultInput.getNameLabel();
+    					enableDisabledMenus();
+    				} else {
+    					compInfoDialogClosed = false;
+    				}
+    			}
+    		}
+    		else if(e.getSource() == editItem) {
+    			lapSumDialog.setEditWindow();
+    			lapSumDialog.getContentPane().add(lapSumDialog.lapSumPanel(), BorderLayout.NORTH);
+    			lapSumDialog.pack();
+    			lapSumDialog.setLocationRelativeTo(frame);
+    			lapSumDialog.setVisible(true);
+    		}
+    		else if(e.getSource() == headerItem) {
+    			String tempHeader = JOptionPane.showInputDialog(frame, "Skriv in rubriken för tävlingen", ScoreBoardWindow.getHeader());
+    			if(tempHeader != null) {
+    				compHeader = tempHeader;
+    				ScoreBoardWindow.setHeader(compHeader);
+    				CHANGE = true;
+    				STATUSFIELD.setText("*");
+    				MESSAGEFIELD.setText("");
+    			}
+    		}
+    		else if(e.getSource() == numberOrientation) {
+    		    new AlignmentWindow(frame, AlignmentWindow.COMP_OWNER, dataManager);
+    		}
+    		else if(e.getSource() == klassStart) {
+    			if(!KLASSOPEN) {
+    				KLASSOPEN = true;
+    				klassWindow = new KlassWindow(frame);
+    			} else {
+    				klassWindow.setVisible(true);
+    			}
+    		}
+    		else if(e.getSource() == snittStart) {
+    			if(!SNITTOPEN) {
+    				SNITTOPEN = true;
+    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
+    			} else {
+    				snittWindow.setVisible(true);
+    			}
+    		}
+    		else if(e.getSource() == about) {
+    			AboutWindow aboutWindow = new AboutWindow(frame);
+    		}
+    		else if(e.getSource() == quit) {
+    			exit();
+    		}
+    		else if(e.getSource() == changeName) {
+    			StringTokenizer inString = new StringTokenizer(inputNameLabel.getText(), ",");
+    			String labelName = inString.nextToken();
+    			String labelClub = inString.nextToken().trim();
+    			String newName = JOptionPane.showInputDialog(frame, "Skriv in nytt namn", labelName);
+    			if(newName != null && newName.trim() != "") {
+    				if(name.add(newName, labelClub)) {
+    					name.remove(labelName, labelClub);
+    					name.sortedNames();
+    					updatePersonMatch();
+    					Integer personID = (Integer) personTracker.get(labelName + ", " + labelClub);
+    					personTracker.remove(labelName + ", " + labelClub);
+    					personTracker.put(newName + ", " + labelClub, personID);
+    					personNameTracker.put(personID, newName + ", " + labelClub);
+    					inputNameLabel.setText(newName + ", " + labelClub);
+    					resultInput.updateNameAndClub(labelName, labelClub, newName, labelClub, personID);
+    					save();
+    				} else {
+    					JOptionPane.showMessageDialog(frame, "Personen finns redan inlagd!");
+    				}
+    			}
+    		}
+    		else if(e.getSource() == changeClub) {
+    			StringTokenizer inString = new StringTokenizer(inputNameLabel.getText(), ",");
+    			String labelName = inString.nextToken();
+    			String labelClub = inString.nextToken().trim();
+    			String newClub = JOptionPane.showInputDialog(frame, "Skriv in ny klubb", labelClub);
+    			if(newClub != null && newClub.trim() != "") {
+    				if(name.add(labelName, newClub)) {
+    					name.remove(labelName, labelClub);
+    					name.sortedNames();
+    					updatePersonMatch();
+    					Integer personID = (Integer) personTracker.get(labelName + ", " + labelClub);
+    					personTracker.remove(labelName + ", " + labelClub);
+    					personTracker.put(labelName + ", " + newClub, personID);
+    					personNameTracker.put(personID, labelName + ", " + newClub);
+    					inputNameLabel.setText(labelName + ", " + newClub);
+    					resultInput.updateNameAndClub(labelName, labelClub, labelName, newClub, personID);
+    					save();
+    				} else {
+    					JOptionPane.showMessageDialog(frame, "Personen finns redan inlagd!");
+    				}
+    			}
+    		}
+    	}
+    	
+    	/** sparar tävlingen som HTML-fil */
+    	private void saveAsHTML() {
+    		fileChooser.setCurrentDirectory(DIRHTM);
+    		fileChooser.setSelectedFile(new File(""));
+    		fileChooser.setFileFilter(htmFilter);
+    		int retval = fileChooser.showSaveDialog(frame);
+    		if(retval == JFileChooser.APPROVE_OPTION) {
+    			File file = fileChooser.getSelectedFile();
+    			String filePath = file.getPath();
+    			while(filePath.endsWith(".htm") || filePath.endsWith(".skv") || filePath.endsWith(".html")) {
+    				if(filePath.endsWith(".html")) {
+    					filePath = filePath.substring(0, filePath.length()-5);
+    				} else {
+    					filePath = filePath.substring(0, filePath.length()-4);
+    				}
+    			}
+    			file = new File(filePath + ".htm");
+    			DIRHTM = fileChooser.getCurrentDirectory();
+    			int val;
+    			if(file.exists()) {
+    				val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
+    				"Skriva över?", JOptionPane.YES_NO_OPTION);
+    			} else {
+    				val = JOptionPane.YES_OPTION;
+    			}
+    			if(val == JOptionPane.YES_OPTION) {
+    				fileNameHTM = file.getPath();
+    				if(compHeader.equals("")) {
+    					val = JOptionPane.showConfirmDialog(frame, "Tävlingen saknar rubrik. Vill du skriva in den nu?",
+    					"Sätta rubrik?", JOptionPane.YES_NO_OPTION);
+    					if(val == JOptionPane.YES_OPTION) {
+    						String tempHeader = JOptionPane.showInputDialog(frame, "Skriv in rubriken för tävlingen", ScoreBoardWindow.getHeader());
+    						if(tempHeader != null) {
+    							compHeader = tempHeader;
+    							ScoreBoardWindow.setHeader(compHeader);
+    						}
+    					}
+    				}
+    				try {
+    				    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+    					io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
+    					warningHTM = false;
+    					CHANGE = true;
+    					MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
+    					STATUSFIELD.setText("*");
+    				} catch (Exception f) {
+    					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    				}
+    			}
+    		}
+    	}
+    	
+    	/** sparar tävlingen */
+    	private void saveToSKV() {
+    		if(fileNameSKV == null) {
+    			saveAsSKV();
+    		} else {
+    			try {
+    				io.outputToSKV(fileNameSKV, fileNameHTM, resultInput.getResultList(), compHeader, lapSumDialog.getEditData());
+    				CHANGE = false;
+    				MESSAGEFIELD.setText("Tävlingen är sparad.");
+    				STATUSFIELD.setText("");
+    			} catch (Exception f) {
+    				JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    			}
+    		}
+    	}
+    	
+    	/** sparar tävlingen under angivet filnamn */
+    	private void saveAsSKV() {
+    		fileChooser.setCurrentDirectory(DIRSKV);
+    		fileChooser.setSelectedFile(new File(""));
+    		fileChooser.setFileFilter(skvFilter);
+    		int retval = fileChooser.showSaveDialog(frame);
+    		if(retval == JFileChooser.APPROVE_OPTION) {
+    			File file = fileChooser.getSelectedFile();
+    			String filePath = file.getPath();
+    			while(filePath.endsWith(".htm") || filePath.endsWith(".skv") || filePath.endsWith(".html")) {
+    				if(filePath.endsWith(".html")) {
+    					filePath = filePath.substring(0, filePath.length()-5);
+    				} else {
+    					filePath = filePath.substring(0, filePath.length()-4);
+    				}
+    			}
+    			file = new File(filePath + ".skv");
+    			DIRSKV = fileChooser.getCurrentDirectory();
+    			int val;
+    			if(file.exists()) {
+    				val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
+    				"Skriva över?", JOptionPane.YES_NO_OPTION);
+    			} else {
+    				val = JOptionPane.YES_OPTION;
+    			}
+    			if(val == JOptionPane.YES_OPTION) {
+    				fileNameSKV = file.getPath();
+    				try {
+    					io.outputToSKV(fileNameSKV, fileNameHTM, resultInput.getResultList(), compHeader, lapSumDialog.getEditData());
+    					CHANGE = false;
+    					MESSAGEFIELD.setText("Tävlingen är sparad.");
+    					STATUSFIELD.setText("");
+    				} catch (Exception f) {
+    					JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    				}
+    			}
+    		}
+    	}
+    }
+
+    /** klassen som tar hand om knapptryckningarna vid sökning */
+    class SearchHandler implements ActionListener {
+    	/** kollar vilken knapp som tryckts ned */
+    	public void actionPerformed(ActionEvent e) {
+    		for(int i = 0; i < 10; i++) {
+    			if(e.getSource()==button[i] && !button[i].getText().equals("")){
+    			    selectSearchField();
+    				setPopup(button[i]);
+    			}
+    		}
+    	}
+    }
+
+    /** klassen som tar hand om knapptryckningarna vid ändring av namnregistret */
+    class PlayerHandler implements ActionListener {
+    	/** kollar vilken knapp som tryckts ned */
+    	public void actionPerformed(ActionEvent e) {
+    		if(e.getSource() == addPlayerButton) {
+    			handlePlayer(true);
+    		} else if (e.getSource() == removePlayerButton) {
+    			handlePlayer(false);
+    		}
+    	}
+    }
+
+    /** klassen som tar hand om tangentbordsinmatningen i sökfältet */
+    class KeyHandler extends KeyAdapter {
+    	private int searchFieldLength = 0;	// håller reda på längden på sökfältet
+    	
+    	/** utför lämplig handling */
+    	public void keyReleased(KeyEvent e) {
+    		/** om tecknet som matas in inte ligger mellan 0 och 9 så 
+    		 *  uppdateras träffarna efter värdet i sökfältet searchField
+    		 */
+    		if(e.getKeyChar() < '0' || e.getKeyChar() > '9') {
+    			searchFieldLength = searchField.getText().length();
+    			updatePersonMatch();
+    		/** annars ställs sökfältets värde tillbaka till det ursprungliga */
+    		} else {
+    			String search = searchField.getText();
+    			searchField.setText(search.substring(0, searchFieldLength));
+    		}
+    	}
+    	
+    	/** ser till så att resultatinmatningsfönstret poppar upp när 
+    	 * 	man trycker på någon av knapparna 0 till 9 i sökfältet
+    	 */
+    	public void keyPressed(KeyEvent e) {
+    		if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
+    			searchField.setEditable(false);
+    			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
+    			if(!button[keyNbr].getText().equals("")) {
+    			    selectSearchField();
+    				setPopup(button[keyNbr]);
+    			}
+    			searchField.setEditable(true);
+    		}
+    	}
+    }
+
+    /** klassen som tar hand om tangentbordsinmatningen på sökknapparna */
+    class ButtonKeyHandler extends KeyAdapter {
+    	/** utför lämplig handling */
+    	public void keyPressed(KeyEvent e) {
+    		JButton pressedButton = (JButton) e.getSource();
+    		if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
+    			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
+    			if(!button[keyNbr].getText().equals("")) {
+    			    selectSearchField();
+    				setPopup(button[keyNbr]);
+    			}
+    		} else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+    			if(pressedButton == addPlayerButton) {
+    				handlePlayer(true);
+    			} else if(pressedButton == removePlayerButton) {
+    				handlePlayer(false);
+    			} else if(!pressedButton.getText().equals("")) {
+    			    selectSearchField();
+    				setPopup(pressedButton);
+    			}
+    		} 
+    	}
+    }
+
+    /** klassen som sköter fönsterhanteringen i huvudfönstret */
+    class WindowHandler extends WindowAdapter {
+    	/** stänger ned fönstret */
+    	public void windowClosing(WindowEvent e) {
+    		exit();
+    	}
+    }
+
+    /** klassen som sköter fönsterhanteringen för fönstret där man matar in tävlingsinställningarna */
+    class WinHandForCompInfoDialog extends WindowAdapter {
+    	/** stänger ned fönstret */
+    	public void windowClosing(WindowEvent e) {
+    		compInfoDialogClosed = true;
+    		((CompInfoDialog)e.getSource()).setVisible(false);
+    	}
+    }
 }

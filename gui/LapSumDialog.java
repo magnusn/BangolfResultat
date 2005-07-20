@@ -14,9 +14,11 @@ import javax.swing.JPanel;
 /** klassen som beskriver fönstret där man anger vilka delsummor samt om placering skall visas */
 public class LapSumDialog extends JDialog {
 	private boolean firstTime = true;		// talar om ifall det är första gången antal varv sätts
-	private JButton lapSumButton;			// OK-knappen vid ändring av visning av delsummor och placering
+	private JButton acceptButton;			// OK-knappen vid ändring av visning av delsummor och placering
+	private JButton cancelButton;			// knapp för att avbryta
 	private LapSumHandler lapSumHand;		// sköter om knapparna i fönstret för delsummor och placering
 	private JPanel lapSumPanel;				// behållare för redigering (av delsummor och placering)
+	private JPanel buttonPanel;				// behållare för knapparna Ok och Avbryt
 	private JCheckBox[] lapBox;				// för att välja delsummor
 	private JCheckBox place;				// för att välja om placering skall visas
 	private int nbrRounds;					// antal varv tävlingen är på
@@ -42,9 +44,15 @@ public class LapSumDialog extends JDialog {
 	
 	/** skapar panelen för delsummor och placering */
 	private void setupLapSumPanel() {
-		lapSumButton = new JButton("Ok");
-		lapSumButton.setMnemonic(KeyEvent.VK_O);
-		lapSumButton.addActionListener(lapSumHand);
+		acceptButton = new JButton("Ok");
+		acceptButton.setMnemonic(KeyEvent.VK_O);
+		acceptButton.addActionListener(lapSumHand);
+		cancelButton = new JButton("Avbryt");
+		cancelButton.setMnemonic(KeyEvent.VK_A);
+		cancelButton.addActionListener(lapSumHand);
+		buttonPanel = new JPanel(new GridLayout(1,2));
+		buttonPanel.add(acceptButton);
+		buttonPanel.add(cancelButton);
 		lapSumPanel = new JPanel();
 		lapBox = new JCheckBox[CompInfoDialog.MAXROUNDS-2];
 		int mnemonic = KeyEvent.VK_2;
@@ -66,7 +74,7 @@ public class LapSumDialog extends JDialog {
 			lapSumPanel.add(lapBox[i]);
 		}
 		lapSumPanel.add(place);
-		lapSumPanel.add(lapSumButton);
+		lapSumPanel.add(buttonPanel);
 		return lapSumPanel;
 	}
 	
@@ -101,7 +109,7 @@ public class LapSumDialog extends JDialog {
 	class LapSumHandler implements ActionListener {
 		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == lapSumButton) {
+			if(e.getSource() == acceptButton) {
 				editData = new boolean[1+nbrRounds-2];
 				editData[0] = place.isSelected();
 				boolean[] lapSums = new boolean[nbrRounds-2];
@@ -116,6 +124,8 @@ public class LapSumDialog extends JDialog {
 				SearchWindow.CHANGE = true;
 				SearchWindow.STATUSFIELD.setText("*");
 				SearchWindow.MESSAGEFIELD.setText("");
+			} else if(e.getSource() == cancelButton) {
+			    setVisible(false);
 			}
 		}
 	}

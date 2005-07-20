@@ -12,6 +12,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -49,6 +50,7 @@ public class CompareWindow extends JDialog {
         ButtonHandler buttonHand = new ButtonHandler();
         chooseButton = new JButton("Välj fil...");
         chooseButton.addActionListener(buttonHand);
+        chooseButton.setMnemonic(KeyEvent.VK_V);
         choosenFile = new JTextField(snittData.getCompareFile(tabIndex));
         choosenFile.setEditable(false);
         choosenFile.setPreferredSize(new Dimension(300,26));
@@ -60,16 +62,18 @@ public class CompareWindow extends JDialog {
         
         FlowLayout flowLayout = new FlowLayout();
         JPanel buttonPanel = new JPanel(flowLayout);
-        //flowLayout.setHgap(60);
         acceptButton = new JButton("Ok");
         acceptButton.setPreferredSize(new Dimension(77,26));
         acceptButton.addActionListener(buttonHand);
+        acceptButton.setMnemonic(KeyEvent.VK_O);
         removeButton = new JButton("Ta bort");
         removeButton.setPreferredSize(new Dimension(77,26));
         removeButton.addActionListener(buttonHand);
+        removeButton.setMnemonic(KeyEvent.VK_T);
         cancelButton = new JButton("Avbryt");
         cancelButton.setPreferredSize(new Dimension(77,26));
         cancelButton.addActionListener(buttonHand);
+        cancelButton.setMnemonic(KeyEvent.VK_A);
         buttonPanel.add(acceptButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(cancelButton);
