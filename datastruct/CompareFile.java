@@ -18,13 +18,12 @@ import snitt.SnittData;
  * CompareFile - håller reda på en jämförelsesnittlista
  */
 public class CompareFile {
-    private HashMap map;							// innehåller resultaten
-    private int surface;							// underlaget
-    public static final int SURFACE_NOT_SET = -1;	// heltalsvärde för underlaget innan det är satt
+    private HashMap map;	// innehåller resultaten
+    private int surface;	// underlaget
     
     /** skapar en ny jämförelsesnittlista */
-    public CompareFile() {
-        surface = SURFACE_NOT_SET;
+    public CompareFile(int surface) {
+        this.surface = surface;
         map = new HashMap();
     }
     
@@ -63,11 +62,6 @@ public class CompareFile {
         return (PersonMean) map.get(identity);
     }
     
-    /** ställer in underlaget */
-    public void setSurface(int surface) {
-        this.surface = surface;
-    }
-    
     /** returnerar underlaget */
     public int getSurface() {
         return surface;
@@ -86,13 +80,17 @@ public class CompareFile {
 	public String[][][] getOutput() {
 	    LinkedList list = sortResults();
 	    String[][][] data = new String[2][][];
-	    String[][] output = new String[list.size()][2];
-	    String[][] outputColor = new String[list.size()][2];
-	    for(int i = 0; i < list.size(); i++) {
-	        PersonMean personMean = (PersonMean) list.get(i);
-	        output[i][0] = personMean.getNameAndClub();
-	        output[i][1] = personMean.getMeanWithComma();
-	        outputColor[i][1] = getColor(personMean.getMean());
+	    String[][] output = new String[list.size() + 1][3];
+	    String[][] outputColor = new String[list.size() + 1][3];
+	    output[0][0] = "Namn";
+        output[0][1] = "Klubb";
+        output[0][2] = "Snitt";
+	    for(int i = 1; i <= list.size(); i++) {
+	        PersonMean personMean = (PersonMean) list.get(i-1);
+	        output[i][0] = personMean.getName();
+	        output[i][1] = personMean.getClub();
+	        output[i][2] = personMean.getMeanWithComma();
+	        outputColor[i][2] = getColor(personMean.getMean());
 	    }
 	    data[0] = output;
 	    data[1] = outputColor;
@@ -142,7 +140,7 @@ public class CompareFile {
     /** klassen som sköter sorteringen av snitten */
 	class MeanComparator implements Comparator {
 		/**	bestämmer skillnaden mellan lhs och rhs genom att sortera i ordningen
-		 *	snitt och därefter namn
+		 *	snitt, namn och därefter klubb
 		 *	@see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		public int compare(Object lhs, Object rhs) {
@@ -150,12 +148,18 @@ public class CompareFile {
 			PersonMean right = (PersonMean) rhs;
 			int meanLeft = (int) (left.getMean() * 1000);
 			int meanRight = (int) (right.getMean() * 1000);
-			String nameLeft = left.getNameAndClub();
-			String nameRight = right.getNameAndClub();
+			String nameLeft = left.getName();
+			String nameRight = right.getName();
+			String clubLeft = left.getClub();
+			String clubRight = right.getClub();
 			
 			if (meanLeft == meanRight) {
 				if (nameLeft.equals(nameRight)) {
-				    return 0;
+				    if(clubLeft.equals(clubRight)) {
+				        return 0;
+				    } else {
+				        return clubLeft.compareTo(clubRight);
+				    }
 				} else {
 				    return nameLeft.compareTo(nameRight);
 				}

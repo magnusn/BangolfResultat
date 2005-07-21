@@ -330,11 +330,10 @@ public class IOHandler {
 	/** läser in resultat från en semikolonseparerad fil med filnamnet fileName 
 	 	returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
 	public CompareFile inputFromSNITT(String fileName) throws IOException, NoSuchElementException {
-	    CompareFile compareFile = new CompareFile();
 	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
 	    String inLine = fileIn.readLine();
 	    int surface = Integer.parseInt(inLine);
-	    compareFile.setSurface(surface);
+	    CompareFile compareFile = new CompareFile(surface);
 	    
 	    StringTokenizer inString;
 	    if(inLine != null) {

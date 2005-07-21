@@ -258,7 +258,7 @@ public class SearchWindow {
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		snittStart = new JMenuItem("Hantera snittlistan...", KeyEvent.VK_H);
 		snittStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
-		makeCompareFile = new JMenuItem("Skapa jämförande snittlista...", KeyEvent.VK_N);
+		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		about = new JMenuItem("Om BangolfResultat...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
@@ -390,14 +390,10 @@ public class SearchWindow {
 	    this.mode = mode;
 	    if(mode == SearchWindow.MODE_SNITT) {
 	        CompareFile compareFile = (CompareFile) o;
-	        int surface;
-	        if(compareFile.getSurface() == CompareFile.SURFACE_NOT_SET) {
-	            surface = newCompareFile();
-	        } else {
-	            surface = compareFile.getSurface();
+	        if(compareFile == null) {
+	            compareFile = new CompareFile(newCompareFile());
 	        }
-	        if(surface != -1) {
-	            compareFile.setSurface(surface);
+	        if(compareFile.getSurface() != -1) {
 	            resultInput.setCompareFile(compareFile);
 	            resultInput.setupResultInputPanel(mode);
 	        } else {
@@ -790,7 +786,7 @@ public class SearchWindow {
     		}
     		/** öppnar fönster för att mata in en jämförelsesnittlista */
 			else if(e.getSource() == makeCompareFile) {
-			    setMode(SearchWindow.MODE_SNITT, new CompareFile());
+			    setMode(SearchWindow.MODE_SNITT, null);
 			}
 			else if(e.getSource() == openCompareFile) {
     			int val = JOptionPane.YES_OPTION;
@@ -822,7 +818,6 @@ public class SearchWindow {
     					        MESSAGEFIELD.setText("Öppnat filen: " + fileNameSNITT + ".");
     					        enableCompareFileMenus();
     					    } catch (Exception f) {
-    					        System.out.println(f);
     					        JOptionPane.showMessageDialog(frame, "Inläsningen från SNITT-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
     					    }
     					} else {
@@ -1088,7 +1083,9 @@ public class SearchWindow {
     		/** annars ställs sökfältets värde tillbaka till det ursprungliga */
     		} else {
     			String search = searchField.getText();
-    			searchField.setText(search.substring(0, searchFieldLength));
+    			if(search.length() >= searchFieldLength) {
+    			    searchField.setText(search.substring(0, searchFieldLength));
+    			}
     		}
     	}
     	

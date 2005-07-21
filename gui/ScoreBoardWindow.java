@@ -7,10 +7,6 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-
-
-
-
 import datastruct.CompareFile;
 import datastruct.DataManager;
 import datastruct.ResultList;
@@ -87,7 +83,7 @@ class ScoreBoardWindow {
 	/** ställer in resultatfönstret för jämförelsesnittlistan compareFile */
 	public void setup(CompareFile compareFile) {
 	    this.compareFile = compareFile;
-	    this.cols = 2;
+	    this.cols = 3;
 	    board.removeAll();
 	    label = new JLabel[65][cols];
 	    setLabelLayout(label);
@@ -105,7 +101,7 @@ class ScoreBoardWindow {
 	    String[][][] data = compareFile.getOutput();
 	    String[][] output = data[0];
 	    String[][] outputColor = data[1];
-	    if(output.length > label.length) {
+	    if(output.length >= label.length) {
 	        JLabel[][] tempLabel = new JLabel[label.length + 50][cols];
 	        setLabelLayout(tempLabel);
 	        for(int i = 0; i < label.length; i++) {
@@ -230,7 +226,7 @@ class ScoreBoardWindow {
 				label[i][j] = new JLabel();
 				if(j == 0) {
 					c.anchor = GridBagConstraints.WEST;
-				} else if((j == 2 && !licenseNbr) || j == 3) {
+				} else if(((j == 2 && !licenseNbr) || j == 3) && compareFile == null) {
 					c.anchor = align;
 				}
 				gridbag.setConstraints(label[i][j], c);
