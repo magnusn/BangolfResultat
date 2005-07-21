@@ -29,14 +29,16 @@ import java.awt.Image;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
+import snitt.SnittWindow;
+
+
+import datastruct.CompareFile;
 import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.NameList;
 import datastruct.ResultList;
 
-import snitt.CompareFile;
-import snitt.SnittWindow;
 
 import java.util.StringTokenizer;
 
@@ -55,15 +57,17 @@ public class SearchWindow {
 	public static JTextField STATUSFIELD,MESSAGEFIELD;	// meddelande- och statusfält
 	private JButton[] button;							// knapparna med funna personer som matchar sökningen
 	private JButton addPlayerButton,removePlayerButton;	// lägg till och ta bort spelare
-	private JMenuItem newComp, openFromSKV, saveToSKV;	// meny för ny tävling och öppna samt spara tävling
+	private JMenuItem newComp, openFromSKV, save;		// meny för ny tävling och öppna samt spara
 	private	JMenuItem saveToHTML, quit, editItem; 		// spara till HTML, avsluta, redigera
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
-	private JMenuItem headerItem, saveAsSKV, saveAsHTML;// sätter tävlingens namn, spara som för SKV- och HTML-filer
+	private JMenuItem makeCompareFile, openCompareFile;	// skapar eller öppnar en jämförande snittlista
+	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
 	private JMenuItem changeName, changeClub;			// ändra namn och klubb på en spelare
 	private JMenuItem numberOrientation;				// alternativ för sifferorienteringen
 	private JLabel inputNameLabel;				// innehåller namnet på den person som resultat skrivs in för
 	private JFileChooser fileChooser;			// filväljare
 	private Filter skvFilter, htmFilter;		// filter för skv- och htmfiler
+	private Filter snittFilter;					// filter för snittfiler
 	private IOHandler io;						// sköter skrivning till och läsning från filer
 	private DataManager dataManager;			// håller reda på inställningar
 	public static boolean SNITTOPEN, KLASSOPEN;	// talar om ifall motsvarande fönster är öppet
@@ -74,6 +78,7 @@ public class SearchWindow {
 	private KlassWindow klassWindow;			// klasshanterarfönstret
 	private SnittWindow snittWindow;			// snittlistshanterarfönstret
 	private String compHeader, fileNameSKV, fileNameHTM;// tävlingsrubrik, filnamn för SKV- och HTML-filerna
+	private String fileNameSNITT;				// filnamn för SNITT-fil
 	public static File DIRSKV, DIRHTM, DIRSNITT, DIRJMF;// mappar för olika filtyper
 	public static final int DUMMY_STARTUP = 0;	// antal varv som anges vid "dum"-starten
 	private int mode;							// talar om vilket läger som gäller
@@ -230,11 +235,11 @@ public class SearchWindow {
 		newComp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 		openFromSKV = new JMenuItem("Öppna tävling...", KeyEvent.VK_P);
 		openFromSKV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		saveToSKV = new JMenuItem("Spara tävling", KeyEvent.VK_S);
-		saveToSKV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		saveToSKV.setEnabled(false);
-		saveAsSKV = new JMenuItem("Spara tävling som...", KeyEvent.VK_M);
-		saveAsSKV.setEnabled(false);
+		save = new JMenuItem("Spara", KeyEvent.VK_S);
+		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		save.setEnabled(false);
+		saveAs = new JMenuItem("Spara som...", KeyEvent.VK_M);
+		saveAs.setEnabled(false);
 		saveToHTML = new JMenuItem("Skapa webbsida", KeyEvent.VK_W);
 		saveToHTML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
 		saveToHTML.setEnabled(false);
@@ -253,12 +258,14 @@ public class SearchWindow {
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		snittStart = new JMenuItem("Hantera snittlistan...", KeyEvent.VK_H);
 		snittStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+		makeCompareFile = new JMenuItem("Skapa jämförande snittlista...", KeyEvent.VK_N);
+		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		about = new JMenuItem("Om BangolfResultat...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
 		saveAsHTML.addActionListener(menuHand);
-		saveAsSKV.addActionListener(menuHand);
-		saveToSKV.addActionListener(menuHand);
+		saveAs.addActionListener(menuHand);
+		save.addActionListener(menuHand);
 		openFromSKV.addActionListener(menuHand);
 		quit.addActionListener(menuHand);
 		headerItem.addActionListener(menuHand);
@@ -266,11 +273,13 @@ public class SearchWindow {
 		numberOrientation.addActionListener(menuHand);
 		klassStart.addActionListener(menuHand);
 		snittStart.addActionListener(menuHand);
+		makeCompareFile.addActionListener(menuHand);
+		openCompareFile.addActionListener(menuHand);
 		about.addActionListener(menuHand);
 		menu.add(newComp);
 		menu.add(openFromSKV);
-		menu.add(saveToSKV);
-		menu.add(saveAsSKV);
+		menu.add(save);
+		menu.add(saveAs);
 		menu.add(saveToHTML);
 		menu.add(saveAsHTML);
 		menu.add(quit);
@@ -279,6 +288,8 @@ public class SearchWindow {
 		edit.add(numberOrientation);
 		klassMenu.add(klassStart);
 		snittMenu.add(snittStart);
+		snittMenu.add(makeCompareFile);
+		snittMenu.add(openCompareFile);
 		help.add(about);
 		frame.setJMenuBar(bar);
 		
@@ -328,6 +339,7 @@ public class SearchWindow {
 		fileChooser = new JFileChooser();
 		skvFilter = new Filter(new String[]{"skv"}, "Semikolonseparerad fil");
 		htmFilter = new Filter(new String[]{"htm", "html"}, "Webbsida");
+		snittFilter = new Filter(new String[]{"snitt"}, "Jämförelsefil för snittlista");
 		try {
 			DIRSKV = (File) io.load("dirskv");
 			DIRHTM = (File) io.load("dirhtm");
@@ -353,8 +365,8 @@ public class SearchWindow {
 	    headerItem.setEnabled(false);
 		editItem.setEnabled(false);
 		numberOrientation.setEnabled(false);
-	    saveToSKV.setEnabled(true);
-		saveAsSKV.setEnabled(true);
+	    save.setEnabled(true);
+		saveAs.setEnabled(true);
 		saveToHTML.setEnabled(false);
 		saveAsHTML.setEnabled(false);
 	}
@@ -364,8 +376,8 @@ public class SearchWindow {
 	    headerItem.setEnabled(true);
 		editItem.setEnabled(true);
 		numberOrientation.setEnabled(true);
-	    saveToSKV.setEnabled(true);
-		saveAsSKV.setEnabled(true);
+	    save.setEnabled(true);
+		saveAs.setEnabled(true);
 		saveToHTML.setEnabled(true);
 		saveAsHTML.setEnabled(true);
 		setMode(SearchWindow.MODE_COMP, null);
@@ -373,16 +385,21 @@ public class SearchWindow {
 	
 	/** ställer läget till mode, alternativen är MODE_COMP, MODE_DUMMY och MODE_SNITT 
 	 * 	skickar med ett objekt o som används vid vissa tillfällen */
-	public void setMode(int mode, Object o) {
+	private void setMode(int mode, Object o) {
 	    int oldMode = this.mode;
 	    this.mode = mode;
 	    if(mode == SearchWindow.MODE_SNITT) {
-	        frame.setVisible(true);
-	        int surface = newCompareFile();
+	        CompareFile compareFile = (CompareFile) o;
+	        int surface;
+	        if(compareFile.getSurface() == CompareFile.SURFACE_NOT_SET) {
+	            surface = newCompareFile();
+	        } else {
+	            surface = compareFile.getSurface();
+	        }
 	        if(surface != -1) {
-	            ((CompareFile) o).setSurface(surface);
+	            compareFile.setSurface(surface);
+	            resultInput.setCompareFile(compareFile);
 	            resultInput.setupResultInputPanel(mode);
-	            resultInput.setCompareFile((CompareFile) o);
 	        } else {
 	            this.mode = oldMode;
 	        }
@@ -417,6 +434,7 @@ public class SearchWindow {
 				compHeader = "";
 				fileNameSKV = null;
 				fileNameHTM = null;
+				fileNameSNITT = null;
 				warningHTM = false;
 				CHANGE = false;
 				STATUSFIELD.setText("");
@@ -424,8 +442,6 @@ public class SearchWindow {
 				ScoreBoardWindow.setHeader(compHeader);
 				inputNameLabel = resultInput.getNameLabel();
 				enableCompareFileMenus();
-			} else {
-				snittWindow.setVisible(true);
 			}
 		}
 		return surface;
@@ -525,7 +541,11 @@ public class SearchWindow {
 	/** sparar efter uppmaning */
 	private void autoSave() {
 		MenuHandler menu = new MenuHandler();
-		menu.saveToSKV();
+		if(mode == MODE_COMP) {
+		    menu.saveToSKV();
+		} else if(mode == MODE_SNITT) {
+		    menu.saveToSNITT();
+		}
 	}
 	
 	/** talar om för resultatinmatningsfönstret vilken person som valts */
@@ -642,11 +662,19 @@ public class SearchWindow {
     		else if(e.getSource() == saveAsHTML) {
     			saveAsHTML();
     		}
-    		else if(e.getSource() == saveToSKV) {
-    			saveToSKV();
+    		else if(e.getSource() == save) {
+    		    if(mode == MODE_COMP) {
+    		        saveToSKV();
+    		    } else if(mode == MODE_SNITT) {
+    		        saveToSNITT();
+    		    }
     		}
-    		else if(e.getSource() == saveAsSKV) {
-    			saveAsSKV();
+    		else if(e.getSource() == saveAs) {
+    		    if(mode == MODE_COMP) {
+    		        saveAsSKV();
+    		    } else if(mode == MODE_SNITT) {
+    		        saveAsSNITT();
+    		    }
     		}
     		else if(e.getSource() == openFromSKV) {
     			int val = JOptionPane.YES_OPTION;
@@ -758,6 +786,49 @@ public class SearchWindow {
     				snittWindow = new SnittWindow(frame, personNameTracker, dataManager, searchWindow);
     			} else {
     				snittWindow.setVisible(true);
+    			}
+    		}
+    		/** öppnar fönster för att mata in en jämförelsesnittlista */
+			else if(e.getSource() == makeCompareFile) {
+			    setMode(SearchWindow.MODE_SNITT, new CompareFile());
+			}
+			else if(e.getSource() == openCompareFile) {
+    			int val = JOptionPane.YES_OPTION;
+    			if(CHANGE) {
+    				val = JOptionPane.showConfirmDialog(frame, "De senaste ändringarna är ej sparade. Vill du spara nu?"
+    				, "Spara?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    				if(val == JOptionPane.YES_OPTION) {
+    					autoSave();
+    				}
+    			}
+    			if(!CHANGE || val == JOptionPane.NO_OPTION) {
+    				fileChooser.setCurrentDirectory(DIRJMF);
+    				fileChooser.setSelectedFile(new File(""));
+    				fileChooser.setFileFilter(snittFilter);
+    				int retval = fileChooser.showOpenDialog(frame);
+    				if(retval == JFileChooser.APPROVE_OPTION) {
+    					File file = fileChooser.getSelectedFile();
+    					DIRJMF = fileChooser.getCurrentDirectory();
+    					fileNameSNITT = file.getPath();
+    					if(!fileNameSNITT.endsWith(".snitt")) {
+    						fileNameSNITT = fileNameSNITT + ".snitt";
+    					}
+    					if(new File(fileNameSNITT).exists()) {
+    					    try {
+    					        CompareFile compareFile = io.inputFromSNITT(fileNameSNITT);
+    					        setMode(MODE_SNITT, compareFile);
+    					        CHANGE = false;
+    					        STATUSFIELD.setText("");
+    					        MESSAGEFIELD.setText("Öppnat filen: " + fileNameSNITT + ".");
+    					        enableCompareFileMenus();
+    					    } catch (Exception f) {
+    					        System.out.println(f);
+    					        JOptionPane.showMessageDialog(frame, "Inläsningen från SNITT-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    					    }
+    					} else {
+    					    JOptionPane.showMessageDialog(frame, "Filen, " + fileNameSNITT + ", existerar inte", "Varning", JOptionPane.ERROR_MESSAGE);
+    					}
+    				}
     			}
     		}
     		else if(e.getSource() == about) {
@@ -914,6 +985,64 @@ public class SearchWindow {
     					STATUSFIELD.setText("");
     				} catch (Exception f) {
     					JOptionPane.showMessageDialog(frame, "Skrivning till SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    				}
+    			}
+    		}
+    	}
+    	
+    	/** sparar den inmatade snittlistan */
+    	private void saveToSNITT() {
+    	    if(fileNameSNITT == null) {
+    			saveAsSNITT();
+    		} else {
+    			try {
+    				io.outputToSNITT(fileNameSNITT, resultInput.getCompareFile());
+    				CHANGE = false;
+    				MESSAGEFIELD.setText("Jämförelsesnittlistan är sparad.");
+    				STATUSFIELD.setText("");
+    			} catch (Exception f) {
+    				JOptionPane.showMessageDialog(frame, "Skrivning till SNITT-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+    			}
+    		}
+    	}
+    	
+    	/** sparar den inmatade snittlistan under angivet filnamn */
+    	private void saveAsSNITT() {
+    	    fileChooser.setCurrentDirectory(DIRJMF);
+    		fileChooser.setSelectedFile(new File(""));
+    		fileChooser.setFileFilter(snittFilter);
+    		int retval = fileChooser.showSaveDialog(frame);
+    		if(retval == JFileChooser.APPROVE_OPTION) {
+    			File file = fileChooser.getSelectedFile();
+    			String filePath = file.getPath();
+    			while(filePath.endsWith(".htm") || filePath.endsWith(".skv") || filePath.endsWith(".html")
+    			        || filePath.endsWith(".snitt")) {
+    			    if(filePath.endsWith(".snitt")) {
+    					filePath = filePath.substring(0, filePath.length()-6);
+    				} else if(filePath.endsWith(".html")) {
+    					filePath = filePath.substring(0, filePath.length()-5);
+    				} else {
+    					filePath = filePath.substring(0, filePath.length()-4);
+    				}
+    			}
+    			file = new File(filePath + ".snitt");
+    			DIRJMF = fileChooser.getCurrentDirectory();
+    			int val;
+    			if(file.exists()) {
+    				val = JOptionPane.showConfirmDialog(frame, "Filen finns redan. Vill du ersätta den?",
+    				"Skriva över?", JOptionPane.YES_NO_OPTION);
+    			} else {
+    				val = JOptionPane.YES_OPTION;
+    			}
+    			if(val == JOptionPane.YES_OPTION) {
+    				fileNameSNITT = file.getPath();
+    				try {
+    					io.outputToSNITT(fileNameSNITT, resultInput.getCompareFile());
+    					CHANGE = false;
+    					MESSAGEFIELD.setText("Jämförelsesnittlistan är sparad.");
+    					STATUSFIELD.setText("");
+    				} catch (Exception f) {
+    					JOptionPane.showMessageDialog(frame, "Skrivning till SNITT-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
     				}
     			}
     		}

@@ -4,6 +4,8 @@ import java.util.StringTokenizer;
 
 import snitt.SnittData;
 
+
+
 /** beskriver tävlingsinformation för en person */
 public class Person {
 	private String name,club;		// namn och klubb

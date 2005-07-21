@@ -308,7 +308,7 @@ public class ResultList {
 	}
 	
 	/** returnerar en sträng som talar om vilken färg resultatet skall ha,
-	 man ger in summan result och på hur många varv varv */
+	 	man ger in summan result och på hur många varv varv */
 	private String getColor(int result, int varv) {
 		double snitt = (double)result/(double)varv;
 		String color;

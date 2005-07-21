@@ -18,9 +18,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 
-import snitt.CompareFile;
 
+
+
+import datastruct.CompareFile;
 import datastruct.IOHandler;
+import datastruct.PersonMean;
 import datastruct.PersonResult;
 import datastruct.ResultList;
 
@@ -101,12 +104,17 @@ public class ResultInputWindow {
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
 	    } else if(mode == SearchWindow.MODE_SNITT) {
-	        inputPanel = new JPanel(new GridLayout(4,2));
+	        GridLayout gridLayout = new GridLayout(4,2);
+		    gridLayout.setHgap(2);
+		    gridLayout.setVgap(2);
+	        inputPanel = new JPanel(gridLayout);
 	        person = new JLabel();
 	        inputPanel.add(person);
 	        inputPanel.add(new JLabel());
 	        inputPanel.add(new JLabel("Snitt:"));
+	        EnterKeyHandler enterHandler = new EnterKeyHandler();
 	        meanField = new JTextField();
+	        meanField.addKeyListener(enterHandler);
 	        inputPanel.add(meanField);
 	        klassChoice = new JComboBox();
 	        
@@ -132,6 +140,8 @@ public class ResultInputWindow {
 	        popup.setResizable(false);
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
+	        
+	        BOARD.setup(compareFile);
 	    }
 	}
 	
@@ -273,7 +283,17 @@ public class ResultInputWindow {
 		        }
 		    }
 		} else if(mode == SearchWindow.MODE_SNITT) {
-		    
+		    StringTokenizer str = new StringTokenizer(person.getText(), ",");
+		    String name = str.nextToken();
+		    String club = str.nextToken().trim();
+		    String identity = name + ", " + club;
+		    Integer personID = ((Integer) personTracker.get(identity));
+		    PersonMean personMean = compareFile.getPerson(personID);
+		    if(personMean != null) {
+		        meanField.setText(personMean.getMeanWithComma());
+		    } else {
+		        meanField.setText("");
+		    }
 		}
 		popup.pack();
 		popup.setLocationRelativeTo(frame);
@@ -317,6 +337,11 @@ public class ResultInputWindow {
 	    this.compareFile = compareFile;
 	}
 	
+	/** returnerar jämförelselistans data */
+	protected CompareFile getCompareFile() {
+	    return compareFile;
+	}
+	
 	/** klassen som tar hand om knapptryckningarna vid inmatning av resultat */
 	class ResultHandler implements ActionListener {
 		/** kollar vilken knapp som tryckts ned och utför lämplig handling */
@@ -357,16 +382,24 @@ public class ResultInputWindow {
 	            if(mean < ResultList.MIN_SCORE || mean > ResultList.MAX_SCORE) {
 	                throw new Exception("Ej giltigt snitt");
 	            }
-	            compareFile.addMean(personID, nameAndClub, mean);
+	            compareFile.addMean(personID, name, club, mean);
 	            done = true;
+	            SearchWindow.CHANGE = true;
+				SearchWindow.STATUSFIELD.setText("*");
+				SearchWindow.MESSAGEFIELD.setText("");
+	            BOARD.updateMean(true);
 	        } catch (Exception e) {
-	            e.printStackTrace();
 	            JOptionPane.showMessageDialog(popup, "Inget giltigt värde!");
 	        }
 	    } else {
 	        done = compareFile.removeMean(personID);
 	        if(!done) {
 	            JOptionPane.showMessageDialog(popup, "Personen gick ej att ta bort!");;
+	        } else {
+	            SearchWindow.CHANGE = true;
+				SearchWindow.STATUSFIELD.setText("*");
+				SearchWindow.MESSAGEFIELD.setText(nameAndClub + ", är nu borttagen från snittlistan.");
+	            BOARD.updateMean(false);
 	        }
 	    }
 	    if(done) {
@@ -386,8 +419,10 @@ public class ResultInputWindow {
 				removeResult();
 			} else if(e.getKeyCode() == KeyEvent.VK_ENTER && e.getSource() == inputOk) {
 				handleResultInput();
-			} else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			} else if(e.getKeyCode() == KeyEvent.VK_ENTER && mode == SearchWindow.MODE_COMP) {
 				handleResultInput();
+			} else if(e.getKeyCode() == KeyEvent.VK_ENTER && mode == SearchWindow.MODE_SNITT) {
+			    handleMeanInput(true);
 			}
 		}
 	}

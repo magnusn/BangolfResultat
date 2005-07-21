@@ -56,7 +56,6 @@ public class SnittWindow extends JFrame {
 	private JMenuItem appearance;			// ställer in vad som skall visas på snittlistans webbsida
 	private JMenuItem compareFileChooser;	// väljer fil att jämföra snittet med
 	private JMenuItem numberAlignment;		// för att ställa in sifferorienteringen
-	private JMenuItem makeCompareFile;		// skapar en jämförande snittlista
 	private String[] headers;				// rubriker för snittlistorna
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	
@@ -122,8 +121,6 @@ public class SnittWindow extends JFrame {
 		saveToHTML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		saveCompareFile = new JMenuItem("Spara snittlista att jämföra med...", KeyEvent.VK_J);
 		saveCompareFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.CTRL_MASK));
-		makeCompareFile = new JMenuItem("Skapa jämförande snittlista...", KeyEvent.VK_K);
-		makeCompareFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		quit = new JMenuItem("Stäng snitthanterarfönstret", KeyEvent.VK_G);
 		appearance = new JMenuItem("Utseende...", KeyEvent.VK_U);
 		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_S);
@@ -134,7 +131,6 @@ public class SnittWindow extends JFrame {
 		removeComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
 		saveCompareFile.addActionListener(menuHand);
-		makeCompareFile.addActionListener(menuHand);
 		quit.addActionListener(menuHand);
 		appearance.addActionListener(menuHand);
 		sort.addActionListener(menuHand);
@@ -145,7 +141,6 @@ public class SnittWindow extends JFrame {
 		menu.add(removeComp);
 		menu.add(saveToHTML);
 		menu.add(saveCompareFile);
-		menu.add(makeCompareFile);
 		menu.add(quit);
 		edit.add(appearance);
 		edit.add(numberAlignment);
@@ -355,11 +350,6 @@ public class SnittWindow extends JFrame {
 					JOptionPane.showMessageDialog(frame, "Inga tävlingar har markerats", "Tävlingar ej borttagna", JOptionPane.ERROR_MESSAGE);
 				}
 				setMessage("", false);
-			}
-			/** öppnar fönster för att mata in en jämförelsesnittlista */
-			else if(e.getSource() == makeCompareFile) {
-			    //ResultInputWindow.setCompareFile(new CompareFile()); TODO
-			    searchWindow.setMode(SearchWindow.MODE_SNITT, new CompareFile());
 			}
 			/** stänger fönstret */
 			else if(e.getSource() == quit) {

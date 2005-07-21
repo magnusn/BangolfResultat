@@ -8,6 +8,10 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+
+
+
+import datastruct.CompareFile;
 import datastruct.DataManager;
 import datastruct.ResultList;
 
@@ -19,6 +23,7 @@ class ScoreBoardWindow {
 	private GridBagConstraints c;		// inställning för layouten
 	private int cols,nbrRounds;			// antal kolumner och antal varv
 	private ResultList result;			// resultatlistan
+	private CompareFile compareFile;	// listan över snitt
 	private JLabel[][] label;			// matrisen av etiketter som visar resultaten
 	private static JLabel headerLabel;	// rubriketikett
 	private int align;					// talar om hur sifferorienteringen skall se ut
@@ -62,6 +67,7 @@ class ScoreBoardWindow {
 		board.removeAll();
 		label = new JLabel[65][cols];
 		this.result = result;
+		this.compareFile = null;
 		
 		board.setLayout(gridbag);
 		
@@ -78,6 +84,47 @@ class ScoreBoardWindow {
 		}
 	}
 	
+	/** ställer in resultatfönstret för jämförelsesnittlistan compareFile */
+	public void setup(CompareFile compareFile) {
+	    this.compareFile = compareFile;
+	    this.cols = 2;
+	    board.removeAll();
+	    label = new JLabel[65][cols];
+	    setLabelLayout(label);
+	    board.repaint();
+	    if(compareFile.size() != 0) {
+	        updateMean(true);
+	    }
+	}
+	
+	/** ritar om innehållet i fönstret, add talar om ifall det har lagts till resultat eller ej */
+	public void updateMean(boolean add) {
+	    if(!add) {
+	        clearAll();
+	    }
+	    String[][][] data = compareFile.getOutput();
+	    String[][] output = data[0];
+	    String[][] outputColor = data[1];
+	    if(output.length > label.length) {
+	        JLabel[][] tempLabel = new JLabel[label.length + 50][cols];
+	        setLabelLayout(tempLabel);
+	        for(int i = 0; i < label.length; i++) {
+	            for(int j = 0; j < label[i].length; j++) {
+	                tempLabel[i][j] = label[i][j];
+	            }
+	        }
+	        label = tempLabel;
+	    }
+	    Color color;
+	    for(int i = 0; i < output.length; i++) {
+	        for(int j = 0; j < output[i].length; j++) {
+	            color = getColor(outputColor[i][j]);
+	            label[i][j].setText(output[i][j]);
+	            label[i][j].setForeground(color);
+	        }
+	    }
+	}
+	
 	/** ritar om innehållet i fönstret, add talar om ifall det har lagts till resultat eller ej */
 	public void update(boolean add) {
 		if(!add) {
@@ -91,19 +138,7 @@ class ScoreBoardWindow {
 				enlarge();
 			}
 			for(int j = 0; j < output[i].length; j++) {
-				if(style[i][j] != null) {
-					if(style[i][j].equals("red")) {
-						color = new Color(255,0,0);
-					} else if(style[i][j].equals("green")) {
-						color = new Color(0,170,0);
-					} else if(style[i][j].equals("blue")) {
-						color = new Color(0,0,255);
-					} else {
-						color = Color.black;
-					}
-				} else {
-					color = Color.black;
-				}
+			    color = getColor(style[i][j]);
 				label[i][j].setText(output[i][j]);
 				label[i][j].setForeground(color);
 			}
@@ -125,6 +160,25 @@ class ScoreBoardWindow {
 		        }
 		    }
 		}
+	}
+	
+	/** returnerar färg beroende på strängen colorString */
+	private Color getColor(String colorString) {
+	    Color color;
+	    if(colorString != null) {
+			if(colorString.equals("red")) {
+				color = new Color(255,0,0);
+			} else if(colorString.equals("green")) {
+				color = new Color(0,170,0);
+			} else if(colorString.equals("blue")) {
+				color = new Color(0,0,255);
+			} else {
+				color = Color.black;
+			}
+		} else {
+			color = Color.black;
+		}
+	    return color;
 	}
 	
 	/** raderar alla etiketters innehåll */

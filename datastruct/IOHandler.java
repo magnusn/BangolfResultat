@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.LinkedList;
 
+
+
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
 	
@@ -214,6 +216,32 @@ public class IOHandler {
 		bufferOut.close();
 	}
 	
+	/** skriver ut resultatlistan result till en semikolonseparerad fil med namnet fileName där tävlingens namn sätts till header */
+	public void outputToSNITT(String fileName, CompareFile compareFile) throws IOException {
+		LinkedList res = compareFile.sortResults();
+		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		
+		bufferOut.write(String.valueOf(compareFile.getSurface()));
+		for(int i = 0; i < res.size(); i++) {
+			PersonMean personMean = (PersonMean) res.get(i);
+			String idNbr = String.valueOf(personMean.getID());
+			String name = personMean.getName();
+			String club = personMean.getClub();
+			String mean = personMean.getMeanAsString();
+			
+			bufferOut.newLine();
+			bufferOut.write(idNbr);
+			bufferOut.write(";");
+			bufferOut.write(name);
+			bufferOut.write(";");
+			bufferOut.write(club);
+			bufferOut.write(";");
+			bufferOut.write(mean);
+		}
+		bufferOut.flush();
+		bufferOut.close();
+	}
+	
 	/** läser in resultat från en semikolonseparerad fil med filnamnet fileName 
 		returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
 	public Object[] inputFromSKV(String fileName) throws IOException, NoSuchElementException {
@@ -297,6 +325,33 @@ public class IOHandler {
 		objects[3] = startNbrMap;
 		objects[4] = editData;
 		return objects;
+	}
+	
+	/** läser in resultat från en semikolonseparerad fil med filnamnet fileName 
+	 	returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
+	public CompareFile inputFromSNITT(String fileName) throws IOException, NoSuchElementException {
+	    CompareFile compareFile = new CompareFile();
+	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+	    String inLine = fileIn.readLine();
+	    int surface = Integer.parseInt(inLine);
+	    compareFile.setSurface(surface);
+	    
+	    StringTokenizer inString;
+	    if(inLine != null) {
+	        inLine = fileIn.readLine();
+	        while (inLine != null) {
+	            inString = new StringTokenizer(inLine, ";");
+	            if(inString.countTokens() != 0) {
+	                Integer idNbr = Integer.valueOf(inString.nextToken());
+	                String name = inString.nextToken();
+	                String club = inString.nextToken();
+	                double mean = Double.parseDouble(inString.nextToken());
+	                compareFile.addMean(idNbr, name, club, mean);
+	            }
+	            inLine = fileIn.readLine();
+	        }
+	    }
+	    return compareFile;
 	}
 	
 	/** skriver ut en lista med vilka strängar som är valda och vilka som ej är valda till filen fileName
