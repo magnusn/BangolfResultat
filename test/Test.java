@@ -17,12 +17,19 @@ class Test extends Test2 {
 	    frame.setVisible(true);
     }
     
+    public Test(boolean dummy) {
+        Object vector = new int[8];
+        Object matrix = new int[8][8];
+        System.out.println("Vektor är instans av int[]: " + (vector instanceof int[]));
+        System.out.println("Matris är instans av int[]: " + (matrix instanceof int[]));
+    }
+    
     public void show() {
         JOptionPane.showMessageDialog(panel, "Heffaklump");
     }
     
 	public static void main(String[] args) {
-	    Test test = new Test();    
+	    Test test = new Test(true);    
 	}
 	
 	/** klassen som sköter fönsterhanteringen i huvudfönstret */

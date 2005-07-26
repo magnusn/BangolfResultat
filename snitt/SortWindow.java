@@ -50,7 +50,14 @@ public class SortWindow extends JDialog {
 		map.put("+/-", new Integer(Snitt.CHANGE));
 		try {
 			sortVector = io.readFileList("compare", nbrTabs*2);
-			if(sortVector.length != nbrTabs*2) {
+			boolean differentLengths = false;
+			for(int i = 0; i < nbrTabs; i++) {
+			    if((sortVector[i*2].size() + sortVector[i*2 + 1].size()) == 0) {
+			        differentLengths = true;
+			        break;
+			    }
+			}
+			if(differentLengths) {
 			    Vector[] tempVector = new Vector[nbrTabs*2];
 			    Vector selectionVector = getSelectionStartVector();
 				Vector selectedVector = getSelectedStartVector();
@@ -76,7 +83,7 @@ public class SortWindow extends JDialog {
 			    sortVector[i*2] = selectionVector;
 			    sortVector[i*2+1] = selectedVector;
 			}
-			compare = new ListPanel(selectionVector, selectedVector);
+			compare = new ListPanel(sortVector[tabIndex*2], sortVector[tabIndex*2 + 1]);
 		}
 		
 		compare.setSelectionText("Ej inkluderade i sorteringen:");
@@ -146,18 +153,22 @@ public class SortWindow extends JDialog {
 		int[][] compareBy;
 		try {
 		    compareBy = (int[][]) io.load("compareby");
-		    compareBy[tabIndex] = new int[s.length];
-		    for(int i = 0; i < s.length; i++) {
-				s[i] = (String)sortVector[tabIndex*2 + 1].get(i);
-				compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
-			}
 		} catch (Exception e) {
+		    try {
+		        int[] oldCompareBy = (int[]) io.load("compareby");
+		    } catch (Exception ex) {
+		        JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
+		    }
 		    compareBy = new int[nbrTabs][2];
 		    for(int i = 0; i < compareBy[tabIndex].length; i++) {
 		        compareBy[i][0] = Snitt.MEAN;
 		        compareBy[i][1] = Snitt.ROUNDS;
 		    }
-		    JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		compareBy[tabIndex] = new int[s.length];
+	    for(int i = 0; i < s.length; i++) {
+			s[i] = (String)sortVector[tabIndex*2 + 1].get(i);
+			compareBy[tabIndex][i] = ((Integer)map.get(s[i])).intValue();
 		}
 		try {
 		    io.save("compareby", compareBy);

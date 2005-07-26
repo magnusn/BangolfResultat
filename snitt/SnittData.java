@@ -35,16 +35,7 @@ public class SnittData {
             if(headers.length != nbrTabs) {
                 JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][NBR_HEADERS];
                 for(int i = 0; i < nbrTabs; i++) {
-                    tempHeaders[i][Snitt.NAME] = new JCheckBox("Namn", true);
-                    tempHeaders[i][Snitt.NAME].setEnabled(false);
-                    tempHeaders[i][Snitt.CLUB] = new JCheckBox("Klubb", true);
-                    tempHeaders[i][Snitt.COMPS] = new JCheckBox("Tävlingar", true);
-                    tempHeaders[i][Snitt.ROUNDS] = new JCheckBox("Varv", true);
-                    tempHeaders[i][Snitt.HITSUM] = new JCheckBox("Slag", true);
-                    tempHeaders[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
-                    tempHeaders[i][Snitt.MEAN].setEnabled(false);
-                    tempHeaders[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-                    tempHeaders[i][Snitt.CHANGE] = new JCheckBox("+/-");
+                    tempHeaders[i] = getStandardHeaders();
                 }
                 if(headers[0].length == tempHeaders[0].length) {
                     for(int i = 0; i < headers.length; i++) {
@@ -57,19 +48,28 @@ public class SnittData {
         } catch (Exception e) {
             headers = new JCheckBox[nbrTabs][NBR_HEADERS];
             for(int i = 0; i < nbrTabs; i++) {
-                headers[i][Snitt.NAME] = new JCheckBox("Namn", true);
-                headers[i][Snitt.NAME].setEnabled(false);
-                headers[i][Snitt.CLUB] = new JCheckBox("Klubb", true);
-                headers[i][Snitt.COMPS] = new JCheckBox("Tävlingar", true);
-                headers[i][Snitt.ROUNDS] = new JCheckBox("Varv", true);
-                headers[i][Snitt.HITSUM] = new JCheckBox("Slag", true);
-                headers[i][Snitt.MEAN] = new JCheckBox("Snitt", true);
-                headers[i][Snitt.MEAN].setEnabled(false);
-                headers[i][Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-                headers[i][Snitt.CHANGE] = new JCheckBox("+/-");
+                headers[i] = getStandardHeaders();
             }
         }
         return false;
+    }
+    
+    /** returnerar originalinställningarna för utseende */
+    private JCheckBox[] getStandardHeaders() {
+        JCheckBox[] standardHeaders = new JCheckBox[NBR_HEADERS];
+        standardHeaders[Snitt.NAME] = new JCheckBox("Namn", true);
+        standardHeaders[Snitt.NAME].setEnabled(false);
+        standardHeaders[Snitt.CLUB] = new JCheckBox("Klubb", true);
+        standardHeaders[Snitt.COMPS] = new JCheckBox("Tävlingar", true);
+        standardHeaders[Snitt.ROUNDS] = new JCheckBox("Varv", true);
+        standardHeaders[Snitt.HITSUM] = new JCheckBox("Slag", true);
+        standardHeaders[Snitt.MEAN] = new JCheckBox("Snitt", true);
+        standardHeaders[Snitt.MEAN].setEnabled(false);
+        standardHeaders[Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
+        standardHeaders[Snitt.EX_MEAN].setEnabled(false);
+        standardHeaders[Snitt.CHANGE] = new JCheckBox("+/-");
+        standardHeaders[Snitt.CHANGE].setEnabled(false);
+        return standardHeaders;
     }
     
     /** sparar utseendeinställningarna */
@@ -118,6 +118,7 @@ public class SnittData {
     
     /** returnerar rubrikinställningarna för snittlistefliken tabIndex */
     protected JCheckBox[] getAppearanceHeaders(int tabIndex) {
+        initAppearanceHeaders(tabIndex);
         return headers[tabIndex];
     }
     

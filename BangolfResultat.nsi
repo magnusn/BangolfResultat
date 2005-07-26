@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.6.7"
+!define PRODUCT_VERSION "0.6.7a"
 !define PRODUCT_PUBLISHER "Magnus Nilsson"
 !define PRODUCT_WEB_SITE "http://web.telia.com/~u44802129/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
