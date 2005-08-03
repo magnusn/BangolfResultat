@@ -22,8 +22,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import javax.swing.JDialog;
@@ -31,14 +36,12 @@ import javax.swing.KeyStroke;
 
 import snitt.SnittWindow;
 
-
 import datastruct.CompareFile;
 import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.NameList;
 import datastruct.ResultList;
-
 
 import java.util.StringTokenizer;
 
@@ -622,7 +625,40 @@ public class SearchWindow {
 	
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
-		SearchWindow window = new SearchWindow();
+	    try {
+	        SearchWindow window = new SearchWindow();
+	    } catch (Exception e) { // TODO bryta ut
+	        JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
+	        		"Informationen om detta sparas i filen error.log.\n" +
+	        		"Denna fil finns i katalogen där programmet installerades, " +
+	        		"vanligtvis C:\\Program\\BangolfResultat.\n\n" +
+	        		"Var vänlig spara aktivt arbete och starta om programmet.\n" +
+	        		"Om problem uppstår igen tag kontakt med programmets tillverkare.");
+            LinkedList list = new LinkedList();
+	        try {
+	            BufferedReader fileIn = new BufferedReader(new FileReader("error.log"));
+	            String inLine = fileIn.readLine();
+	            
+	            while(inLine != null) {
+	                list.add(inLine);
+	                inLine = fileIn.readLine();
+	            }
+	        } catch (Exception ex) {
+	        }
+	        
+	        try {
+	            PrintStream printStream = new PrintStream("error.log");
+	            for(int i = 0; i < list.size(); i++) {
+	                printStream.println((String)list.get(i));
+	            }
+		        e.printStackTrace(printStream);
+		        printStream.println();
+		        printStream.flush();
+		        printStream.close();
+	        } catch (Exception exc) {
+	            JOptionPane.showMessageDialog(null, "Loggningen av felet misslyckades");
+	        }
+	    }
 	}
 
     /** klassen som tar hand om knapptryckningarna i menyn */

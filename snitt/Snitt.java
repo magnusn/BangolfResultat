@@ -148,6 +148,8 @@ public class Snitt {
 	public LinkedList sortMap() {
 		LinkedList list = new LinkedList();
 		list.addAll(map.values());
+		IOHandler io = new IOHandler();
+		loadCompareBy(io);
 		SnittComparator comparator = new SnittComparator();
 		Collections.sort(list, comparator);
 		return list;
@@ -420,7 +422,12 @@ public class Snitt {
 			    compare[i][0] = Snitt.MEAN;
 			    compare[i][1] = Snitt.ROUNDS;
 			}
-			JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			try {
+			    io.save("compareby", compare);
+			} catch (Exception ex) {}
+			if(e instanceof IOException) {
+			    JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -453,8 +460,6 @@ public class Snitt {
 			rightCompareBy[EX_MEAN] = new Integer((int) (right.getOldMean() * 100));
 			rightCompareBy[CHANGE] = new Integer((int) (right.getDiff() * 100));
 			
-			IOHandler io = new IOHandler();
-			loadCompareBy(io);
 			for(int i = 0; i < compare[tabIndex].length; i++) {
 				if(leftCompareBy[compare[tabIndex][i]] instanceof String) {
 					if(!((String)leftCompareBy[compare[tabIndex][i]]).equals((String)rightCompareBy[compare[tabIndex][i]])) {

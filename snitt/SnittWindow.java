@@ -205,6 +205,7 @@ public class SnittWindow extends JFrame {
 			/** sparar snittlistan som webbsida */
 			if(e.getSource() == saveToHTML) {
 				if(selected.size() != 0) {
+				    long start = System.currentTimeMillis(); // TODO
 					fileChooser.setCurrentDirectory(SearchWindow.DIRSNITT);
 					fileChooser.setSelectedFile(new File(""));
 					fileChooser.setFileFilter(htmFilter);
@@ -228,6 +229,7 @@ public class SnittWindow extends JFrame {
 							makeSnitt(file.getPath(), inputHeader, listPanel);
 						}
 					}
+					System.out.println(System.currentTimeMillis() - start); // TODO
 				} else {
 					JOptionPane.showMessageDialog(frame, "Inga tävlingar har valts! Snittlista gick ej att skapa."
 							, "Varning", JOptionPane.ERROR_MESSAGE);
