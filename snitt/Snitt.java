@@ -425,7 +425,7 @@ public class Snitt {
 			try {
 			    io.save("compareby", compare);
 			} catch (Exception ex) {}
-			if(e instanceof IOException) {
+			if(!(e instanceof ClassCastException)) {
 			    JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			}
 		}
