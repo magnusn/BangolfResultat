@@ -22,12 +22,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 import java.awt.Image;
@@ -623,41 +619,27 @@ public class SearchWindow {
 		personTracker.put(" ", new Integer(i.intValue() + 1));
 	}
 	
+	/** loggar informationen om Exception exception */
+	private static void logError(Exception exception) {
+	    JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
+        		"Informationen om detta sparas i filen error.log.\n" +
+        		"Denna fil finns i katalogen där programmet installerades, " +
+        		"vanligtvis C:\\Program\\BangolfResultat.\n\n" +
+        		"Var vänlig spara aktivt arbete och starta om programmet.\n" +
+        		"Om problem uppstår igen tag kontakt med programmets tillverkare.");
+	    if(IOHandler.logError(exception)) {
+	        JOptionPane.showMessageDialog(null, "Loggningen är klar.");
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Loggningen misslyckades.");
+	    }
+	}
+	
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
 	    try {
 	        SearchWindow window = new SearchWindow();
-	    } catch (Exception e) { // TODO bryta ut
-	        JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
-	        		"Informationen om detta sparas i filen error.log.\n" +
-	        		"Denna fil finns i katalogen där programmet installerades, " +
-	        		"vanligtvis C:\\Program\\BangolfResultat.\n\n" +
-	        		"Var vänlig spara aktivt arbete och starta om programmet.\n" +
-	        		"Om problem uppstår igen tag kontakt med programmets tillverkare.");
-            LinkedList list = new LinkedList();
-	        try {
-	            BufferedReader fileIn = new BufferedReader(new FileReader("error.log"));
-	            String inLine = fileIn.readLine();
-	            
-	            while(inLine != null) {
-	                list.add(inLine);
-	                inLine = fileIn.readLine();
-	            }
-	        } catch (Exception ex) {
-	        }
-	        
-	        try {
-	            PrintStream printStream = new PrintStream("error.log");
-	            for(int i = 0; i < list.size(); i++) {
-	                printStream.println((String)list.get(i));
-	            }
-		        e.printStackTrace(printStream);
-		        printStream.println();
-		        printStream.flush();
-		        printStream.close();
-	        } catch (Exception exc) {
-	            JOptionPane.showMessageDialog(null, "Loggningen av felet misslyckades");
-	        }
+	    } catch (Exception e) {
+	        logError(e);
 	    }
 	}
 

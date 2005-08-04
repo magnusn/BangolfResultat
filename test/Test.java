@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
@@ -63,11 +64,13 @@ class Test extends Test2 {
 	        
 	        try {
 	            PrintStream printStream = new PrintStream("error.log");
-	            for(int i = 0; i < list.size(); i++) {
-	                printStream.println((String)list.get(i));
-	            }
+	            Date date = new Date(System.currentTimeMillis());
+	            printStream.println(date.toString());
 		        e.printStackTrace(printStream);
 		        printStream.println();
+		        while(list.size() != 0) {
+	                printStream.println((String)list.removeFirst());
+	            }
 		        printStream.flush();
 		        printStream.close();
 	        } catch (Exception exc) {

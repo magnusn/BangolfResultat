@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.6.7a"
+!define PRODUCT_VERSION "0.6.7b"
 !define PRODUCT_PUBLISHER "Magnus Nilsson"
 !define PRODUCT_WEB_SITE "http://web.telia.com/~u44802129/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -209,6 +209,7 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\bytanamn.gif"
   Delete "$INSTDIR\doc\bilder\bgr.gif"
   Delete "$INSTDIR\doc\bilder\align.gif"
+  Delete "$INSTDIR\error.log"
   Delete "$INSTDIR\licens.txt"
   Delete "$INSTDIR\BangolfResultat.jar"
 

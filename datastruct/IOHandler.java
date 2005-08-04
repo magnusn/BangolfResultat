@@ -11,13 +11,13 @@ import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.LinkedList;
-
-
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
@@ -425,5 +425,34 @@ public class IOHandler {
 		o = ois.readObject();
 		ois.close();
 		return o;
+	}
+	
+	/** loggar informationen om ett exception som har uppstått i filen error.log 
+	 *  returnerar true om operationen lyckas */
+	public static boolean logError(Exception exception) {
+	    LinkedList list = new LinkedList();
+        try {
+            BufferedReader fileIn = new BufferedReader(new FileReader("error.log"));
+            String inLine = fileIn.readLine();
+            while(inLine != null) {
+                list.add(inLine);
+                inLine = fileIn.readLine();
+            }
+        } catch (Exception e) {}
+        try {
+            PrintStream printStream = new PrintStream("error.log");
+            Date date = new Date(System.currentTimeMillis());
+            printStream.println(date.toString());
+	        exception.printStackTrace(printStream);
+	        printStream.println();
+	        while(list.size() != 0) {
+                printStream.println((String)list.removeFirst());
+            }
+	        printStream.flush();
+	        printStream.close();
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
 	}
 }
