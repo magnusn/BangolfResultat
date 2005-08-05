@@ -619,15 +619,16 @@ public class SearchWindow {
 		personTracker.put(" ", new Integer(i.intValue() + 1));
 	}
 	
-	/** loggar informationen om Exception exception */
-	private static void logError(Exception exception) {
+	/** loggar informationen om Throwable throwable */
+	private static void logError(Throwable throwable) {
 	    JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
         		"Informationen om detta sparas i filen error.log.\n" +
         		"Denna fil finns i katalogen där programmet installerades, " +
         		"vanligtvis C:\\Program\\BangolfResultat.\n\n" +
         		"Var vänlig spara aktivt arbete och starta om programmet.\n" +
-        		"Om problem uppstår igen tag kontakt med programmets tillverkare.");
-	    if(IOHandler.logError(exception)) {
+        		"Om problem uppstår igen tag kontakt med programmets tillverkare.",
+        		"Varningsmeddelande", JOptionPane.WARNING_MESSAGE);
+	    if(IOHandler.logError(throwable)) {
 	        JOptionPane.showMessageDialog(null, "Loggningen är klar.");
 	    } else {
 	        JOptionPane.showMessageDialog(null, "Loggningen misslyckades.");
@@ -636,11 +637,8 @@ public class SearchWindow {
 	
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
-	    try {
-	        SearchWindow window = new SearchWindow();
-	    } catch (Exception e) {
-	        logError(e);
-	    }
+	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
+	    SearchWindow window = new SearchWindow();
 	}
 
     /** klassen som tar hand om knapptryckningarna i menyn */
@@ -1159,5 +1157,13 @@ public class SearchWindow {
     		compInfoDialogClosed = true;
     		((CompInfoDialog)e.getSource()).setVisible(false);
     	}
+    }
+    
+    /** klassen som tar hand om fel som uppstår */
+    public static class ErrorHandler {
+        /** tar hand om felet som uppstår */
+        public void handle(Throwable t) {
+            logError(t);
+        }
     }
 }

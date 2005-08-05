@@ -427,9 +427,9 @@ public class IOHandler {
 		return o;
 	}
 	
-	/** loggar informationen om ett exception som har uppstått i filen error.log 
-	 *  returnerar true om operationen lyckas */
-	public static boolean logError(Exception exception) {
+	/** loggar informationen om ett exception som har uppstått till filen error.log 
+	 *  och returnerar true om operationen lyckas */
+	public static boolean logError(Throwable throwable) {
 	    LinkedList list = new LinkedList();
         try {
             BufferedReader fileIn = new BufferedReader(new FileReader("error.log"));
@@ -443,7 +443,7 @@ public class IOHandler {
             PrintStream printStream = new PrintStream("error.log");
             Date date = new Date(System.currentTimeMillis());
             printStream.println(date.toString());
-	        exception.printStackTrace(printStream);
+	        throwable.printStackTrace(printStream);
 	        printStream.println();
 	        while(list.size() != 0) {
                 printStream.println((String)list.removeFirst());
