@@ -134,6 +134,9 @@ class ScoreBoardWindow {
 				enlarge();
 			}
 			for(int j = 0; j < output[i].length; j++) {
+			    if(style[i][j] != null && style[i][j].startsWith("S:a")) {
+				    style[i][j] = style[i][j].replaceFirst("S:a", "");
+				}
 			    color = getColor(style[i][j]);
 				label[i][j].setText(output[i][j]);
 				label[i][j].setForeground(color);

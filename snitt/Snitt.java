@@ -56,7 +56,6 @@ public class Snitt {
 			fileName = fileName + ".snitt";
 		}
 		this.fileName = fileName;
-		IOHandler io = new IOHandler();
 	}
 	
 	/** läser in resultat ifrån filerna i strängvektorn fileNames och hämtar namn och klubb med hjälp av personTrack */

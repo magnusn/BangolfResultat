@@ -167,13 +167,19 @@ public class SnittWindow extends JFrame {
 		setVisible(true);
 		
 		snittData = new SnittData(tab.getTabCount());
-		if(!snittData.readAppearanceSettings()) {
+		/** TODO Avkommentera detta och ta bort filen snittapp i mappen data för att få NullPointerException 
+		 *  Meningen är att kontrollera hur felloggen fungerar */
+		/*if(!snittData.readAppearanceSettings()) {
 		    JOptionPane.showMessageDialog(frame, "Föregående inställningar för snittlistans utseende gick ej" +
 		    		" att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
-		}
+		}*/
 		if(!snittData.readCompareFiles()) {
 		    JOptionPane.showMessageDialog(frame, "Jämförelsefilernas adresser kunde ej läsas in",
 		            "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		if(!snittData.readAppearanceSettings()) {
+		    JOptionPane.showMessageDialog(frame, "Föregående inställningar för snittlistans utseende gick ej" +
+		    		" att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

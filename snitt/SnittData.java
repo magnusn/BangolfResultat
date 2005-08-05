@@ -35,7 +35,7 @@ public class SnittData {
             if(headers.length != nbrTabs) {
                 JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][NBR_HEADERS];
                 for(int i = 0; i < nbrTabs; i++) {
-                    tempHeaders[i] = getStandardHeaders();
+                    tempHeaders[i] = getStandardHeaders(i);
                 }
                 if(headers[0].length == tempHeaders[0].length) {
                     for(int i = 0; i < headers.length; i++) {
@@ -48,14 +48,14 @@ public class SnittData {
         } catch (Exception e) {
             headers = new JCheckBox[nbrTabs][NBR_HEADERS];
             for(int i = 0; i < nbrTabs; i++) {
-                headers[i] = getStandardHeaders();
+                headers[i] = getStandardHeaders(i);
             }
         }
         return false;
     }
     
-    /** returnerar originalinställningarna för utseende */
-    private JCheckBox[] getStandardHeaders() {
+    /** returnerar originalinställningarna för utseende gällande flik tabIndex */
+    private JCheckBox[] getStandardHeaders(int tabIndex) {
         JCheckBox[] standardHeaders = new JCheckBox[NBR_HEADERS];
         standardHeaders[Snitt.NAME] = new JCheckBox("Namn", true);
         standardHeaders[Snitt.NAME].setEnabled(false);
@@ -66,9 +66,16 @@ public class SnittData {
         standardHeaders[Snitt.MEAN] = new JCheckBox("Snitt", true);
         standardHeaders[Snitt.MEAN].setEnabled(false);
         standardHeaders[Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-        standardHeaders[Snitt.EX_MEAN].setEnabled(false);
         standardHeaders[Snitt.CHANGE] = new JCheckBox("+/-");
-        standardHeaders[Snitt.CHANGE].setEnabled(false);
+        if(getCompareFile(tabIndex) == null) {
+            standardHeaders[Snitt.EX_MEAN].setEnabled(false);
+            standardHeaders[Snitt.CHANGE].setEnabled(false);
+            standardHeaders[Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
+            standardHeaders[Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
+        } else {
+            standardHeaders[Snitt.EX_MEAN].setSelected(true);
+            standardHeaders[Snitt.CHANGE].setSelected(true);
+        }
         return standardHeaders;
     }
     
@@ -118,7 +125,6 @@ public class SnittData {
     
     /** returnerar rubrikinställningarna för snittlistefliken tabIndex */
     protected JCheckBox[] getAppearanceHeaders(int tabIndex) {
-        initAppearanceHeaders(tabIndex);
         return headers[tabIndex];
     }
     
@@ -136,7 +142,7 @@ public class SnittData {
         }
     }
     
-    /** sätter adressen fileName för jämförelsefilen till snittlisefliken tabIndex */
+    /** sätter adressen fileName för jämförelsefilen till snittlistefliken tabIndex */
     protected void setCompareFile(String fileName, int tabIndex) {
         if(!fileName.equals(files[tabIndex])) {
             files[tabIndex] = fileName;
