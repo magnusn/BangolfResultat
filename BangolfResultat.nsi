@@ -20,8 +20,6 @@
 ; Welcome page
 !define MUI_WELCOMEPAGE_TEXT "Denna guide tar dig igenom installationen av ${PRODUCT_NAME} ${PRODUCT_VERSION}.\r\n\r\nDet rekommenderas att du avslutar alla andra program innan du fortsätter installationen. Detta tillåter att installationen uppdaterar nödvändiga systemfiler utan att behöva starta om din dator.\r\n\r\nOm du redan har en version av ${PRODUCT_NAME} installerad på datorn bör du säkerhetskopiera filerna i mappen data innan du fortsätter med installationen.\r\n\r\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
-;Test page
-;MessageBox MB_OK "Säkerhetskopiera alla filer i katalogen data innan en eventuell uppgradering"
 ; License page
 !insertmacro MUI_PAGE_LICENSE "E:\Java\eclipse\workspace\BangolfResultat\doc\licens.txt"
 ; Directory page
@@ -49,7 +47,7 @@ var ICONS_GROUP
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "installer\BangolfResultat ${PRODUCT_VERSION}.exe"
+OutFile "installer\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
 InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 ShowInstDetails show
 ShowUnInstDetails show
@@ -224,7 +222,7 @@ Section Uninstall
   RMDir "$INSTDIR\doc\bilder"
   RMDir "$INSTDIR\doc"
   RMDir "$INSTDIR\data"
-  RMDir "$INSTDIR"
+  RMDir /REBOOTOK "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose true

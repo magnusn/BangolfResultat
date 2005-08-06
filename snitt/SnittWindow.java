@@ -171,7 +171,7 @@ public class SnittWindow extends JFrame {
 		    JOptionPane.showMessageDialog(frame, "Jämförelsefilernas adresser kunde ej läsas in",
 		            "Varning", JOptionPane.ERROR_MESSAGE);
 		}
-		// måste göras efter readCompareFiles() för att undvika NullPointerException
+		// måste göras efter readCompareFiles() för att fungera korrekt
 		if(!snittData.readAppearanceSettings()) {
 		    JOptionPane.showMessageDialog(frame, "Föregående inställningar för snittlistans utseende gick ej" +
 		    		" att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);

@@ -26,10 +26,12 @@ public class SnittData {
     protected SnittData(int nbrTabs) {
         this.nbrTabs = nbrTabs;
         io = new IOHandler();
+        files = new String[nbrTabs];
     }
     
     /** läser in inställningarna för hur snittlistorna skall se ut */
     protected boolean readAppearanceSettings() {
+        boolean success = false;
         try {
             headers = (JCheckBox[][]) io.load("snittapp");
             if(headers.length != nbrTabs) {
@@ -44,14 +46,19 @@ public class SnittData {
                 }
                 headers = tempHeaders;
             }
-            return true;
+            success = true;
         } catch (Exception e) {
+            e.printStackTrace();
+            success = false;
             headers = new JCheckBox[nbrTabs][NBR_HEADERS];
             for(int i = 0; i < nbrTabs; i++) {
                 headers[i] = getStandardHeaders(i);
             }
         }
-        return false;
+        for(int i = 0; i < headers.length; i++) {
+            setOldMeanHeaders(i, false);
+        }
+        return success;
     }
     
     /** returnerar originalinställningarna för utseende gällande flik tabIndex */
@@ -59,23 +66,16 @@ public class SnittData {
         JCheckBox[] standardHeaders = new JCheckBox[NBR_HEADERS];
         standardHeaders[Snitt.NAME] = new JCheckBox("Namn", true);
         standardHeaders[Snitt.NAME].setEnabled(false);
+        standardHeaders[Snitt.NAME].setToolTipText("Visas alltid");
         standardHeaders[Snitt.CLUB] = new JCheckBox("Klubb", true);
         standardHeaders[Snitt.COMPS] = new JCheckBox("Tävlingar", true);
         standardHeaders[Snitt.ROUNDS] = new JCheckBox("Varv", true);
         standardHeaders[Snitt.HITSUM] = new JCheckBox("Slag", true);
         standardHeaders[Snitt.MEAN] = new JCheckBox("Snitt", true);
         standardHeaders[Snitt.MEAN].setEnabled(false);
-        standardHeaders[Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol");
-        standardHeaders[Snitt.CHANGE] = new JCheckBox("+/-");
-        if(getCompareFile(tabIndex) == null) {
-            standardHeaders[Snitt.EX_MEAN].setEnabled(false);
-            standardHeaders[Snitt.CHANGE].setEnabled(false);
-            standardHeaders[Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
-            standardHeaders[Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
-        } else {
-            standardHeaders[Snitt.EX_MEAN].setSelected(true);
-            standardHeaders[Snitt.CHANGE].setSelected(true);
-        }
+        standardHeaders[Snitt.MEAN].setToolTipText("Visas alltid");
+        standardHeaders[Snitt.EX_MEAN] = new JCheckBox("Snitt ifjol", true);
+        standardHeaders[Snitt.CHANGE] = new JCheckBox("+/-", true);
         return standardHeaders;
     }
     
@@ -146,26 +146,33 @@ public class SnittData {
     protected void setCompareFile(String fileName, int tabIndex) {
         if(!fileName.equals(files[tabIndex])) {
             files[tabIndex] = fileName;
-            initAppearanceHeaders(tabIndex);
+            setOldMeanHeaders(tabIndex, true);
         }
     }
     
-    /** ställer automatiskt in utseendet efter att jämförelsefilen har ändrats */
-    private void initAppearanceHeaders(int tabIndex) {
-        if(getCompareFile(tabIndex) != null) {
-            headers[tabIndex][Snitt.EX_MEAN].setEnabled(true);
-            headers[tabIndex][Snitt.CHANGE].setEnabled(true);
-            headers[tabIndex][Snitt.EX_MEAN].setSelected(true);
-            headers[tabIndex][Snitt.CHANGE].setSelected(true);
-            headers[tabIndex][Snitt.EX_MEAN].setToolTipText(null);
-            headers[tabIndex][Snitt.CHANGE].setToolTipText(null);
-        } else {
+    /** ställer in utseendealternativen <EM>Snitt ifjol</EM> och <EM>+/-</EM>
+     *  efter om någon jämförelsefil är vald
+     * 	@param tabIndex - snittlistefliken som inställningen görs för
+     * 	@param compareFileChange - true om jämförelsefilen har ändrats och det är detta som föranleder
+     * 	en ändring i utseendeinställningarna för <EM>Snitt ifjol</EM> och <EM>+/-</EM>
+     */
+    private void setOldMeanHeaders(int tabIndex, boolean compareFileChange) {
+        if(getCompareFile(tabIndex) == null) {
             headers[tabIndex][Snitt.EX_MEAN].setEnabled(false);
             headers[tabIndex][Snitt.CHANGE].setEnabled(false);
             headers[tabIndex][Snitt.EX_MEAN].setSelected(false);
             headers[tabIndex][Snitt.CHANGE].setSelected(false);
             headers[tabIndex][Snitt.EX_MEAN].setToolTipText("Aktiveras först då jämförelsefil är vald");
             headers[tabIndex][Snitt.CHANGE].setToolTipText("Aktiveras först då jämförelsefil är vald");
+        } else {
+            headers[tabIndex][Snitt.EX_MEAN].setEnabled(true);
+            headers[tabIndex][Snitt.CHANGE].setEnabled(true);
+            headers[tabIndex][Snitt.EX_MEAN].setToolTipText(null);
+            headers[tabIndex][Snitt.CHANGE].setToolTipText(null);
+            if(compareFileChange) {
+                headers[tabIndex][Snitt.EX_MEAN].setSelected(true);
+                headers[tabIndex][Snitt.CHANGE].setSelected(true);
+            }
         }
     }
     
