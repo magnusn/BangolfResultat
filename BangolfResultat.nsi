@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.6.7b"
+!define PRODUCT_VERSION "0.6.7c"
 !define PRODUCT_PUBLISHER "Magnus Nilsson"
 !define PRODUCT_WEB_SITE "http://web.telia.com/~u44802129/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -54,7 +54,7 @@ ShowUnInstDetails show
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
-  SetOverwrite ifnewer
+  SetOverwrite on
   File "E:\Java\eclipse\workspace\BangolfResultat\doc\licens.txt"
   File "E:\Java\eclipse\workspace\BangolfResultat\installer\BangolfResultat.jar"
   SetOutPath "$INSTDIR\doc\bilder"

@@ -26,6 +26,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
@@ -497,7 +498,7 @@ public class SnittWindow extends JFrame {
 				    int align = DataManager.getOrientation(AlignmentWindow.SNITT_OWNER);
 					snitt.outputToHTML(list, surface, compareSurface, headerList, align);
 					setMessage("Snittlistan är sparad som webbsida.", true);
-				} catch (Exception e) {
+				} catch (IOException ioe) {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}

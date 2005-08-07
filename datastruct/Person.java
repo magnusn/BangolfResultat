@@ -13,7 +13,6 @@ public class Person {
 	private int comps,rounds,hits;	// antal tävlingar, varv och slag
 	private double oldMean;			// fjolårssnitt
 	private double diff;			// differensen mellan årets snitt och fjolårets
-	private double twoDecimalMean;	// snitt med två decimalers noggrannhet
 	public static final double NO_VALUE = 127; // då giltigt värde saknas
 	
 	/** skapar resultat för en person med namnet name och klubben club 
@@ -27,7 +26,6 @@ public class Person {
 		this.hits = hits;
 		this.oldMean = Person.NO_VALUE;
 		this.diff = Person.NO_VALUE;
-		this.twoDecimalMean = Person.NO_VALUE;
 	}
 	
 	/** returnerar identifikationsnumret */
@@ -117,10 +115,14 @@ public class Person {
 	/** returnerar snittet med två decimalers noggrannhet */
 	public double getTwoDecimalMean() {
 	    double mean = getMean();
-	    StringTokenizer str = new StringTokenizer(String.valueOf(mean), ".");
-        String heltal = str.nextToken();
-        String decimaltal = str.nextToken();
-        String meanValue = SnittData.getValueWithTwoDecimals(mean, heltal, decimaltal, true);
-	    return Double.parseDouble(meanValue);
+	    if(mean != Person.NO_VALUE) {
+	        StringTokenizer str = new StringTokenizer(String.valueOf(mean), ".");
+	        String heltal = str.nextToken();
+	        String decimaltal = str.nextToken();
+	        String meanValue = SnittData.getValueWithTwoDecimals(mean, heltal, decimaltal, true);
+	        return Double.parseDouble(meanValue);
+	    } else {
+	        return Person.NO_VALUE;
+	    }
 	}
 }
