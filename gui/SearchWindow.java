@@ -23,6 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
@@ -833,7 +834,7 @@ public class SearchWindow {
     					        STATUSFIELD.setText("");
     					        MESSAGEFIELD.setText("Öppnat filen: " + fileNameSNITT + ".");
     					        enableCompareFileMenus();
-    					    } catch (Exception f) {
+    					    } catch (IOException ioe) {
     					        JOptionPane.showMessageDialog(frame, "Inläsningen från SNITT-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
     					    }
     					} else {

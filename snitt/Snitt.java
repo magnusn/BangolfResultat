@@ -322,17 +322,20 @@ public class Snitt {
 		bufferOut.write(String.valueOf(surface));
 		bufferOut.newLine();
 		
+		Person person;
+		double snitt;
 		for (int i = 1; i <= res.size(); i++) {
-			Person person = (Person)res.get(i-1);
-			double snitt;
+			person = (Person)res.get(i-1);
 			snitt = person.getMean();
-			StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
-			String heltal = str.nextToken();
-			String decimaltal = str.nextToken();
-			String medel = SnittData.getValueWithTwoDecimals(snitt, heltal, decimaltal, true);
-			
-			bufferOut.write(person.getIdNbr() + ";" + person.getName() + ";" + person.getClub() + ";" + medel);
-			bufferOut.newLine();
+			if(snitt != Person.NO_VALUE) {
+			    StringTokenizer str = new StringTokenizer(String.valueOf(snitt), ".");
+			    String heltal = str.nextToken();
+			    String decimaltal = str.nextToken();
+			    String medel = SnittData.getValueWithTwoDecimals(snitt, heltal, decimaltal, true);
+			    
+			    bufferOut.write(person.getIdNbr() + ";" + person.getName() + ";" + person.getClub() + ";" + medel);
+			    bufferOut.newLine();
+			}
 		}
 		
 		bufferOut.flush();
@@ -340,7 +343,7 @@ public class Snitt {
 	}
 	
 	/** läser jämförelsefilens snittlista fileName */
-	public int readCompareFile(String fileName) throws FileNotFoundException, IOException {
+	public int readCompareFile(String fileName) throws IOException {
 	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
 		int surface = Integer.parseInt(fileIn.readLine());
 		String inLine = fileIn.readLine();

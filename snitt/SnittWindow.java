@@ -481,7 +481,7 @@ public class SnittWindow extends JFrame {
 			                JOptionPane.showMessageDialog(frame, "Vald jämförelsefil existerar inte", "Varning", JOptionPane.ERROR_MESSAGE);
 			                readOk = false;
 			            }
-			        } catch (Exception e) {
+			        } catch (IOException ioe) {
 			            JOptionPane.showMessageDialog(frame, "Inläsningen av snittlista att jämföra med misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			            readOk = false;
 			        }
