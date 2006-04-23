@@ -128,7 +128,7 @@ public class IOHandler {
 				}
 				bufferOut.write(endRow);
 				bufferOut.newLine();
-			} else {
+			} else if (!outputStyle[i][0].equals("Bold+")) {
 				bufferOut.write("<TR><TD HEIGHT=15> </TD></TR>");
 				bufferOut.newLine();
 			}

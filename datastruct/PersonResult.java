@@ -51,6 +51,8 @@ public class PersonResult {
 	
 	/** returnerar klassen */
 	public String getKlass() {
+	    if (klass.trim().equals(""))
+	        return " ";
 		return klass;
 	}
 	
