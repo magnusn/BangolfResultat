@@ -1,0 +1,7 @@
+1. Ändra doc/om.htm
+2. Ändra doc/versionhistory.htm
+3. Ändra hemsida/index.htm
+4. Ändra BangolfResultat.nsi
+5. Skapa ny jar-fil
+6. Kompilera ny exekverbar fil
+7. Lägga upp alla ändringar
