@@ -44,7 +44,6 @@ import java.util.StringTokenizer;
 
 /** klassen som beskriver själva huvudfönstret och delen för sökning */
 public class SearchWindow {
-    private SearchWindow searchWindow;		// detta fönster
 	private HashMap personTracker;			// håller reda på vem personen är även om någon persondata ändras
 	private HashMap personNameTracker;		// lagrar namnet som idnumret tillhör
 	private NameList name;					// namnlista som används för sökning
@@ -123,7 +122,6 @@ public class SearchWindow {
 		WindowHandler window = new WindowHandler();
 		frame.addWindowListener(window);
 		
-		JPanel buttonpanel = new JPanel();
 		searchPanel = new JPanel();
 		button = new JButton[10];
 		
@@ -331,7 +329,7 @@ public class SearchWindow {
 		STATUSFIELD.setFocusable(false);
 		statusPanel.add(MESSAGEFIELD, BorderLayout.CENTER);
 		statusPanel.add(STATUSFIELD, BorderLayout.WEST);
-		resultInput = new ResultInputWindow(frame, searchPanel, statusPanel, resBar, personTracker, personNameTracker);
+		resultInput = new ResultInputWindow(frame, resBar, personTracker, personNameTracker);
 		lapSumDialog = new LapSumDialog(frame);
 		compInfoDialog = new CompInfoDialog(frame, this);
 		compInfoDialog.addWindowListener(new WinHandForCompInfoDialog());
@@ -357,7 +355,6 @@ public class SearchWindow {
 		dummyStartUp();
 		frame.pack();
 		frame.setVisible(true);
-		searchWindow = this;
 	}
 	
 	/** fixar till menyalternativen för skapandet av en jämförelsesnittlista */
@@ -639,7 +636,7 @@ public class SearchWindow {
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
-	    SearchWindow window = new SearchWindow();
+	    new SearchWindow();
 	}
 
     /** klassen som tar hand om knapptryckningarna i menyn */
@@ -796,7 +793,7 @@ public class SearchWindow {
     		else if(e.getSource() == snittStart) {
     			if(!SNITTOPEN) {
     				SNITTOPEN = true;
-    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager, searchWindow);
+    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
     			} else {
     				snittWindow.setVisible(true);
     			}
@@ -844,7 +841,7 @@ public class SearchWindow {
     			}
     		}
     		else if(e.getSource() == about) {
-    			AboutWindow aboutWindow = new AboutWindow(frame);
+    			new AboutWindow(frame);
     		}
     		else if(e.getSource() == quit) {
     			exit();

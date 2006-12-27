@@ -2,13 +2,13 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.6.7e"
+!define PRODUCT_VERSION "0.6.8"
 !define PRODUCT_PUBLISHER "Magnus Nilsson"
 !define PRODUCT_WEB_SITE "http://web.telia.com/~u44802129/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
-!define PRODUCT_WORKSPACE "E:\Java\eclipse\workspace"
+!define PRODUCT_WORKSPACE "E:\eclipse\workspace"
 ;!define PRODUCT_WORKSPACE "C:\eclipse\workspace"
 
 ; MUI 1.67 compatible ------

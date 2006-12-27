@@ -42,7 +42,7 @@ class Test extends Test2 {
     
 	public static void main(String[] args) {
 	    try {
-	        Test test = new Test(false);
+	        new Test(false);
 	    } catch (Exception e) {
 	        JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
 	        		"Informationen om detta sparas i filen error.log.\n" +

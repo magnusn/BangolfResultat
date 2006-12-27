@@ -65,8 +65,8 @@ import javax.swing.filechooser.FileFilter;
 */
 public class Filter extends FileFilter {
 	
-	private static String TYPE_UNKNOWN = "Type Unknown";
-	private static String HIDDEN_FILE = "Hidden File";
+//	private static String TYPE_UNKNOWN = "Type Unknown";
+//	private static String HIDDEN_FILE = "Hidden File";
 	
 	private Hashtable filters = null;
 	private String description = null;

@@ -32,56 +32,68 @@ public class IOHandler {
 		boolean[] extras = res.getExtras();
 		String alignment;
 		if(align == AlignmentWindow.LEFT) {
-		    alignment = "bgrleft";
+		    alignment = "left";
 		} else if (align == AlignmentWindow.CENTER) {
-		    alignment = "bgrcenter";
+		    alignment = "center";
 		} else {
-		    alignment = "bgrright";
+		    alignment = "right";
 		}
-		String startRow = "<TR>";
-		String endRow = "</TR>";
+		String startRow = "<tr>";
+		String endRow = "</tr>";
 		String startCol;
-		String startColEmpty = "<TD>";
-		String startColStartNbr = "<TD CLASS=" + alignment + " WIDTH=50>";
-		String startColPlaceNbr = "<TD CLASS=" + alignment + " WIDTH=50>";
-		String startColLicense = "<TD CLASS=bgrleft WIDTH=110>";
-		String startColName = "<TD CLASS=bgrleft WIDTH=160>";
-		String startColClub = "<TD CLASS=bgrleft WIDTH=95>";
+		String startColEmpty = "<td>";
+		String startColStartNbr = "<td style=\"text-align:" + alignment + "\">";
+		String startColPlaceNbr = "<td style=\"text-align:" + alignment + "\">";
+		String startColLicense = "<td>";
+		String startColName = "<td>";
+		String startColClub = "<td>";
 		String startColResult;
+		String colWidth;
+		String startNbrColWidth = "50px";
+		String placeNbrColWidth = "50px";
+		String licenseColWidth = "110px";
+		String nameColWidth = "160px";
+		String clubColWidth = "95px";
+		String resultColWidth;
+		String sumColWidth = "30px";
 		if(res.getNbrRounds() <= 5) {
-			startColResult = "<TD CLASS=" + alignment + " WIDTH=50>";
+			startColResult = "<td style=\"text-align:" + alignment + "\">";
+			resultColWidth = "50px";
 		} else {
-			startColResult = "<TD CLASS=" + alignment + " WIDTH=28>";
+			startColResult = "<td style=\"text-align:" + alignment + "\">";
+			resultColWidth = "28px";
 		}
-		String startColSum = "<TD CLASS=" + alignment + " WIDTH=30>";
-		String endCol = "</TD>";
+		String startColSum = "<td style=\"text-align:" + alignment + "\">";
+		String endCol = "</td>";
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
-		bufferOut.write("<HTML>");
+		bufferOut.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
 		bufferOut.newLine();
-		bufferOut.write("<HEAD>");
+		bufferOut.write("<html lang=\"sv\">");
 		bufferOut.newLine();
-		bufferOut.write("<STYLE ID=\"Bangolftävlingar\"><!--table "+
-		" .bgrleft{font-size:10.0pt;text-align:left;vertical-align:super;white-space:nowrap;}"+
-		" .bgrcenter{font-size:10.0pt;text-align:center;vertical-align:super;white-space:nowrap;}"+
-		" .bgrright{font-size:10.0pt;text-align:right;vertical-align:super;white-space:nowrap;}"+
-		"--></STYLE>");
+		bufferOut.write("<head>");
 		bufferOut.newLine();
-		bufferOut.write("<TITLE>" + header + "</TITLE>");
+		bufferOut.write("<title>" + header + "</title>");
 		bufferOut.newLine();
-		bufferOut.write("</HEAD>");
+		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=WINDOWS-1252\">");
 		bufferOut.newLine();
-		bufferOut.write("<BODY BGCOLOR=\"white\">");
+		bufferOut.write("<style type=\"text/css\">" +
+				"body {font-family: arial} " +
+				"td {font-size: 10.0pt; vertical-align: super; white-space: nowrap} " +
+				"</style>");
 		bufferOut.newLine();
-		bufferOut.write("<FONT FACE=\"arial\">");
+		bufferOut.write("</head>");
 		bufferOut.newLine();
-		bufferOut.write("<H1 STYLE='font-size:14.0pt;font-weight:800;font-style:normal'>" + header + "</H1>");
+		
+		bufferOut.write("<body style=\"background-color:white\">");
+		bufferOut.newLine();
+		bufferOut.write("<h1 style=\"font-size: 14.0pt\">" + header + "</h1>");
 		bufferOut.newLine();
 		
 		String[][] output = res.getOutput();
 		String[][] outputStyle = res.getOutputStyle();
 		
-		bufferOut.write("<TABLE CELLPADDING=1 CELLSPACING=1>");
+		bufferOut.write("<table cellpadding=\"1\" cellspacing=\"1\">");
 		bufferOut.newLine();
 		
 		for(int i = 0; i < output.length; i++) {
@@ -94,63 +106,74 @@ public class IOHandler {
 					if(outputStyle[i][j] == null) {
 						outputStyle[i][j] = "black";
 					} else if(outputStyle[i][j].equals("Bold")) {
-						boldStart = "<B>";
-						boldStop = "</B>";
+						boldStart = "<b>";
+						boldStop = "</b>";
 						outputStyle[i][j] = "black";
 					} else if(outputStyle[i][j].equals("Bold+")) {
-						boldStart = "<B style='font-size:12.0pt'>";
-						boldStop = "</B>";
+						boldStart = "<b style=\"font-size:12.0pt\">";
+						boldStop = "</b>";
 						outputStyle[i][j] = "black";
 					} 
 					if(output[i][j] == null) {
 						output[i][j] = "";
 						startCol = startColEmpty;
+						colWidth = "";
 					} else if(j == 0) {
 						startCol = startColName;
+						colWidth = nameColWidth;
 					} else if(j == 1) {
 						startCol = startColClub;
+						colWidth = clubColWidth;
 					} else if(j == 2 && extras[1]) {
 						startCol = startColLicense;
+						colWidth = licenseColWidth;
 					} else if((j == 2 && extras[2]) || (j == 3 && (extras[1] && extras[2]))) {
 						startCol = startColStartNbr;
+						colWidth = startNbrColWidth;
 					} else if((j == output[i].length-1 && extras[0]) || (j == output[i].length-2 && extras[0])) {
 						startCol = startColPlaceNbr;
+						colWidth = placeNbrColWidth;
 					} else {
 						startCol = startColResult;
+						colWidth = resultColWidth;
 					}
 					if(outputStyle[i][j].startsWith("S:a") || output[i][j].startsWith("S:a")) {
 					    startCol = startColSum;
+					    colWidth = sumColWidth;
 					    outputStyle[i][j] = outputStyle[i][j].replaceFirst("S:a", "");
 					}
-					bufferOut.write(startCol + boldStart + "<FONT COLOR=\""+outputStyle[i][j]+"\">"+ 
-							output[i][j] +"</FONT>" + boldStop + endCol);
+					if (! boldStart.equals(""))
+						startCol = addStyle(startCol, "width", colWidth);
+					if (! outputStyle[i][j].equals("black"))
+						startCol = addStyle(startCol, "color", outputStyle[i][j]);
+					bufferOut.write(startCol + boldStart + output[i][j] + boldStop + endCol);
 					bufferOut.newLine();
 				}
 				bufferOut.write(endRow);
 				bufferOut.newLine();
 			} else if (outputStyle[i][0] == null || !outputStyle[i][0].equals("Bold+")) {
-				bufferOut.write("<TR><TD HEIGHT=15> </TD></TR>");
+				bufferOut.write("<tr><td style=\"height:15px\"> </td></tr>");
 				bufferOut.newLine();
 			}
 		}
 		
-		bufferOut.write("</TABLE>");
+		bufferOut.write("</table>");
 		bufferOut.newLine();
-		bufferOut.write("<P><BR>");
+		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-		bufferOut.write("<FONT SIZE=-2>Denna sida är skapad av <A HREF=\"http://web.telia.com/~u44802129/\" TARGET=\"_top\">"
-										+ "BangolfResultat</A></FONT>");
+//		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://web.telia.com/~u44802129/\" target=\"_top\">"
+//										+ "BangolfResultat</a></div>");
+		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://web.telia.com/~u44802129/\">"
+				+ "BangolfResultat</a></div>");
 		bufferOut.newLine();
-		bufferOut.write("</FONT>");
+		bufferOut.write("</body>");
 		bufferOut.newLine();
-		bufferOut.write("</BODY>");
-		bufferOut.newLine();
-		bufferOut.write("</HTML>");
+		bufferOut.write("</html>");
 		
 		bufferOut.flush();
 		bufferOut.close();
 	}
-	
+
 	/** skriver ut resultatlistan result till en semikolonseparerad fil med namnet fileName där tävlingens namn sätts till header */
 	public void outputToSKV(String fileName, String fileNameHTM, ResultList result, 
 													String header, boolean[] editData) throws IOException {
@@ -454,5 +477,34 @@ public class IOHandler {
             return false;
         }
         return true;
+	}
+	
+	/** lägger till ett styleproperty till en HTML-tagg */
+	public static String addStyle(String tag, String property, String value) {
+		int styleIndex = tag.indexOf("style");
+		if (styleIndex == -1) {
+			int endOfTag;
+			if (tag.endsWith(">")) {
+				endOfTag = tag.lastIndexOf('>');
+			} else {
+				return tag;
+			}
+			String begin = tag.substring(0, endOfTag);
+			String end = tag.substring(endOfTag, tag.length());
+			tag = begin + " style=\"\"" + end;
+		}
+		int startQuoteIndex = tag.indexOf('"', styleIndex);
+		int endQuoteIndex = tag.indexOf('"', startQuoteIndex+1);
+		if (startQuoteIndex != -1 && endQuoteIndex != -1) {
+			String begin = tag.substring(0, endQuoteIndex);
+			String end = tag.substring(endQuoteIndex, tag.length());
+			String separator;
+			if (startQuoteIndex + 1 == endQuoteIndex)
+				separator = "";
+			else
+				separator ="; ";
+			return begin + separator + property + ":" + value + end;
+		}
+		return tag;
 	}
 }

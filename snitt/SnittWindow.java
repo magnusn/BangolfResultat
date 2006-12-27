@@ -37,7 +37,6 @@ import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
-    private SearchWindow searchWindow;		// huvudfönstret
     private DataManager dataManager;		// håller kolla på vissa inställningar
     private SnittData snittData;			// lagrar inställningarna för snittlistorna
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
@@ -62,12 +61,11 @@ public class SnittWindow extends JFrame {
 	
 	/** skapar snitthanterarfönstret */
 	public SnittWindow(JFrame owner, HashMap personNameTracker, 
-	        DataManager dataManager, SearchWindow searchWindow) {
+	        DataManager dataManager) {
 		super("Snittlistshanteraren");
 		frame = this;
 		this.personNameTracker = personNameTracker;
 		this.dataManager = dataManager;
-		this.searchWindow = searchWindow;
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setIconImage(SearchWindow.ICON);
 		
@@ -203,7 +201,6 @@ public class SnittWindow extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			ListPanel listPanel = (ListPanel)tab.getSelectedComponent();
 			Vector selected = listPanel.getSelected();
-			Vector selection = listPanel.getSelection();
 			/** sparar snittlistan som webbsida */
 			if(e.getSource() == saveToHTML) {
 				if(selected.size() != 0) {

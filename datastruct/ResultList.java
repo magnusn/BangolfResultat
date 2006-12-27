@@ -53,7 +53,6 @@ public class ResultList {
 	public void addResult(int startNbr, String name, String club, String idNbr, int[] results, int rounds, String klass
 			, int prio, int nbrRoundsFinished, int personID) {
 		nbrRounds = rounds;
-		String identity = name + club;
 		Integer pID = new Integer(personID);
 		if(IDMap.containsKey(pID)) {
 			PersonResult pr = (PersonResult) IDMap.get(pID);
@@ -82,7 +81,6 @@ public class ResultList {
 	
 	/** ändrar namn och klubb för en spelare till newName och newClub */
 	public void changeNameAndClub(Integer personID, String newName, String newClub) {
-		String newIdentity = newName + newClub;
 		if(IDMap.containsKey(personID)) {
 			PersonResult pr = (PersonResult) IDMap.get(personID);
 			pr.changeNameAndClub(newName, newClub);
@@ -101,8 +99,10 @@ public class ResultList {
 	
 	/** räknar ner antal förekomster av klassen klass */
 	private void removeFromKlass(String klass) {
-		int n = ((Integer)classMap.get(klass)).intValue();
-		classMap.put(klass, new Integer(n--));
+		if (classMap.containsKey(klass)) {
+			int n = ((Integer)classMap.get(klass)).intValue();
+			classMap.put(klass, new Integer(n--));
+		}
 	}
 	
 	/** returnerar PersonResult för personen med id personIdentification */

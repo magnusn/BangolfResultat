@@ -36,15 +36,14 @@ public class ResultInputWindow {
 	public static ResultList RESULTLIST;	// resultatlistan
 	public static ScoreBoardWindow BOARD;	// den visuella resultatlistan
 	private IOHandler io;					// tar hand om skrivning och läsning till fil
-	private int nbrRounds,surface;			// tävlingens varvantal och underlag
+	private int nbrRounds;					// tävlingens varvantal
 	private String[] classes;				// strängvektorn med de olika klassnamnen
-	private static JComboBox klassChoice;			// valrutan för vilken klass
-	private JFrame frame;							// huvudfönstret
-	private JDialog inputDialog, popup;				// indatafönster och resultatinmatningsfönster
-	private JPanel inputPanel, searchPanel;			// behållare för indata, sökning och redigering (av delsummor och placering)
+	private static JComboBox klassChoice;	// valrutan för vilken klass
+	private JFrame frame;					// huvudfönstret
+	private JDialog popup;					// resultatinmatningsfönster
+	private JPanel inputPanel;				// behållare för indata
 	private JTextField prio, startNbrField, licenseNbrField; 	// inmatning av sorteringsordning, startnummer och licensnummer
 	private JTextField meanField;								// inmatning av snitt
-	private JPanel statusPanel;									// statuspanelen
 	private JTextField[] varvResult;							// inmatning av varvresultat
 	private JButton inputOk,inputCancel,inputErase,inputRemove; // OK, avbryt, radera och ta bort är vad dessa knappar sköter om
 	private JLabel person;							// visar namnet på personen som valts vid resultatinmatningsfönstret
@@ -55,10 +54,8 @@ public class ResultInputWindow {
 	
 	/** skapar indatafönstret och får in huvudfönstret mainFrame, sökpanelen searchPanel och fönstret för
 			delsummorna för att kunna ställa in dessa senare när all indata som behövs har fåtts fram */
-	public ResultInputWindow(JFrame mainFrame, JPanel searchPanel, JPanel statusPanel, JMenuBar resBar, HashMap personTracker, HashMap personNameTracker) {
+	public ResultInputWindow(JFrame mainFrame, JMenuBar resBar, HashMap personTracker, HashMap personNameTracker) {
 		frame = mainFrame;
-		this.searchPanel = searchPanel;
-		this.statusPanel = statusPanel;
 		bar = resBar;
 		this.personTracker = personTracker;
 		this.personNameTracker = personNameTracker;
@@ -150,7 +147,6 @@ public class ResultInputWindow {
 	    this.mode = SearchWindow.MODE_COMP;
 	    this.boxData = boxData;
 	    this.nbrRounds = nbrRounds;
-	    this.surface = surface;
 	    startNbrMap.clear();
 	    inputPanel = new JPanel();
 	    GridLayout gridLayout;
@@ -545,7 +541,6 @@ public class ResultInputWindow {
 					if(klass == null) {
 					    klass = "";
 					}
-					String identity = name + ", " + club;
 					RESULTLIST.addResult(startNr,name,club,licenseNr,results,nbrRounds,klass,prioNr,nbrRoundsToRead,personID.intValue());
 					SearchWindow.CHANGE = true;
 					SearchWindow.STATUSFIELD.setText("*");
@@ -599,7 +594,6 @@ public class ResultInputWindow {
 	
 	/** anpassar licensnumren och resultatlistan till nytt namn eller ny klubb */
 	public void updateNameAndClub(String oldName, String oldClub, String newName, String newClub, Integer personID) {
-		String oldIdentity = oldName + ", " + oldClub;
 		String newIdentity = newName + ", " + newClub;
 		RESULTLIST.changeNameAndClub(personID, newName, newClub);
 		BOARD.update(true);

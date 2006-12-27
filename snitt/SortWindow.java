@@ -156,6 +156,7 @@ public class SortWindow extends JDialog {
 		} catch (Exception e) {
 		    try {
 		        int[] oldCompareBy = (int[]) io.load("compareby");
+		        oldCompareBy.hashCode(); // can be removed without any sideeffects
 		    } catch (Exception ex) {
 		        JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
 		    }

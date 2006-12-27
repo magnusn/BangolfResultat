@@ -75,8 +75,6 @@ class KlassWindow extends JFrame {
 	class MenuHandler implements ActionListener {
 		/** kollar vilket menyalternativ som valts */
 		public void actionPerformed(ActionEvent e) {
-			Vector selected = klass.getSelected();
-			Vector selection = klass.getSelection();
 			String inputValue;
 			if(e.getSource() == addKlass) {
 				inputValue = JOptionPane.showInputDialog(frame, "Skriv in klassnamnet:");

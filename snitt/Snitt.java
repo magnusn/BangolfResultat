@@ -160,59 +160,72 @@ public class Snitt {
 	        				 boolean[] headerList, int align) throws IOException {
 	    String alignment;
 	    if(align == AlignmentWindow.LEFT) {
-	        alignment = "bgrleft";
+	        alignment = "left";
 	    } else if(align == AlignmentWindow.CENTER) {
-	        alignment = "bgrcenter";
+	        alignment = "center";
 	    } else {
-	        alignment = "bgrright";
+	        alignment = "right";
 	    }
-		String startRow = "<TR>";
-		String endRow = "</TR>";
-		String startCol = "<TD class=" + alignment + ">";
-		String startColLeft = "<TD class=bgrleft>";
-		String startColCenter = "<TD class=bgrcenter>";
-		String startColRight = "<TD class=bgrright>";
-		String endCol = "</TD>";
+		String startRow = "<tr>";
+		String endRow = "</tr>";
+		String startCol = "<td>";
+		String startColAligned = startCol;
+		if (! alignment.equals("left"))
+			startColAligned = IOHandler.addStyle(startCol, "text-align", alignment);
+//		String startColLeft = "<TD class=bgrleft>";
+//		String startColCenter = "<TD class=bgrcenter>";
+//		String startColRight = "<TD class=bgrright>";
+		String startColName = "<td style=\"width:160px\">";
+		String startColClub = "<td style=\"width:95px\">";
+		String startColComps = IOHandler.addStyle("<td style=\"width:60px\">", "text-align", alignment);
+		String startColRounds = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
+		String startColHitSum = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
+		String startColMean = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
+		String startColExMean = IOHandler.addStyle("<td style=\"width:65px\">", "text-align", alignment);
+		String startColChange = IOHandler.addStyle("<td style=\"width:45px\">", "text-align", alignment);
+		String endCol = "</td>";
 		String[] headers = new String[headerList.length];
-		headers[Snitt.NAME] = "<TD class=bgrleft WIDTH=160><B>Namn</B>" + endCol;
-		headers[Snitt.CLUB] = "<TD class=bgrleft WIDTH=95><B>Klubb</B>" + endCol;
-		headers[Snitt.COMPS] = "<TD class=" + alignment + " WIDTH=60><B>Tävlingar</B>" + endCol;
-		headers[Snitt.ROUNDS] = "<TD class=" + alignment + " WIDTH=50><B>Varv</B>" + endCol;
-		headers[Snitt.HITSUM] = "<TD class=" + alignment + " WIDTH=50><B>Slag</B>" + endCol;
-		headers[Snitt.MEAN] = "<TD class=" + alignment + " WIDTH=50><B>Snitt</B>" + endCol;
-		headers[Snitt.EX_MEAN] = "<TD class=" + alignment + " WIDTH=65><B>Snitt ifjol</B>" + endCol;
-		headers[Snitt.CHANGE] = "<TD class=" + alignment + " WIDTH=45><B>+/-</B>" + endCol;
+		headers[Snitt.NAME] = startColName + "<b>Namn</b>" + endCol;
+		headers[Snitt.CLUB] = startColClub + "<b>Klubb</b>" + endCol;
+		headers[Snitt.COMPS] = startColComps + "<b>Tävlingar</b>" + endCol;
+		headers[Snitt.ROUNDS] = startColRounds + "<b>Varv</b>" + endCol;
+		headers[Snitt.HITSUM] = startColHitSum + "<b>Slag</b>" + endCol;
+		headers[Snitt.MEAN] = startColMean + "<b>Snitt</b>" + endCol;
+		headers[Snitt.EX_MEAN] = startColExMean + "<b>Snitt ifjol</b>" + endCol;
+		headers[Snitt.CHANGE] = startColChange + "<b>+/-</b>" + endCol;
 		
 		LinkedList res = list;
 		
 		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
-		bufferOut.write("<HTML>");
+		
+		bufferOut.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
 		bufferOut.newLine();
-		bufferOut.write("<HEAD>");
+		bufferOut.write("<html lang=\"sv\">");
 		bufferOut.newLine();
-		bufferOut.write("<STYLE id=\"Bangolftävlingar\"><!--table "+
-		        		" .bgrleft{font-size:10.0pt;text-align:left;vertical-align:super;white-space:nowrap;}"+
-						" .bgrcenter{font-size:10.0pt;text-align:center;vertical-align:super;white-space:nowrap;}"+
-						" .bgrright{font-size:10.0pt;text-align:right;vertical-align:super;white-space:nowrap;}"+
-						"--></STYLE>");
+		bufferOut.write("<head>");
 		bufferOut.newLine();
-		bufferOut.write("<TITLE>" + header + "</TITLE>");
+		bufferOut.write("<title>" + header + "</title>");
 		bufferOut.newLine();
-		bufferOut.write("</HEAD>");
+		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=WINDOWS-1252\">");
 		bufferOut.newLine();
-		bufferOut.write("<BODY bgcolor=\"white\">");
+		bufferOut.write("<style type=\"text/css\">" +
+				"body {font-family: arial} " +
+				"td {font-size: 10.0pt; vertical-align: super; white-space: nowrap} " +
+				"</style>");
 		bufferOut.newLine();
-		bufferOut.write("<CENTER>");
+		bufferOut.write("</head>");
 		bufferOut.newLine();
-		bufferOut.write("<FONT FACE=\"arial\">");
+		
+		bufferOut.write("<body style=\"background-color:white\">");
 		bufferOut.newLine();
-		bufferOut.write("<H1 style='font-size:14.0pt;font-weight:800;font-style:normal'>" + header + "</H1>");
+		bufferOut.write("<h1 style=\"font-size:14.0pt; text-align:center\">" + header + "</h1>");
 		bufferOut.newLine();
-		bufferOut.write("<TABLE CELLPADDING=1 CELLSPACING=1>");
+		bufferOut.write("<table cellpadding=\"1\" cellspacing=\"1\" style=\"" +
+				"margin-left:auto; margin-right:auto\">");
 		bufferOut.newLine();
 		bufferOut.write(startRow);
 		bufferOut.newLine();
-		bufferOut.write("<TD class=bgrright WIDTH=59><B>Ranking&nbsp;</B>" + endCol);
+		bufferOut.write("<td style=\"width:59px; text-align:right\"><b>Ranking&nbsp;</b>" + endCol);
 		bufferOut.newLine();
 		for(int i = 0; i < headerList.length; i++) {
 		    if(headerList[i]) {
@@ -272,18 +285,24 @@ public class Snitt {
 			oldPerson = person;
 			
 			String[] data = new String[headerList.length];
-			data[Snitt.NAME] = startColLeft + person.getName() + endCol;
-			data[Snitt.CLUB] = startColLeft + person.getClub() + endCol;
-			data[Snitt.COMPS] = startCol + person.getComps() + endCol;
-			data[Snitt.ROUNDS] = startCol + person.getRounds() + endCol;
-			data[Snitt.HITSUM] = startCol + person.getHits() + endCol;
-			data[Snitt.MEAN] = startCol + "<FONT COLOR=\""+color+"\">" + medel + "</FONT>" + endCol;
-			data[Snitt.EX_MEAN] = startCol + "<FONT COLOR=\""+compareColor+"\">" + compareMean + "</FONT>" + endCol;
-			data[Snitt.CHANGE] = startCol + diffValue + endCol;
+			data[Snitt.NAME] = startCol + person.getName() + endCol;
+			data[Snitt.CLUB] = startCol + person.getClub() + endCol;
+			data[Snitt.COMPS] = startColAligned + person.getComps() + endCol;
+			data[Snitt.ROUNDS] = startColAligned + person.getRounds() + endCol;
+			data[Snitt.HITSUM] = startColAligned + person.getHits() + endCol;
+			if (! color.equals("black"))
+				data[Snitt.MEAN] = IOHandler.addStyle(startColAligned, "color", color) + medel + endCol;
+			else
+				data[Snitt.MEAN] = startColAligned + medel + endCol;
+			if (! compareColor.equals("black"))
+				data[Snitt.EX_MEAN] = IOHandler.addStyle(startColAligned, "color", compareColor) + compareMean + endCol;
+			else
+				data[Snitt.EX_MEAN] = startColAligned + compareMean + endCol;
+			data[Snitt.CHANGE] = startColAligned + diffValue + endCol;
 			
 			bufferOut.write(startRow);
 			bufferOut.newLine();
-			bufferOut.write(startColRight + "<B>" + (i - sameResult) + "&nbsp;</B>" + endCol);
+			bufferOut.write(IOHandler.addStyle(startCol, "text-align", "right") + "<b>" + (i - sameResult) + "&nbsp;</b>" + endCol);
 			bufferOut.newLine();
 			for(int j = 0; j < data.length; j++) {
 			    if(headerList[j]) {
@@ -295,20 +314,16 @@ public class Snitt {
 			bufferOut.newLine();
 		}
 		
-		bufferOut.write("</TABLE>");
+		bufferOut.write("</table>");
 		bufferOut.newLine();
-		bufferOut.write("<P><BR>");
+		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-		bufferOut.write("<FONT SIZE=-2>Denna sida är skapad av <A HREF=\"http://web.telia.com/~u44802129/\" TARGET=\"_top\">"
-										+ "BangolfResultat</A></FONT>");
+		bufferOut.write("<div style=\"text-align:center; font-size:7.5pt\">Denna sida är skapad av <a href=\"http://web.telia.com/~u44802129/\">"
+				+ "BangolfResultat</a></div>");
 		bufferOut.newLine();
-		bufferOut.write("</FONT>");
+		bufferOut.write("</body>");
 		bufferOut.newLine();
-		bufferOut.write("</CENTER>");
-		bufferOut.newLine();
-		bufferOut.write("</BODY>");
-		bufferOut.newLine();
-		bufferOut.write("</HTML>");
+		bufferOut.write("</html>");
 		
 		bufferOut.flush();
 		bufferOut.close();
@@ -349,11 +364,10 @@ public class Snitt {
 		String inLine = fileIn.readLine();
 		
 		while (inLine != null) {
-			String identity, heltal, decimaltal;
+			String identity;
 			double oldMean;
 			
 			StringTokenizer inString = new StringTokenizer(inLine, ";");
-			StringTokenizer str;
 			if(inString.countTokens() != 0) {
 				identity = inString.nextToken();
 				inString.nextToken();

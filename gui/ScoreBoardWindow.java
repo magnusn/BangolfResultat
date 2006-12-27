@@ -17,7 +17,7 @@ class ScoreBoardWindow {
 	private JScrollPane scrollpane;		// gör panelen skrollbar
 	private GridBagLayout gridbag;		// resultatlistans layout
 	private GridBagConstraints c;		// inställning för layouten
-	private int cols,nbrRounds;			// antal kolumner och antal varv
+	private int cols;					// antal kolumner och antal varv
 	private ResultList result;			// resultatlistan
 	private CompareFile compareFile;	// listan över snitt
 	private JLabel[][] label;			// matrisen av etiketter som visar resultaten
@@ -27,7 +27,6 @@ class ScoreBoardWindow {
 	/** skapar ett resultatfönster för resultatlistan result */
 	public ScoreBoardWindow(ResultList result) {
 		this.cols = result.getNbrCols();
-		this.nbrRounds = result.getNbrRounds();
 		board = new JPanel();
 		label = new JLabel[65][cols];
 		headerLabel = new JLabel();
@@ -59,7 +58,6 @@ class ScoreBoardWindow {
 	/** ställer in resultatfönstret för resultatlistan result */
 	public void setup(ResultList result) {
 		this.cols = result.getNbrCols();
-		this.nbrRounds = result.getNbrRounds();
 		board.removeAll();
 		label = new JLabel[65][cols];
 		this.result = result;
