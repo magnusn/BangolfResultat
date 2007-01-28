@@ -11,6 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -219,7 +220,7 @@ public class SearchWindow {
 		edit.setMnemonic(KeyEvent.VK_R);
 		JMenu klassMenu = new JMenu("Klasser");
 		klassMenu.setMnemonic(KeyEvent.VK_K);
-		JMenu snittMenu = new JMenu("Snittlista");
+		JMenu snittMenu = new JMenu("Snittlistor");
 		snittMenu.setMnemonic(KeyEvent.VK_S);
 		JMenu help = new JMenu("Info");
 		help.setMnemonic(KeyEvent.VK_I);
@@ -254,7 +255,7 @@ public class SearchWindow {
 		numberOrientation.setEnabled(false);
 		klassStart = new JMenuItem("Hantera klasser...", KeyEvent.VK_H);
 		klassStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
-		snittStart = new JMenuItem("Hantera snittlistan...", KeyEvent.VK_H);
+		snittStart = new JMenuItem("Hantera snittlistor...", KeyEvent.VK_H);
 		snittStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
@@ -636,6 +637,15 @@ public class SearchWindow {
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
+	    /*
+	    try {
+	    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+	    	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+	    } catch (Exception e) {
+	    	
+	    }
+	    */
 	    new SearchWindow();
 	}
 

@@ -37,12 +37,11 @@ public class SnittData {
             if(headers.length != nbrTabs) {
                 JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][NBR_HEADERS];
                 for(int i = 0; i < nbrTabs; i++) {
-                    tempHeaders[i] = getStandardHeaders(i);
-                }
-                if(headers[0].length == tempHeaders[0].length) {
-                    for(int i = 0; i < headers.length; i++) {
-                        tempHeaders[i] = headers[i];
-                    }
+                	if (headers[0].length == tempHeaders[0].length && headers.length > i) {
+                		tempHeaders[i] = headers[i];
+                	} else {
+                		tempHeaders[i] = getStandardHeaders(i);
+                	}
                 }
                 headers = tempHeaders;
             }
@@ -96,10 +95,11 @@ public class SnittData {
             if(files.length != nbrTabs) {
                 String[] tempFiles = new String[nbrTabs];
                 for(int i = 0; i < nbrTabs; i++) {
-                    tempFiles[i] = new String();
-                }
-                for(int i = 0; i < files.length; i++) {
-                    tempFiles[i] = files[i];
+                	if (files.length > i) {
+                		tempFiles[i] = files[i];
+                	} else {
+                		tempFiles[i] = new String();
+                	}
                 }
                 files = tempFiles;
             }

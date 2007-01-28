@@ -433,7 +433,7 @@ public class Snitt {
 	    try {
 			compare = (int[][]) io.load("compareby");
 		} catch (Exception e) {
-			compare = new int[4][2];
+			compare = new int[SnittWindow.NBR_SNITT][2];
 			for(int i = 0; i < compare.length; i++) {
 			    compare[i][0] = Snitt.MEAN;
 			    compare[i][1] = Snitt.ROUNDS;

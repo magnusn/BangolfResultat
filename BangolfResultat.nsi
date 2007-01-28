@@ -2,9 +2,9 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.6.8"
+!define PRODUCT_VERSION "0.7 beta"
 !define PRODUCT_PUBLISHER "Magnus Nilsson"
-!define PRODUCT_WEB_SITE "http://web.telia.com/~u44802129/"
+!define PRODUCT_WEB_SITE "http://bangolfresultat.webhop.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
@@ -114,6 +114,7 @@ Section "MainSection" SEC01
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\ptrack"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snitt"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittapp"
+  File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittitle"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittmap"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittstring"
 SectionEnd
@@ -157,6 +158,7 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\data\snittstring"
   Delete "$INSTDIR\data\snittmap"
+  Delete "$INSTDIR\data\snittitle"
   Delete "$INSTDIR\data\snittapp"
   Delete "$INSTDIR\data\snitt"
   Delete "$INSTDIR\data\ptrack"

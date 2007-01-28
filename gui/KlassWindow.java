@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+
 import java.util.Vector;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ class KlassWindow extends JFrame {
 	private ListPanel klass;						// panelen där man kan välja och välja bort klasser
 	private IOHandler io;							// sköter skrivning till filer och inläsning från filer
 	private JMenuItem addKlass, removeKlass, quit;	// menyalternativ för att lägga till eller ta bort klasser samt avsluta
+	public static String NO_KLASS = "[Ingen klass]";// representerar en tom klassträng
 	
 	/** skapar fönstret för klasshantering */
 	public KlassWindow(JFrame owner) {
@@ -79,15 +81,15 @@ class KlassWindow extends JFrame {
 			if(e.getSource() == addKlass) {
 				inputValue = JOptionPane.showInputDialog(frame, "Skriv in klassnamnet:");
 				if(inputValue != null) {
-					if(!inputValue.trim().equals("")) {
-						if(!map.containsKey(inputValue)) {
-							map.put(inputValue, inputValue);
-							klass.add(inputValue);
-						} else {
-							JOptionPane.showMessageDialog(frame, "En klass med namnet " + inputValue + " finns redan listad", "Varning", JOptionPane.ERROR_MESSAGE);
-						}
+					inputValue = inputValue.trim();
+					if (inputValue.equals("")) {
+						inputValue = NO_KLASS;
+					}
+					if(!map.containsKey(inputValue)) {
+						map.put(inputValue, inputValue);
+						klass.add(inputValue);
 					} else {
-						JOptionPane.showMessageDialog(frame, "Klassnamnet måste innehålla mer än blanksteg", "Klass ej tillagd", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(frame, "En klass med namnet " + inputValue + " finns redan listad", "Varning", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}

@@ -66,7 +66,7 @@ public class SortWindow extends JDialog {
 			        tempVector[i*2+1] = selectedVector;
 			    }
 			    if(sortVector[0].size() + sortVector[1].size() == tempVector[0].size() + tempVector[1].size()) {
-			        for(int i = 0; i < sortVector.length; i++) {
+			        for(int i = 0; i < sortVector.length && i < nbrTabs; i++) {
 			            tempVector[i] = sortVector[i];
 			        }
 			    }
@@ -153,6 +153,22 @@ public class SortWindow extends JDialog {
 		int[][] compareBy;
 		try {
 		    compareBy = (int[][]) io.load("compareby");
+		    if (compareBy.length < nbrTabs) {
+		    	int[][] tempCompareBy = new int[nbrTabs][2];
+		    	for (int i = 0; i < tempCompareBy.length; ++i) {
+		    		if (compareBy.length > i) {
+		    			tempCompareBy[i] = new int[compareBy[i].length];
+		    			for (int j = 0; j < tempCompareBy[i].length; ++j) {
+			    			tempCompareBy[i][j] = compareBy[i][j];
+			    		}
+		    		} else {
+		    			tempCompareBy[i] = new int[2];
+		    			tempCompareBy[i][0] = Snitt.MEAN;
+				        tempCompareBy[i][1] = Snitt.ROUNDS;
+		    		}
+		    	}
+		    	compareBy = tempCompareBy;
+		    }
 		} catch (Exception e) {
 		    try {
 		        int[] oldCompareBy = (int[]) io.load("compareby");

@@ -10,8 +10,10 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import java.util.Collections;
@@ -21,6 +23,7 @@ import java.util.Vector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -33,7 +36,6 @@ import javax.swing.KeyStroke;
 import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
-import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
@@ -53,11 +55,14 @@ public class SnittWindow extends JFrame {
 	private JMenuItem saveToHTML, quit;		// spara snittlistan som webbsida och avsluta
 	private JMenuItem saveCompareFile;		// sparar en snittlista som kan användas vid jämförelse
 	private JMenuItem sort, classStarts; 	// välja sorteringsordning, ta reda på antal klasstarter
+	private JMenuItem setTabTitle;			// sätter fliktitel
 	private JMenuItem appearance;			// ställer in vad som skall visas på snittlistans webbsida
 	private JMenuItem compareFileChooser;	// väljer fil att jämföra snittet med
 	private JMenuItem numberAlignment;		// för att ställa in sifferorienteringen
 	private String[] headers;				// rubriker för snittlistorna
+	private String[] tabTitles;				// fliktitlar
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
+	protected static final int NBR_SNITT=6; // antal snittlistor som kan hanteras
 	
 	/** skapar snitthanterarfönstret */
 	public SnittWindow(JFrame owner, HashMap personNameTracker, 
@@ -73,18 +78,46 @@ public class SnittWindow extends JFrame {
 		skvFilter = new Filter(new String[]{"skv"}, "Semikolonseparerad fil");
 		htmFilter = new Filter(new String[]{"htm", "html"}, "Webbsida");
 		snittFilter = new Filter(new String[]{"snitt"}, "Jämförelsefil för snittlista");
-		snittList = new ListPanel[4];
+		snittList = new ListPanel[NBR_SNITT];
 		io = new IOHandler();
 		try {
 			headers = (String[]) io.load("snittstring");
+			if (headers.length != NBR_SNITT) {
+				String[] tempHeaders = new String[NBR_SNITT];
+				for (int i = 0; i < tempHeaders.length; ++i) {
+					if (headers.length > i)
+						tempHeaders[i] = headers[i];
+					else
+						tempHeaders[i] = new String();
+				}
+				headers = tempHeaders;
+			}
 		} catch (Exception e) {
-			headers = new String[4];
+			headers = new String[NBR_SNITT];
 			for(int i = 0; i < headers.length; i++) {
 				headers[i] = new String();
 			}
 		}
 		try {
-			Vector[] v = io.readFileList("snitt", 8);
+			tabTitles = (String[]) io.load("snittitle");
+			if (tabTitles.length != NBR_SNITT) {
+				String[] tempTitles = new String[NBR_SNITT];
+				for (int i = 0; i < tempTitles.length; ++i) {
+					if (tabTitles.length > i)
+						tempTitles[i] = tabTitles[i];
+					else
+						tempTitles[i] = new String("Snitt " + (i+1));
+				}
+				tabTitles = tempTitles;
+			}
+		} catch (Exception e) {
+			tabTitles = new String[NBR_SNITT];
+			for(int i = 0; i < tabTitles.length; i++) {
+				tabTitles[i] = new String("Snitt " + (i+1));
+			}
+		}
+		try {
+			Vector[] v = io.readFileList("snitt", NBR_SNITT * 2);
 			for(int i = 0; i < snittList.length; i++) {
 				snittList[i] = new ListPanel(v[i*2], v[i*2+1]);
 			}
@@ -121,6 +154,7 @@ public class SnittWindow extends JFrame {
 		saveCompareFile = new JMenuItem("Spara snittlista att jämföra med...", KeyEvent.VK_J);
 		saveCompareFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.CTRL_MASK));
 		quit = new JMenuItem("Stäng snitthanterarfönstret", KeyEvent.VK_G);
+		setTabTitle = new JMenuItem("Fliktitel...", KeyEvent.VK_F);
 		appearance = new JMenuItem("Utseende...", KeyEvent.VK_U);
 		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_S);
 		compareFileChooser = new JMenuItem("Välj fil att jämföra med...", KeyEvent.VK_V);
@@ -131,6 +165,7 @@ public class SnittWindow extends JFrame {
 		saveToHTML.addActionListener(menuHand);
 		saveCompareFile.addActionListener(menuHand);
 		quit.addActionListener(menuHand);
+		setTabTitle.addActionListener(menuHand);
 		appearance.addActionListener(menuHand);
 		sort.addActionListener(menuHand);
 		compareFileChooser.addActionListener(menuHand);
@@ -141,6 +176,7 @@ public class SnittWindow extends JFrame {
 		menu.add(saveToHTML);
 		menu.add(saveCompareFile);
 		menu.add(quit);
+		edit.add(setTabTitle);
 		edit.add(appearance);
 		edit.add(numberAlignment);
 		edit.add(sort);
@@ -151,10 +187,8 @@ public class SnittWindow extends JFrame {
 		WindowHandler winHand = new WindowHandler();
 		frame.addWindowListener(winHand);
 		tab = new JTabbedPane();
-		tab.addTab("Filt", snittList[0]);
-		tab.addTab("EB", snittList[1]);
-		tab.addTab("Betong", snittList[2]);
-		tab.addTab("Blandad", snittList[3]);
+		for (int i = 0; i < NBR_SNITT; ++i)
+			tab.addTab(tabTitles[i], snittList[i]);
 		
 		messageField = new JTextField();
 		messageField.setEditable(false);
@@ -276,21 +310,14 @@ public class SnittWindow extends JFrame {
 						if(listPanel.contains(name)) {
 						    contains = true;
 						}
-						
 						if(!contains) {
 							if(!fileMap.containsKey(name) || ((String) fileMap.get(name)).equals(path)) {
 								try {
-									int surface = io.readSurface(path);
-									if(surface == ResultList.FILT && listPanel==snittList[0]) {
-										snittList[0].add(name);
-									} else if(surface == ResultList.EB  && listPanel==snittList[1]) {
-										snittList[1].add(name);
-									} else if(surface == ResultList.BETONG && listPanel==snittList[2]) {
-										snittList[2].add(name);
-									} else if(listPanel==snittList[3]) {
-										snittList[3].add(name);
+									int tabIndex = tab.getSelectedIndex();
+									if (tabIndex != -1) {
+										snittList[tabIndex].add(name);
 									} else {
-										JOptionPane.showMessageDialog(frame, "Filen " + name + " går ej att lägga till. Kontrollera att rätt flik i Snittlistshanteraren är vald.", "Varning", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(frame, "Filen " + name + " går ej att lägga till. Kontrollera att en flik är vald i Snittlistshanteraren.", "Varning", JOptionPane.ERROR_MESSAGE);
 									}
 									fileMap.put(name, path);
 								} catch (Exception f) {
@@ -354,6 +381,19 @@ public class SnittWindow extends JFrame {
 			else if(e.getSource() == quit) {
 				exit();
 			}
+			/** ställer in fliktiteln */
+			else if(e.getSource() == setTabTitle) {
+				int tabIndex = tab.getSelectedIndex();
+				if (tabIndex == -1)
+					return;
+				String tempTitle = JOptionPane.showInputDialog(frame, "Skriv in önskad titel på fliken", tabTitles[tabIndex]);
+    			if(tempTitle != null) {
+    				tabTitles[tabIndex] = tempTitle;
+    				tab.setTitleAt(tabIndex, tabTitles[tabIndex]);
+    				pack();
+    			}
+			    setMessage("", false);
+			}
 			/** visar fönster för att ställa in snittlistans utseende */
 			else if(e.getSource() == appearance) {
 			    new AppearanceWindow(frame, tab.getSelectedIndex(), snittData);
@@ -395,7 +435,7 @@ public class SnittWindow extends JFrame {
 							map = snitt.countClasses(fileNames);
 						}
 						catch (Exception ex) {
-							JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades.", "Varning", JOptionPane.ERROR_MESSAGE);
 							readOk = false;
 						}
 						if(readOk) {
@@ -412,7 +452,7 @@ public class SnittWindow extends JFrame {
 						}
 					}
 					if(!readOk) {
-						JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra", "Varning", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra.", "Varning", JOptionPane.ERROR_MESSAGE);
 					}
 				} else {
 					JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra eftersom inga tävlingar har markerats.", "Varning", JOptionPane.ERROR_MESSAGE);
@@ -426,36 +466,32 @@ public class SnittWindow extends JFrame {
 	 *  där filerna som inläses tas från ListPanel listPanel */
 	private void makeSnitt(String fileName, String header, ListPanel listPanel) {
 	    int tabIndex = tab.getSelectedIndex();
+	    if (tabIndex == -1) {
+	    	JOptionPane.showMessageDialog(frame, "En flik måste vara vald.", "Varning", JOptionPane.ERROR_MESSAGE);
+	    	return;
+	    }
+	    
 		Snitt snitt = new Snitt(fileName, header, tabIndex);
 		int surface = -1;
 		int compareSurface = -1;
 		boolean readOk = true;
-		if(listPanel == snittList[0]) {
-			surface = ResultList.FILT;
-			headers[0] = header;
-		} else if(listPanel == snittList[1]) {
-			surface = ResultList.EB;
-			headers[1] = header;
-		} else if(listPanel == snittList[2]) {
-			surface = ResultList.BETONG;
-			headers[2] = header;
-		}
+		
+		headers[tabIndex] = header;
 		Vector v = listPanel.getSelected();
 		String[] fileNames = new String[v.size()];
+		Vector fileError = new Vector();
 		for(int i = 0; i < fileNames.length; i++) {
 			String file = (String) v.get(i);
 			try {
 				fileNames[i] = (String) fileMap.get(file);
-				io.readSurface(fileNames[i]);
+				int readSurface = io.readSurface(fileNames[i]);
 				if(surface == -1) {
-					surface = io.readSurface(fileNames[i]);
-					headers[3] = header;
-				} else if(surface != io.readSurface(fileNames[i]) && surface != BLANDAD) {
+					surface = readSurface;
+				} else if(surface != readSurface && surface != BLANDAD) {
 					surface = BLANDAD;
-					headers[3] = header;
 				}
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(frame, "Inläsningen av filen " + fileNames[i] + " misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				fileError.add(fileNames[i]);
 				readOk = false;
 			}
 		}
@@ -499,6 +535,16 @@ public class SnittWindow extends JFrame {
 					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+		} else {
+			JTextArea textArea = new JTextArea("Inläsningen av följande fil(er) misslyckades:", 10, 0);
+			while (fileError.size() > 0) {
+				textArea.append("\n" + fileError.remove(0));
+			}
+			textArea.setMargin(new Insets(0, 0, 0, 10));
+			textArea.setEditable(false);
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			
+			JOptionPane.showMessageDialog(frame, scrollPane, "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -508,23 +554,16 @@ public class SnittWindow extends JFrame {
 		Snitt snitt = new Snitt(fileName);
 		int surface = -1;
 		boolean readOk = true;
-		if(listPanel == snittList[0]) {
-			surface = ResultList.FILT;
-		} else if(listPanel == snittList[1]) {
-			surface = ResultList.EB;
-		} else if(listPanel == snittList[2]) {
-			surface = ResultList.BETONG;
-		}
 		Vector v = listPanel.getSelected();
 		String[] fileNames = new String[v.size()];
 		for(int i = 0; i < fileNames.length; i++) {
 			String file = (String) v.get(i);
 			try {
 				fileNames[i] = (String) fileMap.get(file);
-				io.readSurface(fileNames[i]);
+				int readSurface = io.readSurface(fileNames[i]);
 				if(surface == -1) {
-					surface = io.readSurface(fileNames[i]);
-				} else if(surface != io.readSurface(fileNames[i]) && surface != BLANDAD) {
+					surface = readSurface;
+				} else if(surface != readSurface && surface != BLANDAD) {
 					surface = BLANDAD;
 				}
 			} catch (Exception e) {
@@ -571,7 +610,7 @@ public class SnittWindow extends JFrame {
 	                "Varning", JOptionPane.ERROR_MESSAGE);
 	    }
 	    
-		Vector[] v = new Vector[8];
+		Vector[] v = new Vector[NBR_SNITT * 2];
 		for(int i = 0; i < snittList.length; i++) {
 			v[i*2] = snittList[i].getSelection();
 			v[i*2+1] = snittList[i].getSelected();
@@ -580,6 +619,11 @@ public class SnittWindow extends JFrame {
 			io.save("snittstring", headers);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(frame, "Sparandet av rubrikerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		try {
+			io.save("snittitle", tabTitles);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame, "Sparandet av fliktitlarna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.writeFileList("snitt", v);

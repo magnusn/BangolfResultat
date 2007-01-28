@@ -254,7 +254,11 @@ public class ResultInputWindow {
 		    }
 		    PersonResult pr = RESULTLIST.getPerson(personID.intValue());
 		    if(pr != null) {
-		        klassChoice.setSelectedItem(pr.getKlass());
+		    	String klass = pr.getKlass();
+		    	if (klass.trim().equals(""))
+		    		klassChoice.setSelectedItem(KlassWindow.NO_KLASS);
+		    	else
+		    		klassChoice.setSelectedItem(klass);
 		        results = pr.getResultList();
 		        startNbrField.setText(String.valueOf(pr.getStartNr()));
 		        int prioNbr = pr.getPrio();
@@ -538,7 +542,7 @@ public class ResultInputWindow {
 				}
 				if(goodValues) {
 					String klass = (String) klassChoice.getSelectedItem();
-					if(klass == null) {
+					if(klass == null || klass.equals(KlassWindow.NO_KLASS)) {
 					    klass = "";
 					}
 					RESULTLIST.addResult(startNr,name,club,licenseNr,results,nbrRounds,klass,prioNr,nbrRoundsToRead,personID.intValue());
