@@ -1,7 +1,8 @@
 1. Ändra doc/om.htm
 2. Ändra doc/versionhistory.htm
-3. Ändra hemsida/index.htm
-4. Ändra BangolfResultat.nsi
-5. Skapa ny jar-fil
-6. Kompilera ny exekverbar fil
-7. Lägga upp alla ändringar
+3. Ändra doc/licens.txt (vid nytt år, ny hemsideadress eller ändrade licensvillkor)
+4. Ändra hemsida/index.htm
+5. Ändra BangolfResultat.nsi
+6. Skapa ny jar-fil
+7. Kompilera ny exekverbar fil
+8. Lägga upp alla ändringar

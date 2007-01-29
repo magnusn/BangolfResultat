@@ -2,6 +2,7 @@ package datastruct;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.LinkedList;
 
@@ -113,6 +114,13 @@ public class ResultList {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * @return iterator över alla personers resultat
+	 */
+	public Iterator iterator() {
+		return IDMap.values().iterator();
 	}
 	
 	/** returnerar resultatlistans storlek */

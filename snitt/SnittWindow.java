@@ -18,7 +18,9 @@ import javax.swing.JTextField;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +38,8 @@ import javax.swing.KeyStroke;
 import datastruct.DataManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
+import datastruct.PersonResult;
+import datastruct.ResultList;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
@@ -59,8 +63,10 @@ public class SnittWindow extends JFrame {
 	private JMenuItem appearance;			// ställer in vad som skall visas på snittlistans webbsida
 	private JMenuItem compareFileChooser;	// väljer fil att jämföra snittet med
 	private JMenuItem numberAlignment;		// för att ställa in sifferorienteringen
+	private JMenuItem setClubs;				// ställer in vilka klubbar som skall vara med i snittlistan
 	private String[] headers;				// rubriker för snittlistorna
 	private String[] tabTitles;				// fliktitlar
+	private HashSet[] excludedClubs;		// klubbar som inte skall vara med i snittlistan
 	public static final int BLANDAD = 10; 	// underlagets heltalsvärde vid snittlista för flera underlag
 	protected static final int NBR_SNITT=6; // antal snittlistor som kan hanteras
 	
@@ -117,6 +123,24 @@ public class SnittWindow extends JFrame {
 			}
 		}
 		try {
+			excludedClubs = (HashSet[]) io.load("snittclubs");
+			if (excludedClubs.length != NBR_SNITT) {
+				HashSet[] tempClubs = new HashSet[NBR_SNITT];
+				for (int i = 0; i < tempClubs.length; ++i) {
+					if (excludedClubs.length > i)
+						tempClubs[i] = excludedClubs[i];
+					else
+						tempClubs[i] = new HashSet();
+				}
+				excludedClubs = tempClubs;
+			}
+		} catch (Exception e) {
+			excludedClubs = new HashSet[NBR_SNITT];
+			for(int i = 0; i < excludedClubs.length; i++) {
+				excludedClubs[i] = new HashSet();
+			}
+		}
+		try {
 			Vector[] v = io.readFileList("snitt", NBR_SNITT * 2);
 			for(int i = 0; i < snittList.length; i++) {
 				snittList[i] = new ListPanel(v[i*2], v[i*2+1]);
@@ -159,6 +183,7 @@ public class SnittWindow extends JFrame {
 		sort = new JMenuItem("Sorteringsordning...", KeyEvent.VK_S);
 		compareFileChooser = new JMenuItem("Välj fil att jämföra med...", KeyEvent.VK_V);
 		numberAlignment = new JMenuItem("Sifferorientering...", KeyEvent.VK_O);
+		setClubs = new JMenuItem("Klubbar...", KeyEvent.VK_K);
 		classStarts = new JMenuItem("Klasstarter", KeyEvent.VK_K);
 		addComp.addActionListener(menuHand);
 		removeComp.addActionListener(menuHand);
@@ -170,16 +195,22 @@ public class SnittWindow extends JFrame {
 		sort.addActionListener(menuHand);
 		compareFileChooser.addActionListener(menuHand);
 		numberAlignment.addActionListener(menuHand);
+		setClubs.addActionListener(menuHand);
 		classStarts.addActionListener(menuHand);
 		menu.add(addComp);
 		menu.add(removeComp);
+		menu.addSeparator();
 		menu.add(saveToHTML);
 		menu.add(saveCompareFile);
+		menu.addSeparator();
 		menu.add(quit);
 		edit.add(setTabTitle);
+		edit.addSeparator();
 		edit.add(appearance);
 		edit.add(numberAlignment);
 		edit.add(sort);
+		edit.add(setClubs);
+		edit.addSeparator();
 		edit.add(compareFileChooser);
 		compute.add(classStarts);
 		setJMenuBar(bar);
@@ -409,6 +440,38 @@ public class SnittWindow extends JFrame {
 				new SortWindow(frame, tab.getSelectedIndex(), tab.getTabCount());
 				setMessage("", false);
 			}
+			/** visar fönster för att välja vilka klubbar som skall tas med */
+			else if(e.getSource() == setClubs) {
+				if (selected.size() != 0) {
+					TreeSet clubTree = new TreeSet();
+					Iterator it = selected.iterator();
+					while (it.hasNext()) {
+						try {
+							String filePath = (String) fileMap.get(it.next());
+							ResultList res = (ResultList) io.inputFromSKV(filePath)[2];
+							Iterator prIt = res.iterator();
+							while (prIt.hasNext()) {
+								PersonResult pr = (PersonResult) prIt.next();
+								String club = pr.getClub().trim();
+								if (!clubTree.contains(club.toLowerCase()))
+									clubTree.add(club);
+							}
+						} catch (IOException ioe) {
+							ioe.printStackTrace();
+						}
+					}
+					int size = clubTree.size();
+					String[] clubs = new String[size];
+					it = clubTree.iterator();
+					for (int i  = 0; i < size; ++i)
+						clubs[i] = (String) it.next();
+					/*it = excludedClubs[tab.getSelectedIndex()].iterator();
+					while (it.hasNext())
+						System.out.println(it.next());*/
+					new ClubWindow(frame, tab.getSelectedIndex(), clubs, excludedClubs);
+					setMessage("", false);
+				}
+			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
 			    new CompareWindow(frame, tab.getSelectedIndex(), snittData);
@@ -521,7 +584,7 @@ public class SnittWindow extends JFrame {
 			    }
 			}
 			if(readOk) {
-				LinkedList list = snitt.sortMap();
+				LinkedList list = snitt.sortMap(excludedClubs[tabIndex]);
 				try {
 				    JCheckBox[] headerCheckBox = snittData.getAppearanceHeaders(tabIndex);
 				    boolean[] headerList = new boolean[headerCheckBox.length];
@@ -580,7 +643,7 @@ public class SnittWindow extends JFrame {
 				readOk = false;
 			}
 			if(readOk) {
-				LinkedList list = snitt.sortMap();
+				LinkedList list = snitt.sortMap(excludedClubs[tab.getSelectedIndex()]);
 				try {
 					snitt.outputToCompareFile(list, surface);
 					setMessage("Jämförelselistan är sparad.", true);
@@ -624,6 +687,11 @@ public class SnittWindow extends JFrame {
 			io.save("snittitle", tabTitles);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(frame, "Sparandet av fliktitlarna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+		}
+		try {
+			io.save("snittclubs", excludedClubs);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame, "Sparandet av klubbarna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.writeFileList("snitt", v);

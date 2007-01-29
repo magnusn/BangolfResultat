@@ -2,6 +2,8 @@ package snitt;
 
 import gui.AlignmentWindow;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Comparator;
 import java.util.Collections;
@@ -144,9 +146,18 @@ public class Snitt {
 	}
 	
 	/** sorterar resultaten och returnerar dem i en länkad lista */
-	public LinkedList sortMap() {
+	public LinkedList sortMap(HashSet excludedClubs) {
 		LinkedList list = new LinkedList();
-		list.addAll(map.values());
+		if (excludedClubs == null || excludedClubs.isEmpty())
+			list.addAll(map.values());
+		else {
+			Iterator it = map.values().iterator();
+			while (it.hasNext()) {
+				Person person = (Person) it.next();
+				if (!excludedClubs.contains(person.getClub().trim().toLowerCase()))
+					list.add(person);
+			}
+		}
 		IOHandler io = new IOHandler();
 		loadCompareBy(io);
 		SnittComparator comparator = new SnittComparator();

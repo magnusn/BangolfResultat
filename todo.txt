@@ -1,2 +1,3 @@
 - Bestämma mig för vilken ny webbadress BangolfResultat skall ha.
 - Snittlista där bara personer från valda klubbar kommer med.
+- Se till så att man kan markera och avmarkera alla klubbar på en gång.

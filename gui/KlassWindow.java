@@ -62,6 +62,7 @@ class KlassWindow extends JFrame {
 		quit.addActionListener(menuHand);
 		menu.add(addKlass);
 		menu.add(removeKlass);
+		menu.addSeparator();
 		menu.add(quit);
 		frame.setJMenuBar(bar);
 		
