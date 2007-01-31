@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import datastruct.ResultList;
 
@@ -41,6 +43,7 @@ public class CompInfoDialog extends JDialog {
 		this.mainWindow = mainWindow;
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		JPanel varvPanel = new JPanel();
+		varvPanel.setBorder(new EmptyBorder(5,5,5,5));
 		JLabel varvLabel2 = new JLabel("Ange antal varv som tävlingen är på:");
 		JLabel varvLabel1 = new JLabel("Ange tävlingens underlag:");
 		surfaceChoice = new JComboBox();
@@ -60,7 +63,7 @@ public class CompInfoDialog extends JDialog {
 		cancelButton.addActionListener(varvHand);
 		EnterKeyHandler enterHandler = new EnterKeyHandler();
 		acceptButton.addKeyListener(enterHandler);
-		varvPanel.setLayout(new GridLayout(7,1));
+		varvPanel.setLayout(new GridLayout(6,1));
 		varvPanel.add(varvLabel1);
 		varvPanel.add(surfaceChoice);
 		varvPanel.add(varvLabel2);
@@ -72,11 +75,12 @@ public class CompInfoDialog extends JDialog {
 		startBox[1].setMnemonic(KeyEvent.VK_L);
 		varvPanel.add(startBox[0]);
 		varvPanel.add(startBox[1]);
-		JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+		JPanel buttonPanel = new JPanel(new GridLayout(1,2,6,0));
+		buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
 		buttonPanel.add(acceptButton);
 		buttonPanel.add(cancelButton);
-		varvPanel.add(buttonPanel);
-		this.getContentPane().add(varvPanel);
+		this.getContentPane().add(varvPanel, BorderLayout.CENTER);
+		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		this.pack();
 	}
 	

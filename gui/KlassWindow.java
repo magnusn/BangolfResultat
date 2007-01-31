@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 
 import datastruct.IOHandler;
 
@@ -45,6 +46,7 @@ class KlassWindow extends JFrame {
 			map = new HashMap();
 		}
 		
+		klass.setBorder(new EmptyBorder(5,5,5,5));
 		klass.setSelectionText("Ej valda klasser:");
 		klass.setSelectedText("Valda klasser:");
 		JMenuBar bar = new JMenuBar();

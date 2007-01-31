@@ -643,7 +643,7 @@ public class SnittWindow extends JFrame {
 				readOk = false;
 			}
 			if(readOk) {
-				LinkedList list = snitt.sortMap(excludedClubs[tab.getSelectedIndex()]);
+				LinkedList list = snitt.sortMap(null);
 				try {
 					snitt.outputToCompareFile(list, surface);
 					setMessage("Jämförelselistan är sparad.", true);

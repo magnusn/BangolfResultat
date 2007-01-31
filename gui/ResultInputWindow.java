@@ -17,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
+import javax.swing.border.EmptyBorder;
 
 
 
@@ -92,6 +93,7 @@ public class ResultInputWindow {
 	    this.mode = mode;
 	    if(mode == SearchWindow.MODE_DUMMY) {
 	        inputPanel = new JPanel();
+	        inputPanel.setBorder(new EmptyBorder(5,5,5,5));
 	        person = new JLabel();
 	        inputPanel.add(person);
 	        klassChoice = new JComboBox();
@@ -101,10 +103,8 @@ public class ResultInputWindow {
 	        popup.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	        popup.setJMenuBar(bar);
 	    } else if(mode == SearchWindow.MODE_SNITT) {
-	        GridLayout gridLayout = new GridLayout(4,2);
-		    gridLayout.setHgap(2);
-		    gridLayout.setVgap(2);
-	        inputPanel = new JPanel(gridLayout);
+	        inputPanel = new JPanel(new GridLayout(4,2,6,3));
+	        inputPanel.setBorder(new EmptyBorder(5,5,5,5));
 	        person = new JLabel();
 	        inputPanel.add(person);
 	        inputPanel.add(new JLabel());
@@ -149,16 +149,15 @@ public class ResultInputWindow {
 	    this.nbrRounds = nbrRounds;
 	    startNbrMap.clear();
 	    inputPanel = new JPanel();
+	    inputPanel.setBorder(new EmptyBorder(5,5,5,5));
 	    GridLayout gridLayout;
 	    if(boxData[0] && boxData[1]) {
-	        gridLayout = new GridLayout(4+nbrRounds+2,2);
+	        gridLayout = new GridLayout(4+nbrRounds+2,2,6,3);
 	    } else if(boxData[0] || boxData[1]) {
-	        gridLayout = new GridLayout(4+nbrRounds+1,2);
+	        gridLayout = new GridLayout(4+nbrRounds+1,2,6,3);
 	    } else {
-	        gridLayout = new GridLayout(4+nbrRounds,2);
+	        gridLayout = new GridLayout(4+nbrRounds,2,6,3);
 	    }
-	    gridLayout.setHgap(2);
-	    gridLayout.setVgap(2);
 	    inputPanel.setLayout(gridLayout);
 	    person = new JLabel();
 	    JLabel[] varvLabel = new JLabel[nbrRounds];

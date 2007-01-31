@@ -4,9 +4,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+
 import datastruct.CompareFile;
 import datastruct.DataManager;
 import datastruct.ResultList;
@@ -28,6 +31,7 @@ class ScoreBoardWindow {
 	public ScoreBoardWindow(ResultList result) {
 		this.cols = result.getNbrCols();
 		board = new JPanel();
+		board.setBorder(new EmptyBorder(5,5,5,5));
 		label = new JLabel[65][cols];
 		headerLabel = new JLabel();
 		this.result = result;

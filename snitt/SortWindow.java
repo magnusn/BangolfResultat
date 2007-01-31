@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.border.EmptyBorder;
 
 import datastruct.IOHandler;
 
@@ -86,6 +87,7 @@ public class SortWindow extends JDialog {
 			compare = new ListPanel(sortVector[tabIndex*2], sortVector[tabIndex*2 + 1]);
 		}
 		
+		compare.setBorder(new EmptyBorder(5,5,5,5));
 		compare.setSelectionText("Ej inkluderade i sorteringen:");
 		compare.setSelectedText("Sortera efter:");
 		JMenuBar bar = new JMenuBar();

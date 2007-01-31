@@ -5,6 +5,7 @@
  */
 package snitt;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /**
  * AppearanceWindow - beskriver fönstret för att ställa in vad som skall visas i snittlistan
@@ -37,15 +39,17 @@ public class AppearanceWindow extends JDialog {
         this.addWindowListener(new WindowHandler());
         this.tabIndex = tabIndex;
         this.snittData = snittData;
-        setLayout(new GridLayout(SnittData.NBR_HEADERS + 2, 1));
+        
+        JPanel appearancePanel = new JPanel(new GridLayout(SnittData.NBR_HEADERS + 1, 1));
+        appearancePanel.setBorder(new EmptyBorder(5,5,5,5));
         setResizable(false);
         
         headers = snittData.getAppearanceHeaders(tabIndex);
         initialSelection = new boolean[headers.length];
-        getContentPane().add(new JLabel("Välj vad som skall visas:"));
+        appearancePanel.add(new JLabel("Välj vad som skall visas:"));
         for(int i = 0; i < headers.length; i++) {
             initialSelection[i] = headers[i].isSelected();
-            getContentPane().add(headers[i]);
+            appearancePanel.add(headers[i]);
         }
         
         ButtonHandler buttonHand = new ButtonHandler();
@@ -55,10 +59,13 @@ public class AppearanceWindow extends JDialog {
         cancelButton = new JButton("Avbryt");
         cancelButton.setMnemonic(KeyEvent.VK_A);
         cancelButton.addActionListener(buttonHand);
-        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+        JPanel buttonPanel = new JPanel(new GridLayout(1,2,6,0));
+        buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
         buttonPanel.add(acceptButton);
         buttonPanel.add(cancelButton);
-        getContentPane().add(buttonPanel);
+        
+        getContentPane().add(appearancePanel, BorderLayout.CENTER);
+        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
         
         pack();
         setLocationRelativeTo(owner);

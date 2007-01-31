@@ -1,4 +1,5 @@
 package gui;
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /** klassen som beskriver fönstret där man anger vilka delsummor samt om placering skall visas */
 public class LapSumDialog extends JDialog {
@@ -17,6 +19,7 @@ public class LapSumDialog extends JDialog {
 	private JButton acceptButton;			// OK-knappen vid ändring av visning av delsummor och placering
 	private JButton cancelButton;			// knapp för att avbryta
 	private LapSumHandler lapSumHand;		// sköter om knapparna i fönstret för delsummor och placering
+	private JPanel panel;					// övergripande behållare
 	private JPanel lapSumPanel;				// behållare för redigering (av delsummor och placering)
 	private JPanel buttonPanel;				// behållare för knapparna Ok och Avbryt
 	private JCheckBox[] lapBox;				// för att välja delsummor
@@ -50,10 +53,15 @@ public class LapSumDialog extends JDialog {
 		cancelButton = new JButton("Avbryt");
 		cancelButton.setMnemonic(KeyEvent.VK_A);
 		cancelButton.addActionListener(lapSumHand);
-		buttonPanel = new JPanel(new GridLayout(1,2));
+		buttonPanel = new JPanel(new GridLayout(1,2,6,0));
+		buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
 		buttonPanel.add(acceptButton);
 		buttonPanel.add(cancelButton);
+		panel = new JPanel(new BorderLayout());
 		lapSumPanel = new JPanel();
+		lapSumPanel.setBorder(new EmptyBorder(5,5,5,5));
+		panel.add(lapSumPanel, BorderLayout.CENTER);
+		panel.add(buttonPanel, BorderLayout.SOUTH);
 		lapBox = new JCheckBox[CompInfoDialog.MAXROUNDS-2];
 		int mnemonic = KeyEvent.VK_2;
 		for(int i = 0; i < lapBox.length; i++) {
@@ -67,15 +75,14 @@ public class LapSumDialog extends JDialog {
 	
 	/** returnerar panelen för delsummor och placering efter att ha ställt in den efter antal varv */
 	public JPanel lapSumPanel() {
-		lapSumPanel.setLayout(new GridLayout(nbrRounds + 1, 1));
+		lapSumPanel.setLayout(new GridLayout(nbrRounds, 1));
 		lapSumPanel.removeAll();
 		lapSumPanel.add(new JLabel("Ange om följande skall visas:"));
 		for(int i = 0; i < nbrRounds-2; i++) {
 			lapSumPanel.add(lapBox[i]);
 		}
 		lapSumPanel.add(place);
-		lapSumPanel.add(buttonPanel);
-		return lapSumPanel;
+		return panel;
 	}
 	
 	/** återställer så att det är markerat efter det som har valts */

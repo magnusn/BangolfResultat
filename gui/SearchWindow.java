@@ -11,6 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.UIManager;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,6 +32,7 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 
 import snitt.SnittWindow;
 
@@ -124,6 +126,7 @@ public class SearchWindow {
 		frame.addWindowListener(window);
 		
 		searchPanel = new JPanel();
+		searchPanel.setBorder(new EmptyBorder(5,5,5,5));
 		button = new JButton[10];
 		
 		JLabel[] searchLabel = new JLabel[6];
@@ -157,6 +160,7 @@ public class SearchWindow {
 		gridbag.setConstraints(searchLabel[0], c);
 		gridbag.setConstraints(searchLabel[1], c);
 		gridbag.setConstraints(searchLabel[2], c);
+		c.insets = new Insets(1,1,1,1);
 		gridbag.setConstraints(searchField, c);
 		gridbag.setConstraints(searchLabel[3], c);
 		searchPanel.add(searchLabel[0]);
@@ -183,6 +187,7 @@ public class SearchWindow {
 		gridbag.setConstraints(emptyLabel, c);
 		searchPanel.add(emptyLabel);
 		c.gridwidth = 1;
+		c.insets = new Insets(1,1,1,2);
 		gridbag.setConstraints(searchLabel[4], c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		gridbag.setConstraints(searchLabel[5], c);
@@ -641,7 +646,7 @@ public class SearchWindow {
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
-	    /*
+	    
 	    try {
 	    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -649,7 +654,7 @@ public class SearchWindow {
 	    } catch (Exception e) {
 	    	
 	    }
-	    */
+	    
 	    new SearchWindow();
 	}
 

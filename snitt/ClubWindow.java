@@ -5,6 +5,9 @@
  */
 package snitt;
 
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /**
  * ClubWindow - beskriver fönstret för att ställa in vilka klubbars resultat som
@@ -37,17 +41,28 @@ public class ClubWindow extends JDialog {
         this.excludedClubs = excludedClubs;
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowHandler());
-        setLayout(new GridLayout(clubs.length + 2, 1));
+        
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER; //end row
+        c.anchor = GridBagConstraints.WEST;
+        
+        setLayout(gridbag);
+        
+        JPanel clubPanel = new JPanel(gridbag);
+        clubPanel.setBorder(new EmptyBorder(5,5,5,5));
+        //setLayout(new GridLayout(clubs.length + 2, 1));
         setResizable(false);
         
-        getContentPane().add(new JLabel("Välj klubbar som resultat skall visas för:"));
+        addComponentToPanel(clubPanel, 
+        		new JLabel("Välj klubbar som resultat skall visas för:"), gridbag, c);
         //getContentPane().add(new JLabel("Välj vad som skall visas:"));
         this.clubs = new JCheckBox[clubs.length];
         for(int i = 0; i < clubs.length; i++) {
         	String club = clubs[i];
         	this.clubs[i] = new JCheckBox(club, 
         			!excludedClubs[tabIndex].contains(club.toLowerCase()));
-            getContentPane().add(this.clubs[i]);
+            addComponentToPanel(clubPanel, this.clubs[i], gridbag, c);
         }
         
         ButtonHandler buttonHand = new ButtonHandler();
@@ -57,14 +72,34 @@ public class ClubWindow extends JDialog {
         cancelButton = new JButton("Avbryt");
         cancelButton.setMnemonic(KeyEvent.VK_A);
         cancelButton.addActionListener(buttonHand);
-        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+        c.anchor = GridBagConstraints.EAST;
+        JPanel buttonPanel = new JPanel(new GridLayout(1,2,6,0));
+        buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
+        //addComponent(acceptButton, gridbag, c);
+        //addComponent(cancelButton, gridbag, c);
         buttonPanel.add(acceptButton);
         buttonPanel.add(cancelButton);
-        getContentPane().add(buttonPanel);
+        
+        addComponent(clubPanel, gridbag, c);
+        addComponent(buttonPanel, gridbag, c);
         
         pack();
         setLocationRelativeTo(owner);
         setVisible(true);
+    }
+    
+    /** lägger till en grafisk komponent till detta fönster */
+    private void addComponent(Component component, GridBagLayout gridbag, 
+    		GridBagConstraints c) {
+    	gridbag.setConstraints(component, c);
+    	getContentPane().add(component);
+    }
+    
+    /** lägger till en grafisk komponent till angiven JPanel */
+    private void addComponentToPanel(JPanel panel, Component component,
+    		GridBagLayout gridbag, GridBagConstraints c) {
+    	gridbag.setConstraints(component, c);
+    	panel.add(component);
     }
     
     /** klassen som sköter fönsterhanteringen */

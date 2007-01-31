@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.border.EmptyBorder;
 
 import datastruct.DataManager;
 
@@ -57,9 +58,11 @@ public class AlignmentWindow extends JDialog {
         
         GridLayout mainLayout = new GridLayout(NBR_ALIGN+1,1);
         mainLayout.setVgap(1);
-        GridLayout buttonLayout = new GridLayout(1,2);
+        GridLayout buttonLayout = new GridLayout(1,2,6,0);
         JPanel mainPanel = new JPanel(mainLayout);
+        mainPanel.setBorder(new EmptyBorder(5,5,5,5));
         JPanel buttonPanel = new JPanel(buttonLayout);
+        buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
         ButtonGroup buttonGroup = new ButtonGroup();
         
         orientation = new JRadioButton[NBR_ALIGN];
