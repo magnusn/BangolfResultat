@@ -744,7 +744,6 @@ public class SearchWindow {
     					        MESSAGEFIELD.setText("Öppnat filen: " + fileNameSKV + ".");
     					        enableDisabledMenus();
     					    } catch (Exception f) {
-    					        f.printStackTrace();
     					        JOptionPane.showMessageDialog(frame, "Inläsningen från SKV-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
     					    }
     					} else {

@@ -6,6 +6,7 @@
 package snitt;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -16,12 +17,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashSet;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -50,20 +54,26 @@ public class ClubWindow extends JDialog {
         setLayout(gridbag);
         
         JPanel clubPanel = new JPanel(gridbag);
+        JPanel scrollPanel = new JPanel();
+        scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.PAGE_AXIS));
         clubPanel.setBorder(new EmptyBorder(5,5,5,5));
-        //setLayout(new GridLayout(clubs.length + 2, 1));
         setResizable(false);
+        
         
         addComponentToPanel(clubPanel, 
         		new JLabel("Välj klubbar som resultat skall visas för:"), gridbag, c);
-        //getContentPane().add(new JLabel("Välj vad som skall visas:"));
+        addComponentToPanel(clubPanel, 
+        		Box.createRigidArea(new Dimension(0,5)), gridbag, c);
         this.clubs = new JCheckBox[clubs.length];
         for(int i = 0; i < clubs.length; i++) {
         	String club = clubs[i];
         	this.clubs[i] = new JCheckBox(club, 
         			!excludedClubs[tabIndex].contains(club.toLowerCase()));
-            addComponentToPanel(clubPanel, this.clubs[i], gridbag, c);
+        	scrollPanel.add(this.clubs[i]);
         }
+        
+        JScrollPane scrollPane = new JScrollPane(scrollPanel);
+        scrollPane.setPreferredSize(new Dimension(200,250));
         
         ButtonHandler buttonHand = new ButtonHandler();
         acceptButton = new JButton("Ok");
@@ -72,15 +82,16 @@ public class ClubWindow extends JDialog {
         cancelButton = new JButton("Avbryt");
         cancelButton.setMnemonic(KeyEvent.VK_A);
         cancelButton.addActionListener(buttonHand);
-        c.anchor = GridBagConstraints.EAST;
         JPanel buttonPanel = new JPanel(new GridLayout(1,2,6,0));
         buttonPanel.setBorder(new EmptyBorder(5,5,5,5));
-        //addComponent(acceptButton, gridbag, c);
-        //addComponent(cancelButton, gridbag, c);
         buttonPanel.add(acceptButton);
         buttonPanel.add(cancelButton);
         
+        c.fill = GridBagConstraints.HORIZONTAL;
+        addComponentToPanel(clubPanel, scrollPane, gridbag, c);
+        c.fill = GridBagConstraints.NONE;
         addComponent(clubPanel, gridbag, c);
+        c.anchor = GridBagConstraints.EAST;
         addComponent(buttonPanel, gridbag, c);
         
         pack();

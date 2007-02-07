@@ -197,7 +197,6 @@ public class SortWindow extends JDialog {
 		try {
 			io.writeFileList("compare", sortVector);
 		} catch (Exception e) {
-		    e.printStackTrace();
 			JOptionPane.showMessageDialog(compareDialog, "Sparandet av sorteringslistorna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		

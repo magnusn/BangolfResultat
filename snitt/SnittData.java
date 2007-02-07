@@ -47,7 +47,6 @@ public class SnittData {
             }
             success = true;
         } catch (Exception e) {
-            e.printStackTrace();
             success = false;
             headers = new JCheckBox[nbrTabs][NBR_HEADERS];
             for(int i = 0; i < nbrTabs; i++) {

@@ -4,12 +4,16 @@ import gui.AlignmentWindow;
 import gui.ListPanel;
 import gui.SearchWindow;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JFileChooser;
@@ -25,6 +29,7 @@ import java.util.Vector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -442,35 +447,36 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att välja vilka klubbar som skall tas med */
 			else if(e.getSource() == setClubs) {
-				if (selected.size() != 0) {
-					TreeSet clubTree = new TreeSet();
-					Iterator it = selected.iterator();
-					while (it.hasNext()) {
-						try {
-							String filePath = (String) fileMap.get(it.next());
-							ResultList res = (ResultList) io.inputFromSKV(filePath)[2];
-							Iterator prIt = res.iterator();
-							while (prIt.hasNext()) {
-								PersonResult pr = (PersonResult) prIt.next();
-								String club = pr.getClub().trim();
-								if (!clubTree.contains(club.toLowerCase()))
-									clubTree.add(club);
-							}
-						} catch (IOException ioe) {
-							ioe.printStackTrace();
+				TreeSet clubTree = new TreeSet();
+				Iterator it = selected.iterator();
+				Vector fileError = new Vector();
+				String filePath = "";
+				while (it.hasNext()) {
+					try {
+						filePath = (String) fileMap.get(it.next());
+						ResultList res = (ResultList) io.inputFromSKV(filePath)[2];
+						Iterator prIt = res.iterator();
+						while (prIt.hasNext()) {
+							PersonResult pr = (PersonResult) prIt.next();
+							String club = pr.getClub().trim();
+							if (!clubTree.contains(club.toLowerCase()))
+								clubTree.add(club);
 						}
+					} catch (IOException ioe) {
+						fileError.add(filePath);
 					}
-					int size = clubTree.size();
-					String[] clubs = new String[size];
-					it = clubTree.iterator();
-					for (int i  = 0; i < size; ++i)
-						clubs[i] = (String) it.next();
-					/*it = excludedClubs[tab.getSelectedIndex()].iterator();
-					while (it.hasNext())
-						System.out.println(it.next());*/
-					new ClubWindow(frame, tab.getSelectedIndex(), clubs, excludedClubs);
-					setMessage("", false);
 				}
+				if (fileError.size() > 0) {
+					showReadFileError(fileError);
+					return;
+				}
+				int size = clubTree.size();
+				String[] clubs = new String[size];
+				it = clubTree.iterator();
+				for (int i  = 0; i < size; ++i)
+					clubs[i] = (String) it.next();
+				new ClubWindow(frame, tab.getSelectedIndex(), clubs, excludedClubs);
+				setMessage("", false);
 			}
 			/** väljer fil att jämföra med */
 			else if(e.getSource() == compareFileChooser) {
@@ -599,16 +605,28 @@ public class SnittWindow extends JFrame {
 				}
 			}
 		} else {
-			JTextArea textArea = new JTextArea("Inläsningen av följande fil(er) misslyckades:", 10, 0);
-			while (fileError.size() > 0) {
-				textArea.append("\n" + fileError.remove(0));
-			}
-			textArea.setMargin(new Insets(0, 0, 0, 10));
-			textArea.setEditable(false);
-			JScrollPane scrollPane = new JScrollPane(textArea);
-			
-			JOptionPane.showMessageDialog(frame, scrollPane, "Varning", JOptionPane.ERROR_MESSAGE);
+			showReadFileError(fileError);
 		}
+	}
+	
+	/** Visar en lista med filer som ej gick att läsa */
+	private void showReadFileError(Vector files) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		panel.add(new JLabel("Inläsningen av följande fil(er) misslyckades:"));
+		panel.add(Box.createRigidArea(new Dimension(0,5)));
+		JTextArea textArea = new JTextArea(10, 0);
+		for (int i = 0; i < files.size(); ++i) {
+			textArea.append("" + files.get(i));
+			if (i < files.size() - 1)
+				textArea.append("\n");
+		}
+		textArea.setMargin(new Insets(0, 0, 0, 10));
+		textArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		panel.add(scrollPane);
+		
+		JOptionPane.showMessageDialog(frame, panel, "Varning", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	/** producerar en snittlista att använda som jämförelse med filnamnet fileName 
