@@ -24,11 +24,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
@@ -447,7 +448,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att välja vilka klubbar som skall tas med */
 			else if(e.getSource() == setClubs) {
-				TreeSet clubTree = new TreeSet();
+				TreeMap clubMap = new TreeMap();
 				Iterator it = selected.iterator();
 				Vector fileError = new Vector();
 				String filePath = "";
@@ -459,8 +460,9 @@ public class SnittWindow extends JFrame {
 						while (prIt.hasNext()) {
 							PersonResult pr = (PersonResult) prIt.next();
 							String club = pr.getClub().trim();
-							if (!clubTree.contains(club.toLowerCase()))
-								clubTree.add(club);
+							if (!clubMap.containsKey(club.toLowerCase())) {
+								clubMap.put(club.toLowerCase(), club);
+							}
 						}
 					} catch (IOException ioe) {
 						fileError.add(filePath);
@@ -470,9 +472,9 @@ public class SnittWindow extends JFrame {
 					showReadFileError(fileError);
 					return;
 				}
-				int size = clubTree.size();
+				int size = clubMap.size();
 				String[] clubs = new String[size];
-				it = clubTree.iterator();
+				it = clubMap.values().iterator();
 				for (int i  = 0; i < size; ++i)
 					clubs[i] = (String) it.next();
 				new ClubWindow(frame, tab.getSelectedIndex(), clubs, excludedClubs);
@@ -624,6 +626,7 @@ public class SnittWindow extends JFrame {
 		textArea.setMargin(new Insets(0, 0, 0, 10));
 		textArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(scrollPane);
 		
 		JOptionPane.showMessageDialog(frame, panel, "Varning", JOptionPane.ERROR_MESSAGE);
