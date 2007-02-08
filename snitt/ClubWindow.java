@@ -1,5 +1,5 @@
 /*
- * Created on 2005-jun-28
+ * Created on 2007-jan-29
  * 
  * Created by: Magnus
  */
@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -35,6 +36,7 @@ import javax.swing.border.EmptyBorder;
 public class ClubWindow extends JDialog {
 	private int tabIndex;
     private HashSet[] excludedClubs; 	// talar om vilka klubbar som inte är valda för respektive flik
+    private JCheckBox markAll;			// för att markera/avmarkera alla klubbar
     private JCheckBox[] clubs;			// vektor av klubbar som kan väljas
     private JButton acceptButton;		// knapp för att bekräfta inställningarna
     private JButton cancelButton;		// knapp för att avbryta
@@ -56,6 +58,8 @@ public class ClubWindow extends JDialog {
         JPanel clubPanel = new JPanel(gridbag);
         JPanel scrollPanel = new JPanel();
         scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.PAGE_AXIS));
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.PAGE_AXIS));
         clubPanel.setBorder(new EmptyBorder(5,5,5,5));
         setResizable(false);
         
@@ -64,18 +68,34 @@ public class ClubWindow extends JDialog {
         		new JLabel("Välj klubbar som resultat skall visas för:"), gridbag, c);
         addComponentToPanel(clubPanel, 
         		Box.createRigidArea(new Dimension(0,5)), gridbag, c);
+        markAll = new JCheckBox("Markera/avmarkera alla");
+        JSeparator separator = new JSeparator();
+        int maxWidth = (int) separator.getMaximumSize().getWidth();
+        int preferredHeight = (int) separator.getPreferredSize().getHeight();
+        separator.setMaximumSize(new Dimension(maxWidth, preferredHeight));
+        headerPanel.add(markAll);
+        headerPanel.add(separator);
+        
         this.clubs = new JCheckBox[clubs.length];
+        int nbrIncluded = 0;
         for(int i = 0; i < clubs.length; i++) {
         	String club = clubs[i];
         	this.clubs[i] = new JCheckBox(club, 
         			!excludedClubs[tabIndex].contains(club.toLowerCase()));
+        	if (this.clubs[i].isSelected())
+        		nbrIncluded++;
         	scrollPanel.add(this.clubs[i]);
         }
+        if (nbrIncluded > (clubs.length/2))
+        	markAll.setSelected(true);
         
-        JScrollPane scrollPane = new JScrollPane(scrollPanel);
-        scrollPane.setPreferredSize(new Dimension(200,250));
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(scrollPanel);
+        scrollPane.setColumnHeaderView(headerPanel);
+        scrollPane.setPreferredSize(new Dimension(200,300));
         
         ButtonHandler buttonHand = new ButtonHandler();
+        markAll.addActionListener(buttonHand);
         acceptButton = new JButton("Ok");
         acceptButton.setMnemonic(KeyEvent.VK_O);
         acceptButton.addActionListener(buttonHand);
@@ -135,6 +155,14 @@ public class ClubWindow extends JDialog {
                 dispose();
             } else if(e.getSource() == cancelButton) {
                 dispose();
+            } else if(e.getSource() == markAll) {
+            	if (markAll.isSelected()) {
+            		for (int i = 0; i < clubs.length; ++i)
+            			clubs[i].setSelected(true);
+            	} else {
+            		for (int i = 0; i < clubs.length; ++i)
+            			clubs[i].setSelected(false);
+            	}
             }
         }
     }

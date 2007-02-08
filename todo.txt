@@ -1,5 +1,4 @@
 - Bestämma mig för vilken ny webbadress BangolfResultat skall ha.
-- Se till så att man kan markera och avmarkera alla klubbar på en gång.
 - Förstorande av klasshanterare och snitthanterare ökar ej ytan på komponenterna.
-- Inte skilja på Vinslöv och vinslöv när man väljer klubbar.
 - Kunna välja look and feel.
+- Nöjd med ClubWindow?
