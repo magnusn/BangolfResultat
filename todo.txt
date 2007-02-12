@@ -2,3 +2,6 @@
 - Förstorande av klasshanterare och snitthanterare ökar ej ytan på komponenterna.
 - Kunna välja look and feel.
 - Nöjd med ClubWindow?
+- Hantera läsfelmeddelande vid skapande av jämförande snittlista på samma sätt
+som vid skapande av vanlig snittlista.
+- Kontrollera hanteringen vid beräkning av klasstarter.

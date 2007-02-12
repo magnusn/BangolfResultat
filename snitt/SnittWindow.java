@@ -561,7 +561,7 @@ public class SnittWindow extends JFrame {
 				} else if(surface != readSurface && surface != BLANDAD) {
 					surface = BLANDAD;
 				}
-			} catch (Exception e) {
+			} catch (IOException e) {
 				fileError.add(fileNames[i]);
 				readOk = false;
 			}
@@ -615,7 +615,15 @@ public class SnittWindow extends JFrame {
 	private void showReadFileError(Vector files) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(new JLabel("Inläsningen av följande fil(er) misslyckades:"));
+		panel.add(new JLabel("Operationen gick ej att utföra då en eller " +
+				"flera filer inte kunde läsas av programmet."));
+		panel.add(Box.createRigidArea(new Dimension(0,10)));
+		if (files.size() == 1) {
+			panel.add(new JLabel("Kontrollera att nedanstående fil existerar."));
+		} else {
+			panel.add(new JLabel("Kontrollera att nedanstående filer existerar."));
+		}
+		/*Inläsningen av följande fil(er) misslyckades:"*/
 		panel.add(Box.createRigidArea(new Dimension(0,5)));
 		JTextArea textArea = new JTextArea(10, 0);
 		for (int i = 0; i < files.size(); ++i) {
@@ -626,6 +634,8 @@ public class SnittWindow extends JFrame {
 		textArea.setMargin(new Insets(0, 0, 0, 10));
 		textArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setMaximumSize(new Dimension(800,
+				(int) scrollPane.getMaximumSize().getHeight()));
 		scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panel.add(scrollPane);
 		
