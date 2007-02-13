@@ -129,7 +129,7 @@ public class SnittWindow extends JFrame {
 			}
 		}
 		try {
-			excludedClubs = (HashSet[]) io.load("snittclubs");
+			excludedClubs = (HashSet[]) io.load("snittclub");
 			if (excludedClubs.length != NBR_SNITT) {
 				HashSet[] tempClubs = new HashSet[NBR_SNITT];
 				for (int i = 0; i < tempClubs.length; ++i) {
@@ -153,7 +153,8 @@ public class SnittWindow extends JFrame {
 			}
 			fileMap = (HashMap) io.load("snittmap");
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades",
+					"Varning", JOptionPane.ERROR_MESSAGE);
 			for(int i = 0; i < snittList.length; i++) {
 				snittList[i] = new ListPanel(new Vector(), new Vector());
 			}
@@ -321,7 +322,6 @@ public class SnittWindow extends JFrame {
 							val = JOptionPane.YES_OPTION;
 						}
 						if(val == JOptionPane.YES_OPTION) {
-							
 							makeCompareFile(file.getPath(), listPanel);
 						}
 					}
@@ -354,17 +354,22 @@ public class SnittWindow extends JFrame {
 									if (tabIndex != -1) {
 										snittList[tabIndex].add(name);
 									} else {
-										JOptionPane.showMessageDialog(frame, "Filen " + name + " går ej att lägga till. Kontrollera att en flik är vald i Snittlistshanteraren.", "Varning", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(frame, "Filen " + name + " går ej att lägga till. " +
+												"Kontrollera att en flik är vald i Snittlistshanteraren.", 
+												"Varning", JOptionPane.ERROR_MESSAGE);
 									}
 									fileMap.put(name, path);
 								} catch (Exception f) {
-									JOptionPane.showMessageDialog(frame, "Filen " + name + " gick inte att lägga till", "Varning", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(frame, "Filen " + name + " gick inte att lägga till", 
+											"Varning", JOptionPane.ERROR_MESSAGE);
 								}
 							} else {
-								JOptionPane.showMessageDialog(frame, "En fil med namnet " + name + " finns redan men med en annan sökväg. Filen gick ej att lägga till.", "Varning", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(frame, "En fil med namnet " + name + " finns redan men med en annan sökväg. " +
+										"Filen gick ej att lägga till.", "Varning", JOptionPane.ERROR_MESSAGE);
 							}
 						} else {
-							JOptionPane.showMessageDialog(frame, "En fil med namnet " + name + " finns redan listad.", "Varning", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(frame, "En fil med namnet " + name + " finns redan listad.",
+									"Varning", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
@@ -410,7 +415,8 @@ public class SnittWindow extends JFrame {
 						}
 					}
 				} else {
-					JOptionPane.showMessageDialog(frame, "Inga tävlingar har markerats", "Tävlingar ej borttagna", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame, "Inga tävlingar har markerats",
+							"Tävlingar ej borttagna", JOptionPane.ERROR_MESSAGE);
 				}
 				setMessage("", false);
 			}
@@ -423,7 +429,8 @@ public class SnittWindow extends JFrame {
 				int tabIndex = tab.getSelectedIndex();
 				if (tabIndex == -1)
 					return;
-				String tempTitle = JOptionPane.showInputDialog(frame, "Skriv in önskad titel på fliken", tabTitles[tabIndex]);
+				String tempTitle = JOptionPane.showInputDialog(frame,
+						"Skriv in önskad titel på fliken", tabTitles[tabIndex]);
     			if(tempTitle != null) {
     				tabTitles[tabIndex] = tempTitle;
     				tab.setTitleAt(tabIndex, tabTitles[tabIndex]);
@@ -496,8 +503,10 @@ public class SnittWindow extends JFrame {
 						try {
 							fileNames[i] = (String) fileMap.get(file);
 						} catch (Exception ex) {
-							JOptionPane.showMessageDialog(frame, "Inläsningen av filen " + fileNames[i] + " misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(frame, "Inläsningen av filen " + file + " misslyckades." +
+									"\nBeräkningen gick ej att utföra.", "Varning", JOptionPane.ERROR_MESSAGE);
 							readOk = false;
+							break;
 						}
 					}
 					if(readOk) {
@@ -505,8 +514,9 @@ public class SnittWindow extends JFrame {
 						try {
 							map = snitt.countClasses(fileNames);
 						}
-						catch (Exception ex) {
-							JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades.", "Varning", JOptionPane.ERROR_MESSAGE);
+						catch (IOException ioe) {
+							JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades." +
+									"\nBeräkningen gick ej att utföra.", "Varning", JOptionPane.ERROR_MESSAGE);
 							readOk = false;
 						}
 						if(readOk) {
@@ -519,14 +529,13 @@ public class SnittWindow extends JFrame {
 								String entry = (String)iterator.next();
 								classCount = classCount + entry + ": " + map.get(entry) + "\n";
 							}
-							JOptionPane.showMessageDialog(frame, classCount, "Klasstarter", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(frame, classCount,
+									"Klasstarter", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
-					if(!readOk) {
-						JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra.", "Varning", JOptionPane.ERROR_MESSAGE);
-					}
 				} else {
-					JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra eftersom inga tävlingar har markerats.", "Varning", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame, "Beräkningen gick ej att utföra " +
+							"eftersom inga tävlingar har markerats.", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 				setMessage("", false);
 			}
@@ -538,7 +547,8 @@ public class SnittWindow extends JFrame {
 	private void makeSnitt(String fileName, String header, ListPanel listPanel) {
 	    int tabIndex = tab.getSelectedIndex();
 	    if (tabIndex == -1) {
-	    	JOptionPane.showMessageDialog(frame, "En flik måste vara vald.", "Varning", JOptionPane.ERROR_MESSAGE);
+	    	JOptionPane.showMessageDialog(frame, "En flik måste vara vald.",
+	    			"Varning", JOptionPane.ERROR_MESSAGE);
 	    	return;
 	    }
 	    
@@ -571,7 +581,8 @@ public class SnittWindow extends JFrame {
 				snitt.readResults(fileNames, personNameTracker);
 			}
 			catch (Exception e) {
-				JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades",
+						"Varning", JOptionPane.ERROR_MESSAGE);
 				readOk = false;
 			}
 			if(readOk) {
@@ -582,11 +593,13 @@ public class SnittWindow extends JFrame {
 			            if(file.exists()) {
 			                compareSurface = snitt.readCompareFile(compareFile);
 			            } else {
-			                JOptionPane.showMessageDialog(frame, "Vald jämförelsefil existerar inte", "Varning", JOptionPane.ERROR_MESSAGE);
+			                JOptionPane.showMessageDialog(frame, "Vald jämförelsefil existerar " +
+			                		"inte", "Varning", JOptionPane.ERROR_MESSAGE);
 			                readOk = false;
 			            }
 			        } catch (IOException ioe) {
-			            JOptionPane.showMessageDialog(frame, "Inläsningen av snittlista att jämföra med misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			            JOptionPane.showMessageDialog(frame, "Inläsningen av snittlista att " +
+			            		"jämföra med misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			            readOk = false;
 			        }
 			    }
@@ -603,7 +616,8 @@ public class SnittWindow extends JFrame {
 					snitt.outputToHTML(list, surface, compareSurface, headerList, align);
 					setMessage("Snittlistan är sparad som webbsida.", true);
 				} catch (IOException ioe) {
-					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame, "Skrivning till HTML-fil " +
+							"misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		} else {
@@ -650,6 +664,7 @@ public class SnittWindow extends JFrame {
 		boolean readOk = true;
 		Vector v = listPanel.getSelected();
 		String[] fileNames = new String[v.size()];
+		Vector fileError = new Vector();
 		for(int i = 0; i < fileNames.length; i++) {
 			String file = (String) v.get(i);
 			try {
@@ -661,7 +676,7 @@ public class SnittWindow extends JFrame {
 					surface = BLANDAD;
 				}
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(frame, "Inläsningen av filen " + fileNames[i] + " misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				fileError.add(fileNames[i]);
 				readOk = false;
 			}
 		}
@@ -669,8 +684,9 @@ public class SnittWindow extends JFrame {
 			try {
 				snitt.readResults(fileNames, personNameTracker);
 			}
-			catch (Exception e) {
-				JOptionPane.showMessageDialog(frame, "Inläsningen av filerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			catch (IOException e) {
+				JOptionPane.showMessageDialog(frame, "Resultaten kunde inte läsas" +
+						" in från filerna", "Varning", JOptionPane.ERROR_MESSAGE);
 				readOk = false;
 			}
 			if(readOk) {
@@ -678,10 +694,13 @@ public class SnittWindow extends JFrame {
 				try {
 					snitt.outputToCompareFile(list, surface);
 					setMessage("Jämförelselistan är sparad.", true);
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(frame, "Skrivning till fil misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(frame, "Jämförelsefilen kunde " +
+							"ej skrivas till fil", "Varning", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+		} else {
+			showReadFileError(fileError);
 		}
 	}
 	
@@ -696,12 +715,12 @@ public class SnittWindow extends JFrame {
 	/** sköter om nedstängandet av snitthanterarfönstret */
 	public void exit() {
 	    if(!snittData.saveCompareFiles()) {
-	        JOptionPane.showMessageDialog(frame, "Inställningarna för jämförelsefilerna gick ej att spara",
-	                "Varning", JOptionPane.ERROR_MESSAGE);
+	        JOptionPane.showMessageDialog(frame, "Inställningarna för jämförelsefilerna" +
+	        		" gick ej att spara", "Varning", JOptionPane.ERROR_MESSAGE);
 	    }
 	    if(!snittData.saveAppearanceSettings()) {
-	        JOptionPane.showMessageDialog(frame, "Utseendeinställningarna gick ej att spara",
-	                "Varning", JOptionPane.ERROR_MESSAGE);
+	        JOptionPane.showMessageDialog(frame, "Utseendeinställningarna gick ej att" +
+	        		" spara", "Varning", JOptionPane.ERROR_MESSAGE);
 	    }
 	    
 		Vector[] v = new Vector[NBR_SNITT * 2];
@@ -712,23 +731,27 @@ public class SnittWindow extends JFrame {
 		try {
 			io.save("snittstring", headers);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Sparandet av rubrikerna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Sparandet av rubrikerna misslyckades",
+					"Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.save("snittitle", tabTitles);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Sparandet av fliktitlarna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Sparandet av fliktitlarna" +
+					" misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
-			io.save("snittclubs", excludedClubs);
+			io.save("snittclub", excludedClubs);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Sparandet av klubbarna misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Sparandet av klubbarna" +
+					" misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		try {
 			io.writeFileList("snitt", v);
 			io.save("snittmap", fileMap);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Sparandet av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Sparandet av fillistan" +
+					" misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
 		SearchWindow.SNITTOPEN = false;
 		frame.dispose();
