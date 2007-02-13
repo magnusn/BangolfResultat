@@ -527,7 +527,11 @@ public class SnittWindow extends JFrame {
 							String classCount = "";
 							while(iterator.hasNext()) {
 								String entry = (String)iterator.next();
-								classCount = classCount + entry + ": " + map.get(entry) + "\n";
+								if (entry.trim().equals("")) {
+									classCount = classCount + "[Ingen klass]" + ": " + map.get(entry) + "\n";
+								} else {
+									classCount = classCount + entry + ": " + map.get(entry) + "\n";
+								}
 							}
 							JOptionPane.showMessageDialog(frame, classCount,
 									"Klasstarter", JOptionPane.INFORMATION_MESSAGE);
