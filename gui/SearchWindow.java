@@ -42,6 +42,7 @@ import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.NameList;
 import datastruct.ResultList;
+import datastruct.Settings;
 
 import java.util.StringTokenizer;
 
@@ -647,12 +648,13 @@ public class SearchWindow {
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
 	    
+	    Object lookAndFeel = Settings.get("lookAndFeel");
 	    try {
-	    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	    	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-	    	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+	    	if (lookAndFeel != null) {
+	    		UIManager.setLookAndFeel((String) lookAndFeel);
+	    	}
 	    } catch (Exception e) {
-	    	
+	    	//e.printStackTrace();
 	    }
 	    
 	    new SearchWindow();
