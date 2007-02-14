@@ -1,4 +1,3 @@
-- Bestämma mig för vilken ny webbadress BangolfResultat skall ha.
-- Förstorande av klasshanterare och snitthanterare ökar ej ytan på komponenterna.
+- Bestämma mig för vilken ny webbadress BangolfResultat skall ha. Ändra 
+exempel-sidorna för snittlista och vanlig tävling därefter.
 - Kunna välja look and feel.
-- Skriva delarna av manualen som tar upp klubbhantering i snittlista.
