@@ -21,6 +21,7 @@ import java.util.LinkedList;
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
+	public static final String dataPath = "data/";
 	
 	/** skapar ett objekt av klassen */
 	public IOHandler() {
@@ -380,7 +381,7 @@ public class IOHandler {
 		utifrån innehållet i vektorn v */
 	public void writeFileList(String fileName, Vector[] v) throws IOException {
 		Vector[] vector = v;
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter("data/" + fileName));
+		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(dataPath + fileName));
 		for(int i = 0; i < vector.length; i++) {
 			if(i%2 == 0) {
 				bufferOut.write("Unselected");
@@ -403,7 +404,7 @@ public class IOHandler {
 		for(int i = 0; i < vector.length; i++) {
 			vector[i] = new Vector();
 		}
-		BufferedReader fileIn = new BufferedReader(new FileReader("data/" + fileName));
+		BufferedReader fileIn = new BufferedReader(new FileReader(dataPath + fileName));
 		String inLine = fileIn.readLine();
 		int i = -1;
 		while(inLine != null && !inLine.trim().equals("")) {
@@ -432,7 +433,7 @@ public class IOHandler {
 	public void save(String file, Object o) throws IOException {
 		FileOutputStream fos;
 		ObjectOutputStream os;
-		fos = new FileOutputStream("data/" + file);
+		fos = new FileOutputStream(dataPath + file);
 		os = new ObjectOutputStream(fos);
 		os.writeObject(o);
 		os.close();
@@ -443,7 +444,7 @@ public class IOHandler {
 		FileInputStream fis;
 		ObjectInputStream ois;
 		Object o = null;
-		fis = new FileInputStream("data/" + file);
+		fis = new FileInputStream(dataPath + file);
 		ois = new ObjectInputStream(fis);
 		o = ois.readObject();
 		ois.close();
