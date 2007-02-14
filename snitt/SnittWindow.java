@@ -46,6 +46,7 @@ import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.PersonResult;
 import datastruct.ResultList;
+import datastruct.Settings;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
@@ -227,6 +228,12 @@ public class SnittWindow extends JFrame {
 		tab = new JTabbedPane();
 		for (int i = 0; i < NBR_SNITT; ++i)
 			tab.addTab(tabTitles[i], snittList[i]);
+		Object selectedIndex = Settings.get("snittTabIndex");
+		if (selectedIndex != null) {
+			tab.setSelectedIndex(((Integer) selectedIndex).intValue());
+		} else {
+			tab.setSelectedIndex(0);
+		}
 		
 		messageField = new JTextField();
 		messageField.setEditable(false);
@@ -757,6 +764,7 @@ public class SnittWindow extends JFrame {
 			JOptionPane.showMessageDialog(frame, "Sparandet av fillistan" +
 					" misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
+		Settings.set("snittTabIndex", new Integer(tab.getSelectedIndex()));
 		SearchWindow.SNITTOPEN = false;
 		frame.dispose();
 	}
