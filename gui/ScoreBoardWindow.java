@@ -51,7 +51,7 @@ class ScoreBoardWindow {
 		setLabelLayout(label);
 		
 		scrollpane = new JScrollPane(board);
-		scrollpane.setPreferredSize(new Dimension(760,406));
+		scrollpane.setPreferredSize(new Dimension(755,406));
 	}
 	
 	/** returnerar JScrollpanen som allting ligger i */
