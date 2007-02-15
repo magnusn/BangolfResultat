@@ -69,6 +69,8 @@ Section "MainSection" SEC01
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\jmfsurface.gif"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\klasser.gif"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\klasstar.gif"
+  File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\lafjava.gif"
+  File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\lafsystem.gif"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\redig.gif"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\resinmat.gif"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\bilder\resultat.gif"
@@ -84,6 +86,7 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR\doc"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\backup.htm"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\comp.htm"
+  File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\lookandfeel.htm"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\manual.htm"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\om.htm"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\doc\snitt.htm"
@@ -195,6 +198,7 @@ Section Uninstall
   Delete "$INSTDIR\doc\snitt.htm"
   Delete "$INSTDIR\doc\om.htm"
   Delete "$INSTDIR\doc\manual.htm"
+  Delete "$INSTDIR\doc\lookandfeel.htm"
   Delete "$INSTDIR\doc\comp.htm"
   Delete "$INSTDIR\doc\backup.htm"
   Delete "$INSTDIR\doc\bilder\utseende.gif"
@@ -210,6 +214,8 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\resinmat.gif"
   Delete "$INSTDIR\doc\bilder\redig.gif"
   Delete "$INSTDIR\doc\bilder\nyckel.gif"
+  Delete "$INSTDIR\doc\bilder\lafsystem.gif"
+  Delete "$INSTDIR\doc\bilder\lafjava.gif"
   Delete "$INSTDIR\doc\bilder\klasstar.gif"
   Delete "$INSTDIR\doc\bilder\klasser.gif"
   Delete "$INSTDIR\doc\bilder\jmfsurface.gif"
@@ -237,5 +243,5 @@ Section Uninstall
   RMDir /REBOOTOK "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-  SetAutoClose true
+  SetAutoClose false
 SectionEnd

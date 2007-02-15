@@ -63,6 +63,7 @@ public class SearchWindow {
 	private JMenuItem newComp, openFromSKV, save;		// meny för ny tävling och öppna samt spara
 	private	JMenuItem saveToHTML, quit, editItem; 		// spara till HTML, avsluta, redigera
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
+	private JMenuItem setLookAndFeel;					// ställ in programmets look and feel 
 	private JMenuItem makeCompareFile, openCompareFile;	// skapar eller öppnar en jämförande snittlista
 	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
 	private JMenuItem changeName, changeClub;			// ändra namn och klubb på en spelare
@@ -228,12 +229,15 @@ public class SearchWindow {
 		klassMenu.setMnemonic(KeyEvent.VK_K);
 		JMenu snittMenu = new JMenu("Snittlistor");
 		snittMenu.setMnemonic(KeyEvent.VK_S);
+		JMenu windowMenu = new JMenu("Fönster");
+		windowMenu.setMnemonic(KeyEvent.VK_F);
 		JMenu help = new JMenu("Info");
 		help.setMnemonic(KeyEvent.VK_I);
 		bar.add(menu);
 		bar.add(edit);
 		bar.add(klassMenu);
 		bar.add(snittMenu);
+		bar.add(windowMenu);
 		bar.add(help);
 		MenuHandler menuHand = new MenuHandler();
 		newComp = new JMenuItem("Ny tävling...", KeyEvent.VK_N);
@@ -265,6 +269,7 @@ public class SearchWindow {
 		snittStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
+		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
 		about = new JMenuItem("Om BangolfResultat...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
@@ -280,6 +285,7 @@ public class SearchWindow {
 		snittStart.addActionListener(menuHand);
 		makeCompareFile.addActionListener(menuHand);
 		openCompareFile.addActionListener(menuHand);
+		setLookAndFeel.addActionListener(menuHand);
 		about.addActionListener(menuHand);
 		menu.add(newComp);
 		menu.add(openFromSKV);
@@ -299,6 +305,7 @@ public class SearchWindow {
 		snittMenu.addSeparator();
 		snittMenu.add(makeCompareFile);
 		snittMenu.add(openCompareFile);
+		windowMenu.add(setLookAndFeel);
 		help.add(about);
 		frame.setJMenuBar(bar);
 		
@@ -859,7 +866,30 @@ public class SearchWindow {
     					}
     				}
     			}
-    		}
+	    	}
+			else if(e.getSource() == setLookAndFeel) {
+				String java = "Java";
+				String system = "Naturlig";
+				String initialSelectionValue = java;
+				Object lookAndFeel = Settings.get("lookAndFeel");
+				if (lookAndFeel != null) {
+					if (((String) lookAndFeel).equals(
+							UIManager.getSystemLookAndFeelClassName())) {
+						initialSelectionValue = system;
+					}
+				}
+				String newLookAndFeel = (String) JOptionPane.showInputDialog(
+						frame, "Välj utseende och känsla:\n(Börjar gälla när BangolfResultat har startats om.)",
+						"Utseende och känsla", JOptionPane.INFORMATION_MESSAGE,
+						null, new String[]{java,system}, initialSelectionValue);
+				if (newLookAndFeel != null) {
+					if (newLookAndFeel.equals(java)) {
+						Settings.set("lookAndFeel",	UIManager.getCrossPlatformLookAndFeelClassName());
+					} else if (newLookAndFeel.equals(system)) {
+						Settings.set("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
+					}
+				}
+			}
     		else if(e.getSource() == about) {
     			new AboutWindow(frame);
     		}
