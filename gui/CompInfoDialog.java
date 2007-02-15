@@ -19,12 +19,10 @@ import javax.swing.border.EmptyBorder;
 
 import datastruct.ResultList;
 
-
 /** klassen som beskriver fönstret där tävlingens inställningar ställs in */
 public class CompInfoDialog extends JDialog {
     private CompInfoDialog thisDialog;		// referens till detta fönster
 	private SearchWindow mainWindow;		// huvudfönstret som visar allting
-	private JFrame owner;					// huvudfönstret
 	private boolean[] boxData;				// talar om ifall startnummer och licensnummer har valts
 	private JCheckBox[] startBox;			// för att välja startnummer samt licensnummer
 	private JButton acceptButton;			// OK-knapp för indatafönstret
@@ -39,7 +37,6 @@ public class CompInfoDialog extends JDialog {
 		super(owner, "Indatafönster", true);
 		setResizable(false);
 		thisDialog = this;
-		this.owner = owner;
 		this.mainWindow = mainWindow;
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		JPanel varvPanel = new JPanel();
@@ -101,7 +98,6 @@ public class CompInfoDialog extends JDialog {
 		
 		mainWindow.setupResultInputPanel(false, boxData, nbrRounds, surface);
 		this.setVisible(false);
-		owner.pack();
 	}
 	
 	/** klassen som tar hand om tangentbordsinmatningen i sökfältet */
