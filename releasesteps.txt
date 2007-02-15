@@ -6,6 +6,12 @@
 6. Kompilera ny exekverbar fil
 7. Lägga upp alla ändringar
 
-Vid speciella tillfällen:
-- Ändra doc/licens.txt (vid nytt år, ny hemsideadress eller ändrade licensvillkor)
-- Ändra doc/manual.htm (vid ny hemsideadress)
+Vid ny hemsideadress skall följande filer ändras:
+- Javakoden som genererar HTML-sidor.
+- doc/licens.txt
+- doc/manual.htm
+- doc/snitt.htm
+- doc/webbsida.htm
+
+Vid andra speciella tillfällen:
+- Ändra doc/licens.txt (vid nytt år eller ändrade licensvillkor)

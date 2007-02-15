@@ -1,3 +1,2 @@
 - Bestämma mig för vilken ny webbadress BangolfResultat skall ha. Ändra 
 exempel-sidorna för snittlista och vanlig tävling därefter.
-- Kunna välja look and feel.
