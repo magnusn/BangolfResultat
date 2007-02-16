@@ -1,2 +1,3 @@
 - Bestämma mig för vilken ny webbadress BangolfResultat skall ha. Ändra 
 exempel-sidorna för snittlista och vanlig tävling därefter.
+- Separat HashMap för varje snittlistsflik. Konvertera snittmap.

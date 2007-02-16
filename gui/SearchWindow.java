@@ -37,12 +37,12 @@ import javax.swing.border.EmptyBorder;
 import snitt.SnittWindow;
 
 import datastruct.CompareFile;
-import datastruct.DataManager;
+import datastruct.AlignmentManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.NameList;
 import datastruct.ResultList;
-import datastruct.Settings;
+import datastruct.DataStore;
 
 import java.util.StringTokenizer;
 
@@ -73,7 +73,7 @@ public class SearchWindow {
 	private Filter skvFilter, htmFilter;		// filter för skv- och htmfiler
 	private Filter snittFilter;					// filter för snittfiler
 	private IOHandler io;						// sköter skrivning till och läsning från filer
-	private DataManager dataManager;			// håller reda på inställningar
+	private AlignmentManager alignmentManager;	// håller reda på inställningarna för sifferorientering
 	public static boolean SNITTOPEN, KLASSOPEN;	// talar om ifall motsvarande fönster är öppet
 	private boolean warningHTM;					// varnar för att inte skriva till ej önskvärd fil
 	private boolean compInfoDialogClosed;		// talar om ifall indatafönstret har stängts ner utan användande av knappen Ok
@@ -117,8 +117,8 @@ public class SearchWindow {
 		warningHTM = false;
 		CHANGE = false;
 		
-		dataManager = new DataManager();
-		if(!dataManager.loadOrientation()) {
+		alignmentManager = new AlignmentManager();
+		if(!alignmentManager.loadOrientation()) {
 		    JOptionPane.showMessageDialog(null, "Tidigare sifferorienteringsinställningar gick ej att läsa in",
                     "Varning", JOptionPane.ERROR_MESSAGE);
 		}
@@ -518,7 +518,7 @@ public class SearchWindow {
 	
 	/** sparar filer som programmet använder sig av */
 	private void save() {
-	    if(!dataManager.saveOrientation()) {
+	    if(!alignmentManager.saveOrientation()) {
 	        JOptionPane.showMessageDialog(frame, "Orienteringsinställningarna gick ej att spara",
                     "Varning", JOptionPane.ERROR_MESSAGE);
 	    }
@@ -655,7 +655,7 @@ public class SearchWindow {
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
 	    
-	    Object lookAndFeel = Settings.get("lookAndFeel");
+	    Object lookAndFeel = DataStore.get("lookAndFeel");
 	    try {
 	    	if (lookAndFeel != null) {
 	    		UIManager.setLookAndFeel((String) lookAndFeel);
@@ -685,7 +685,7 @@ public class SearchWindow {
     						}
     					}
     					if(doit) {
-    					    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+    					    int align = AlignmentManager.getOrientation(AlignmentWindow.COMP_OWNER);
     						io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
     						warningHTM = false;
     						MESSAGEFIELD.setText("Tävlingen är sparad som webbsida.");
@@ -807,7 +807,7 @@ public class SearchWindow {
     			}
     		}
     		else if(e.getSource() == numberOrientation) {
-    		    new AlignmentWindow(frame, AlignmentWindow.COMP_OWNER, dataManager);
+    		    new AlignmentWindow(frame, AlignmentWindow.COMP_OWNER, alignmentManager);
     		}
     		else if(e.getSource() == klassStart) {
     			if(!KLASSOPEN) {
@@ -820,7 +820,7 @@ public class SearchWindow {
     		else if(e.getSource() == snittStart) {
     			if(!SNITTOPEN) {
     				SNITTOPEN = true;
-    				snittWindow = new SnittWindow(frame, personNameTracker, dataManager);
+    				snittWindow = new SnittWindow(frame, personNameTracker, alignmentManager);
     			} else {
     				snittWindow.setVisible(true);
     			}
@@ -871,7 +871,7 @@ public class SearchWindow {
 				String java = "Java";
 				String system = "Naturlig";
 				String initialSelectionValue = java;
-				Object lookAndFeel = Settings.get("lookAndFeel");
+				Object lookAndFeel = DataStore.get("lookAndFeel");
 				if (lookAndFeel != null) {
 					if (((String) lookAndFeel).equals(
 							UIManager.getSystemLookAndFeelClassName())) {
@@ -884,9 +884,9 @@ public class SearchWindow {
 						null, new String[]{java,system}, initialSelectionValue);
 				if (newLookAndFeel != null) {
 					if (newLookAndFeel.equals(java)) {
-						Settings.set("lookAndFeel",	UIManager.getCrossPlatformLookAndFeelClassName());
+						DataStore.set("lookAndFeel",	UIManager.getCrossPlatformLookAndFeelClassName());
 					} else if (newLookAndFeel.equals(system)) {
-						Settings.set("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
+						DataStore.set("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
 					}
 				}
 			}
@@ -981,7 +981,7 @@ public class SearchWindow {
     					}
     				}
     				try {
-    				    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+    				    int align = AlignmentManager.getOrientation(AlignmentWindow.COMP_OWNER);
     					io.outputToHTML(fileNameHTM, resultInput.getResultList(), compHeader, align);
     					warningHTM = false;
     					CHANGE = true;

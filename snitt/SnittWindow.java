@@ -41,16 +41,16 @@ import java.io.IOException;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
-import datastruct.DataManager;
+import datastruct.AlignmentManager;
 import datastruct.Filter;
 import datastruct.IOHandler;
 import datastruct.PersonResult;
 import datastruct.ResultList;
-import datastruct.Settings;
+import datastruct.DataStore;
 
 /** klassen som beskriver fönstret för snittlistshanteringen */
 public class SnittWindow extends JFrame {
-    private DataManager dataManager;		// håller kolla på vissa inställningar
+    private AlignmentManager alignmentManager;// håller koll på inställningarna för sifferorientering
     private SnittData snittData;			// lagrar inställningarna för snittlistorna
 	private HashMap fileMap;				// datastruktur för att lagra filernas namn och sökväg
 	private HashMap personNameTracker;		// håller reda på vilket namn ID-numret tillhör
@@ -79,11 +79,11 @@ public class SnittWindow extends JFrame {
 	
 	/** skapar snitthanterarfönstret */
 	public SnittWindow(JFrame owner, HashMap personNameTracker, 
-	        DataManager dataManager) {
+	        AlignmentManager alignmentManager) {
 		super("Snittlistshanteraren");
 		frame = this;
 		this.personNameTracker = personNameTracker;
-		this.dataManager = dataManager;
+		this.alignmentManager = alignmentManager;
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setIconImage(SearchWindow.ICON);
 		
@@ -228,7 +228,7 @@ public class SnittWindow extends JFrame {
 		tab = new JTabbedPane();
 		for (int i = 0; i < NBR_SNITT; ++i)
 			tab.addTab(tabTitles[i], snittList[i]);
-		Object selectedIndex = Settings.get("snittTabIndex");
+		Object selectedIndex = DataStore.get("snittTabIndex");
 		if (selectedIndex != null) {
 			tab.setSelectedIndex(((Integer) selectedIndex).intValue());
 		} else {
@@ -452,7 +452,7 @@ public class SnittWindow extends JFrame {
 			}
 			/** visar fönster för att ställa in justeringen av fälten med siffror */
 			else if(e.getSource() == numberAlignment) {
-			    new AlignmentWindow(frame, AlignmentWindow.SNITT_OWNER, dataManager);
+			    new AlignmentWindow(frame, AlignmentWindow.SNITT_OWNER, alignmentManager);
 			    setMessage("", false);
 			}
 			/** öppnar fönstret som används för att bestämma sorteringsordningen */
@@ -623,7 +623,7 @@ public class SnittWindow extends JFrame {
 				    for(int i = 0; i < headerCheckBox.length; i++) {
 				        headerList[i] = headerCheckBox[i].isSelected();
 				    }
-				    int align = DataManager.getOrientation(AlignmentWindow.SNITT_OWNER);
+				    int align = AlignmentManager.getOrientation(AlignmentWindow.SNITT_OWNER);
 					snitt.outputToHTML(list, surface, compareSurface, headerList, align);
 					setMessage("Snittlistan är sparad som webbsida.", true);
 				} catch (IOException ioe) {
@@ -764,7 +764,7 @@ public class SnittWindow extends JFrame {
 			JOptionPane.showMessageDialog(frame, "Sparandet av fillistan" +
 					" misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 		}
-		Settings.set("snittTabIndex", new Integer(tab.getSelectedIndex()));
+		DataStore.set("snittTabIndex", new Integer(tab.getSelectedIndex()));
 		SearchWindow.SNITTOPEN = false;
 		frame.dispose();
 	}

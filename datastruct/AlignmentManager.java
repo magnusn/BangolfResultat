@@ -13,13 +13,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 /**
- * DataManager - håller reda på olika inställningar
+ * AlignmentManager - håller reda på olika inställningar
  */
-public class DataManager {
+public class AlignmentManager {
     private static int[] orientation;	// håller reda på sifferorienteringen
     
     /** skapar en klass för att hålla reda på inställningar */
-    public DataManager() {
+    public AlignmentManager() {
         orientation = new int[AlignmentWindow.NBR_OWNERS];
         for(int i = 0; i < orientation.length; i++) {
             orientation[i] = AlignmentWindow.RIGHT;

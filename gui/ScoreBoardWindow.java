@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import datastruct.CompareFile;
-import datastruct.DataManager;
+import datastruct.AlignmentManager;
 import datastruct.ResultList;
 
 /** beskriver fönstret som visar de inmatade resultaten */
@@ -245,7 +245,7 @@ class ScoreBoardWindow {
 	
 	/** tar reda på hur siffrorna skall vara orienterade */
 	private int getAlignment() {
-	    int align = DataManager.getOrientation(AlignmentWindow.COMP_OWNER);
+	    int align = AlignmentManager.getOrientation(AlignmentWindow.COMP_OWNER);
 	    if(align == AlignmentWindow.LEFT) {
 	        align = GridBagConstraints.WEST;
 	    } else if(align == AlignmentWindow.CENTER) {

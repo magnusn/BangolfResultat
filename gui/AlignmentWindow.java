@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
-import datastruct.DataManager;
+import datastruct.AlignmentManager;
 
 /**
  * NumberOrientationWindow - beskriver fönstret som används för inställning av sifferorienteringen
@@ -31,7 +31,7 @@ public class AlignmentWindow extends JDialog {
     private JRadioButton[] orientation;		// radioknappar för de olika orienteringsmöjligheterna
     private JButton acceptButton;			// knapp för att acceptera de nya inställingarna
     private JButton cancelButton;			// knapp för att avbryta
-    private DataManager dataManager;		// håller reda på inställningarna;
+    private AlignmentManager alignmentManager;// håller reda på inställningarna
     public static final int LEFT = 0;		// heltalsvärde för vänsterjusterat
     public static final int CENTER = 1;		// heltalsvärde för centrerat
     public static final int RIGHT = 2;		// heltalsvärde för högerjusterat
@@ -41,12 +41,12 @@ public class AlignmentWindow extends JDialog {
     public static final int SNITT_OWNER = 1;// nummer för inställningar för snittlista
     
     /** skapar ett sifferorienteringsfönster till ägaren owner */
-    public AlignmentWindow(JFrame owner, int nbrOfOwner, DataManager dataManager) {
+    public AlignmentWindow(JFrame owner, int nbrOfOwner, AlignmentManager alignmentManager) {
         super(owner, "Sifferorientering", true);
         setResizable(false);
         thisWindow = this;
         this.nbrOfOwner = nbrOfOwner;
-        this.dataManager = dataManager;
+        this.alignmentManager = alignmentManager;
         
         ButtonHandler buttonHand = new ButtonHandler();
         acceptButton = new JButton("Ok");
@@ -69,7 +69,7 @@ public class AlignmentWindow extends JDialog {
         orientation[LEFT] = new JRadioButton("Vänsterjusterat");
         orientation[CENTER] = new JRadioButton("Centrerat");
         orientation[RIGHT] = new JRadioButton("Högerjusterat");
-        orientation[DataManager.getOrientation(nbrOfOwner)].setSelected(true);
+        orientation[AlignmentManager.getOrientation(nbrOfOwner)].setSelected(true);
         
         mainPanel.add(new JLabel("Ställ in önskad sifferjustering:"));
         for(int i = 0; i < orientation.length; i++) {
@@ -100,8 +100,8 @@ public class AlignmentWindow extends JDialog {
 			    } else {
 			        alignment = RIGHT;
 			    }
-			    if(DataManager.getOrientation(nbrOfOwner) != alignment) {
-			        dataManager.setOrientation(alignment, nbrOfOwner);
+			    if(AlignmentManager.getOrientation(nbrOfOwner) != alignment) {
+			        alignmentManager.setOrientation(alignment, nbrOfOwner);
 			        if(nbrOfOwner == AlignmentWindow.COMP_OWNER) {
 			            ResultInputWindow.BOARD.update(true);
 			        }
