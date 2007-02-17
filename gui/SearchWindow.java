@@ -655,7 +655,7 @@ public class SearchWindow {
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
 	    
-	    Object lookAndFeel = DataStore.get("lookAndFeel");
+	    Object lookAndFeel = DataStore.get(DataStore.LOOK_AND_FEEL);
 	    try {
 	    	if (lookAndFeel != null) {
 	    		UIManager.setLookAndFeel((String) lookAndFeel);
@@ -871,7 +871,7 @@ public class SearchWindow {
 				String java = "Java";
 				String system = "Naturlig";
 				String initialSelectionValue = java;
-				Object lookAndFeel = DataStore.get("lookAndFeel");
+				Object lookAndFeel = DataStore.get(DataStore.LOOK_AND_FEEL);
 				if (lookAndFeel != null) {
 					if (((String) lookAndFeel).equals(
 							UIManager.getSystemLookAndFeelClassName())) {
@@ -884,9 +884,9 @@ public class SearchWindow {
 						null, new String[]{java,system}, initialSelectionValue);
 				if (newLookAndFeel != null) {
 					if (newLookAndFeel.equals(java)) {
-						DataStore.set("lookAndFeel",	UIManager.getCrossPlatformLookAndFeelClassName());
+						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getCrossPlatformLookAndFeelClassName());
 					} else if (newLookAndFeel.equals(system)) {
-						DataStore.set("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
+						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 					}
 				}
 			}

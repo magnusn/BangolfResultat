@@ -10,6 +10,14 @@ import javax.swing.JOptionPane;
  * This class stores data.
  */
 public class DataStore {
+	/* List of keys. */
+	public static final String LOOK_AND_FEEL = "lookAndFeel";
+	public static final String SNITT_EXCL_CLUBS = "snittExclClubs";
+	public static final String SNITT_FILE_MAP = "snittFileMap";
+	public static final String SNITT_TAB_INDEX = "snittTabIndex";
+	public static final String SNITT_TAB_TITLE = "snittTabTitle";
+	/* End of list of keys. */
+	
 	private static Hashtable dataStore;
 	private static final String filename = "datastore";
 	
@@ -49,7 +57,7 @@ public class DataStore {
 			if (dataStore == null)
 				dataStore = new Hashtable();
 		} catch (Exception e) {
-			File file = new File(IOHandler.dataPath + filename);
+			File file = new File(IOHandler.DATA_PATH + filename);
 			if (file.exists()) {
 				JOptionPane.showMessageDialog(null,
 						"Data ifrån filen '" + filename + "' går inte att " +

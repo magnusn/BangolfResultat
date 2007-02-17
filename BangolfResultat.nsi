@@ -120,9 +120,6 @@ Section "MainSection" SEC01
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\ptrack"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snitt"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittapp"
-  File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittclub"
-  File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittitle"
-  File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittmap"
   File "${PRODUCT_WORKSPACE}\BangolfResultat\installer\data\snittstring"
 SectionEnd
 
@@ -164,9 +161,6 @@ Section Uninstall
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\data\snittstring"
-  Delete "$INSTDIR\data\snittmap"
-  Delete "$INSTDIR\data\snittitle"
-  Delete "$INSTDIR\data\snittclub"
   Delete "$INSTDIR\data\snittapp"
   Delete "$INSTDIR\data\snitt"
   Delete "$INSTDIR\data\ptrack"
