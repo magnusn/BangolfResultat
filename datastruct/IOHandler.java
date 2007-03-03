@@ -162,9 +162,9 @@ public class IOHandler {
 		bufferOut.newLine();
 		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-//		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://web.telia.com/~u44802129/\" target=\"_top\">"
+//		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.webhop.org/\" target=\"_top\">"
 //										+ "BangolfResultat</a></div>");
-		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://web.telia.com/~u44802129/\">"
+		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.webhop.org/\">"
 				+ "BangolfResultat</a></div>");
 		bufferOut.newLine();
 		bufferOut.write("</body>");

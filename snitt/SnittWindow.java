@@ -160,9 +160,10 @@ public class SnittWindow extends JFrame {
 					fileMap[i] = new HashMap();
 				}
 				
-				/** Hanterar övergång från en HashMap för alla snittlistor till en
-				 *  HashMap för varje snittlista */
 				File file = new File(IOHandler.DATA_PATH + "snittmap");
+				/* Hanterar övergång från en HashMap för alla snittlistor till
+				 * en HashMap för varje snittlista.
+				 */
 				if (file.exists()) {
 					HashMap oldFileMap = (HashMap) io.load("snittmap");
 					
@@ -177,10 +178,19 @@ public class SnittWindow extends JFrame {
 						}
 					}
 					file.delete();
+				} 
+				/* Om filen inte existerar måste vi se till att även snittList
+				 * är tom.
+				 */
+				else {
+					for(int i = 0; i < snittList.length; i++) {
+						snittList[i] = new ListPanel(new Vector(), new Vector());
+					}
 				}
 			}
-			/** Hanterar fallet när antalet snittlistor i den inlästa filen
-			 *  skiljer sig ifrån det verkliga antalet. */
+			/* Hanterar fallet när antalet snittlistor i den inlästa filen
+			 * skiljer sig ifrån det verkliga antalet.
+			 */
 			else if (fileMap.length != NBR_SNITT) {
 				HashMap[] tempFileMap = new HashMap[NBR_SNITT];
 				for (int i = 0; i < tempFileMap.length; ++i) {
