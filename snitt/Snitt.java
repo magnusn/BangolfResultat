@@ -2,20 +2,20 @@ package snitt;
 
 import gui.AlignmentWindow;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Comparator;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.LinkedList;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
@@ -65,7 +65,7 @@ public class Snitt {
 		String[] files = fileNames;
 		HashMap personNameTracker = personNameTrack;
 		for(int i = 0; i < files.length; i++) {
-			BufferedReader fileIn = new BufferedReader(new FileReader(files[i]));
+			BufferedReader fileIn = IOHandler.getTextFileReader(files[i]);
 			String inLine = fileIn.readLine();
 			inLine = fileIn.readLine();
 			inLine = fileIn.readLine();
@@ -112,6 +112,7 @@ public class Snitt {
 				}
 				inLine = fileIn.readLine();
 			}
+			fileIn.close();
 		}
 	}
 	
@@ -122,7 +123,7 @@ public class Snitt {
 		String[] files = fileNames;
 		HashMap map = new HashMap();
 		for(int i = 0; i < files.length; i++) {
-			BufferedReader fileIn = new BufferedReader(new FileReader(files[i]));
+			BufferedReader fileIn = IOHandler.getTextFileReader(files[i]);
 			String inLine = fileIn.readLine();
 			inLine = fileIn.readLine();
 			inLine = fileIn.readLine();
@@ -141,6 +142,7 @@ public class Snitt {
 				}
 				inLine = fileIn.readLine();
 			}
+			fileIn.close();
 		}
 		return map;
 	}
@@ -207,7 +209,9 @@ public class Snitt {
 		
 		LinkedList res = list;
 		
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter bufferOut = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8")
+		);
 		
 		bufferOut.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
 		bufferOut.newLine();
@@ -215,9 +219,9 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write("<head>");
 		bufferOut.newLine();
-		bufferOut.write("<title>" + header + "</title>");
+		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 		bufferOut.newLine();
-		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=WINDOWS-1252\">");
+		bufferOut.write("<title>" + header + "</title>");
 		bufferOut.newLine();
 		bufferOut.write("<style type=\"text/css\">" +
 				"body {font-family: arial} " +
@@ -344,7 +348,7 @@ public class Snitt {
 	public void outputToCompareFile(LinkedList list, int surface) throws IOException {
 		LinkedList res = list;
 		
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter bufferOut = IOHandler.getTextFileWriter(fileName);
 		bufferOut.write(String.valueOf(surface));
 		bufferOut.newLine();
 		
@@ -370,7 +374,7 @@ public class Snitt {
 	
 	/** läser jämförelsefilens snittlista fileName */
 	public int readCompareFile(String fileName) throws IOException {
-	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+	    BufferedReader fileIn = IOHandler.getTextFileReader(fileName);
 		int surface = Integer.parseInt(fileIn.readLine());
 		String inLine = fileIn.readLine();
 		
@@ -397,6 +401,7 @@ public class Snitt {
 			}
 			inLine = fileIn.readLine();
 		}
+		fileIn.close();
 		return surface;
 	}
 	

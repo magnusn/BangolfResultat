@@ -1,14 +1,12 @@
 package datastruct;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.LinkedList;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.util.StringTokenizer;
 
 /** klassen som beskriver namnlistan */
 public class NameList {
@@ -60,7 +58,7 @@ public class NameList {
 	
 	/** läser in personer till listan från en fil */
 	public void readNames() throws FileNotFoundException, IOException {
-		BufferedReader fileIn = new BufferedReader(new FileReader("data/namn"));
+		BufferedReader fileIn = IOHandler.getTextFileReader("data/namn");
 		String inLine = fileIn.readLine();
 		String name,club,identity;
 		while (inLine != null) {
@@ -71,12 +69,13 @@ public class NameList {
 			map.put(identity, identity);
 			inLine = fileIn.readLine();
 		}
+		fileIn.close();
 		sortedNames();
 	}
 	
 	/** skriver namnlistan till en fil */
 	public void writeNames() throws IOException {
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter("data/namn"));
+		BufferedWriter bufferOut = IOHandler.getTextFileWriter("data/namn");
 		LinkedList list = sortNames();
 		for(int i = 0; i < list.size()-1; i++) {
 			bufferOut.write((String)list.get(i));

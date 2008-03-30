@@ -3,7 +3,7 @@ package datastruct;
 import gui.AlignmentWindow;
 
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.NoSuchElementException;
@@ -67,16 +68,18 @@ public class IOHandler {
 		String startColSum = "<td style=\"text-align:" + alignment + "\">";
 		String endCol = "</td>";
 		
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter bufferOut = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8")
+		);
 		bufferOut.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
 		bufferOut.newLine();
 		bufferOut.write("<html lang=\"sv\">");
 		bufferOut.newLine();
 		bufferOut.write("<head>");
 		bufferOut.newLine();
-		bufferOut.write("<title>" + header + "</title>");
+		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 		bufferOut.newLine();
-		bufferOut.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=WINDOWS-1252\">");
+		bufferOut.write("<title>" + header + "</title>");
 		bufferOut.newLine();
 		bufferOut.write("<style type=\"text/css\">" +
 				"body {font-family: arial} " +
@@ -162,8 +165,6 @@ public class IOHandler {
 		bufferOut.newLine();
 		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-//		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.webhop.org/\" target=\"_top\">"
-//										+ "BangolfResultat</a></div>");
 		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.webhop.org/\">"
 				+ "BangolfResultat</a></div>");
 		bufferOut.newLine();
@@ -179,7 +180,7 @@ public class IOHandler {
 	public void outputToSKV(String fileName, String fileNameHTM, ResultList result, 
 													String header, boolean[] editData) throws IOException {
 		LinkedList res = result.sortResults();
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter bufferOut = getTextFileWriter(fileName);
 		
 		if(header.equals("")) {
 			header = " ";
@@ -243,7 +244,7 @@ public class IOHandler {
 	/** skriver ut resultatlistan result till en semikolonseparerad fil med namnet fileName där tävlingens namn sätts till header */
 	public void outputToSNITT(String fileName, CompareFile compareFile) throws IOException {
 		LinkedList res = compareFile.sortResults();
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter bufferOut = getTextFileWriter(fileName);
 		
 		bufferOut.write(String.valueOf(compareFile.getSurface()));
 		for(int i = 0; i < res.size(); i++) {
@@ -274,7 +275,7 @@ public class IOHandler {
 		startData[0] = false;
 		startData[1] = false;
 		Object[] objects = new Object[5];
-		BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+		BufferedReader fileIn = getTextFileReader(fileName);
 		String inLine = fileIn.readLine();
 		StringTokenizer inString = new StringTokenizer(inLine, ";");
 		String header = inString.nextToken();
@@ -345,6 +346,7 @@ public class IOHandler {
 				inLine = fileIn.readLine();
 			}
 		}
+		fileIn.close();
 		objects[2] = res;
 		objects[3] = startNbrMap;
 		objects[4] = editData;
@@ -354,7 +356,7 @@ public class IOHandler {
 	/** läser in resultat från en semikolonseparerad fil med filnamnet fileName 
 	 	returnerar tävlingens namn, resultatlista samt startnummer- och idnummerhashmap */
 	public CompareFile inputFromSNITT(String fileName) throws IOException, NoSuchElementException {
-	    BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+	    BufferedReader fileIn = getTextFileReader(fileName);
 	    String inLine = fileIn.readLine();
 	    int surface = Integer.parseInt(inLine);
 	    CompareFile compareFile = new CompareFile(surface);
@@ -374,6 +376,7 @@ public class IOHandler {
 	            inLine = fileIn.readLine();
 	        }
 	    }
+	    fileIn.close();
 	    return compareFile;
 	}
 	
@@ -381,7 +384,7 @@ public class IOHandler {
 		utifrån innehållet i vektorn v */
 	public void writeFileList(String fileName, Vector[] v) throws IOException {
 		Vector[] vector = v;
-		BufferedWriter bufferOut = new BufferedWriter(new FileWriter(DATA_PATH + fileName));
+		BufferedWriter bufferOut = getTextFileWriter(DATA_PATH + fileName);
 		for(int i = 0; i < vector.length; i++) {
 			if(i%2 == 0) {
 				bufferOut.write("Unselected");
@@ -404,7 +407,7 @@ public class IOHandler {
 		for(int i = 0; i < vector.length; i++) {
 			vector[i] = new Vector();
 		}
-		BufferedReader fileIn = new BufferedReader(new FileReader(DATA_PATH + fileName));
+		BufferedReader fileIn = getTextFileReader(DATA_PATH + fileName);
 		String inLine = fileIn.readLine();
 		int i = -1;
 		while(inLine != null && !inLine.trim().equals("")) {
@@ -415,18 +418,71 @@ public class IOHandler {
 			}
 			inLine = fileIn.readLine();
 		}
+		fileIn.close();
 		return vector;
 	}
 	
 	/** läser av vilken sorts underlag tävlingen i filen fileName har spelats på */
 	public int readSurface(String fileName) throws IOException, NoSuchElementException {
-		BufferedReader fileIn = new BufferedReader(new FileReader(fileName));
+		BufferedReader fileIn = getTextFileReader(fileName);
 		String inLine = fileIn.readLine();
 		inLine = fileIn.readLine();
 		StringTokenizer inString = new StringTokenizer(inLine, ";");
 		inString.nextToken();
 		int surface = Integer.parseInt(inString.nextToken());
+		fileIn.close();
 		return surface;
+	}
+	
+	/**
+	 * Returns a {@link BufferedReader} for the given file name. The file will
+	 * be read according to charset UTF-8 if the first line in the file equals
+	 * <tt>UTF-8</tt>, otherwise the default charset will be used.
+	 * 
+	 * @param fileName		name of the file to read
+	 * @return				a BufferedReader for the file represented by the
+	 * 						given file name
+	 * @throws IOException	if an I/O error occurs
+	 */
+	public static BufferedReader getTextFileReader(String fileName) throws IOException {
+		BufferedReader fileIn = new BufferedReader(new InputStreamReader(
+        		new FileInputStream(fileName), "UTF-8"
+        ));
+	    // ---------------------- check charset ---------------------------
+		String inLine = fileIn.readLine();
+		if (inLine == null)
+		{
+			// do nothing, default charset will be used
+		}
+		else if (inLine.equals("UTF-8"))
+		{
+			return fileIn;
+		}
+		
+		// use default charset
+		fileIn.close();
+		return new BufferedReader(new FileReader(fileName));
+		// ----------------------------------------------------------------
+	}
+	
+	/**
+	 * Returns a {@link BufferedWriter} for the given file name. Charset UTF-8
+	 * is used and this method writes the first line of the file as
+	 * <tt>UTF-8</tt> before the {@link BufferedWriter} is returned.
+	 * 
+	 * @param fileName		name of the file for which to get a
+	 * 						{@link BufferedWriter}
+	 * @return				a {@link BufferedWriter} using charset UTF-8
+	 * @throws IOException	if an I/O error occurs
+	 */
+	public static BufferedWriter getTextFileWriter(String fileName) throws IOException {
+        BufferedWriter bufferOut = new BufferedWriter(
+        		new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8")
+        );
+        bufferOut.write("UTF-8");
+        bufferOut.newLine();
+        
+        return bufferOut;
 	}
 	
 	/** sparar objektet o till filen file */
@@ -456,15 +512,17 @@ public class IOHandler {
 	public static boolean logError(Throwable throwable) {
 	    LinkedList list = new LinkedList();
         try {
-            BufferedReader fileIn = new BufferedReader(new FileReader("error.log"));
+        	BufferedReader fileIn = getTextFileReader("error.log");
             String inLine = fileIn.readLine();
             while(inLine != null) {
                 list.add(inLine);
                 inLine = fileIn.readLine();
             }
+            fileIn.close();
         } catch (Exception e) {}
         try {
-            PrintStream printStream = new PrintStream("error.log");
+            PrintStream printStream = new PrintStream("error.log", "UTF-8");
+            printStream.println("UTF-8");
             Date date = new Date(System.currentTimeMillis());
             printStream.println(date.toString());
 	        throwable.printStackTrace(printStream);

@@ -252,10 +252,17 @@ public class ResultList {
 						nbrRoundsPlayed--;
 					}
 					if(varv < nbrRounds) {
+						// delsummor
 						if(lapSum[varv-2]) {
 							j++;
-							output[i+k][j] = String.valueOf(pr.getSum(varv));
-							outputStyle[i+k][j] = "S:a" + getColor(pr.getSum(varv), varv);
+							int nbrRoundsPlayedThisFar = varv - (nbrRoundsFinished - nbrRoundsPlayed);
+							if (nbrRoundsPlayedThisFar != 0) {
+								output[i+k][j] = String.valueOf(pr.getSum(varv));
+								outputStyle[i+k][j] = "S:a" + getColor(pr.getSum(varv), nbrRoundsPlayedThisFar);
+							} else {
+								output[i+k][j] = "-";
+								outputStyle[i+k][j] = "black";
+							}
 						}
 					}
 					varv++;

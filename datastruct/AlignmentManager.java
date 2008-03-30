@@ -9,8 +9,6 @@ import gui.AlignmentWindow;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 
 /**
  * AlignmentManager - håller reda på olika inställningar
@@ -31,7 +29,8 @@ public class AlignmentManager {
      */
     public boolean loadOrientation() {
         try {
-            BufferedReader fileIn = new BufferedReader(new FileReader("data/orientation"));
+            BufferedReader fileIn =
+            	IOHandler.getTextFileReader("data/orientation");
             String inLine = fileIn.readLine();
             int i = 0;
             while(inLine != null) {
@@ -39,6 +38,7 @@ public class AlignmentManager {
                 i++;
                 inLine = fileIn.readLine();
             }
+            fileIn.close();
             return true;
         } catch (Exception e) {
             return false;
@@ -50,7 +50,8 @@ public class AlignmentManager {
      */
     public boolean saveOrientation() {
         try {
-            BufferedWriter bufferOut = new BufferedWriter(new FileWriter("data/orientation"));
+            BufferedWriter bufferOut =
+            	IOHandler.getTextFileWriter("data/orientation");
             for(int i = 0; i < orientation.length; i++) {
                 bufferOut.write(String.valueOf(orientation[i]));
                 bufferOut.newLine();
