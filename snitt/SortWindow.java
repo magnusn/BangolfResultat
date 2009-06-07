@@ -41,6 +41,7 @@ public class SortWindow extends JDialog {
 		
 		io = new IOHandler();
 		map = new HashMap();
+		map.put("Klass", new Integer(Snitt.KLASS));
 		map.put("Namn", new Integer(Snitt.NAME));
 		map.put("Klubb", new Integer(Snitt.CLUB));
 		map.put("Tävlingar", new Integer(Snitt.COMPS));
@@ -52,8 +53,10 @@ public class SortWindow extends JDialog {
 		try {
 			sortVector = io.readFileList("compare", nbrTabs*2);
 			boolean differentLengths = false;
+			int expectedSizeOfVectors = getSelectionStartVector().size() + getSelectedStartVector().size();
 			for(int i = 0; i < nbrTabs; i++) {
-			    if((sortVector[i*2].size() + sortVector[i*2 + 1].size()) == 0) {
+				int sizeOfVectors = sortVector[i*2].size() + sortVector[i*2 + 1].size();
+			    if(sizeOfVectors == 0 || sizeOfVectors != expectedSizeOfVectors) {
 			        differentLengths = true;
 			        break;
 			    }
@@ -112,6 +115,7 @@ public class SortWindow extends JDialog {
 	/** returnerar standardinställningens vektor för det valbara fältet */
 	private Vector getSelectionStartVector() {
 	    Vector vector = new Vector();
+	    vector.add("Klass");
 		vector.add("Namn");
 		vector.add("Klubb");
 		vector.add("Tävlingar");

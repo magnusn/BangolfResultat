@@ -65,12 +65,16 @@ public class NameList {
 		String name,club,identity;
 		while (inLine != null) {
 			StringTokenizer inString = new StringTokenizer(inLine, ",");
-			name = inString.nextToken();
-			club = inString.nextToken();
-			identity = name+","+club;
-			map.put(identity, identity);
+			if (inString.countTokens() >= 2)
+			{
+				name = inString.nextToken();
+				club = inString.nextToken();
+				identity = name+","+club;
+				map.put(identity, identity);
+			}
 			inLine = fileIn.readLine();
 		}
+		fileIn.close();
 		sortedNames();
 	}
 	

@@ -49,20 +49,10 @@ public class IOHandler {
 		String startColName = "<td>";
 		String startColClub = "<td>";
 		String startColResult;
-		String colWidth;
-		String startNbrColWidth = "50px";
-		String placeNbrColWidth = "50px";
-		String licenseColWidth = "110px";
-		String nameColWidth = "160px";
-		String clubColWidth = "95px";
-		String resultColWidth;
-		String sumColWidth = "30px";
 		if(res.getNbrRounds() <= 5) {
 			startColResult = "<td style=\"text-align:" + alignment + "\">";
-			resultColWidth = "50px";
 		} else {
 			startColResult = "<td style=\"text-align:" + alignment + "\">";
-			resultColWidth = "28px";
 		}
 		String startColSum = "<td style=\"text-align:" + alignment + "\">";
 		String endCol = "</td>";
@@ -80,7 +70,7 @@ public class IOHandler {
 		bufferOut.newLine();
 		bufferOut.write("<style type=\"text/css\">" +
 				"body {font-family: arial} " +
-				"td {font-size: 10.0pt; vertical-align: super; white-space: nowrap} " +
+				"td {font-size: 10.0pt; padding-right: 10px; vertical-align: super; white-space: nowrap}" +
 				"</style>");
 		bufferOut.newLine();
 		bufferOut.write("</head>");
@@ -111,40 +101,34 @@ public class IOHandler {
 						boldStop = "</b>";
 						outputStyle[i][j] = "black";
 					} else if(outputStyle[i][j].equals("Bold+")) {
+						// Hantering av klassrubrik
 						boldStart = "<b style=\"font-size:12.0pt\">";
 						boldStop = "</b>";
 						outputStyle[i][j] = "black";
-					} 
+						bufferOut.write("<td colspan=\"0\">" + boldStart + output[i][j] + boldStop + endCol);
+						bufferOut.newLine();
+						break;
+					}
 					if(output[i][j] == null) {
 						output[i][j] = "";
 						startCol = startColEmpty;
-						colWidth = "";
 					} else if(j == 0) {
 						startCol = startColName;
-						colWidth = nameColWidth;
 					} else if(j == 1) {
 						startCol = startColClub;
-						colWidth = clubColWidth;
 					} else if(j == 2 && extras[1]) {
 						startCol = startColLicense;
-						colWidth = licenseColWidth;
 					} else if((j == 2 && extras[2]) || (j == 3 && (extras[1] && extras[2]))) {
 						startCol = startColStartNbr;
-						colWidth = startNbrColWidth;
 					} else if((j == output[i].length-1 && extras[0]) || (j == output[i].length-2 && extras[0])) {
 						startCol = startColPlaceNbr;
-						colWidth = placeNbrColWidth;
 					} else {
 						startCol = startColResult;
-						colWidth = resultColWidth;
 					}
 					if(outputStyle[i][j].startsWith("S:a") || output[i][j].startsWith("S:a")) {
 					    startCol = startColSum;
-					    colWidth = sumColWidth;
 					    outputStyle[i][j] = outputStyle[i][j].replaceFirst("S:a", "");
 					}
-					if (! boldStart.equals(""))
-						startCol = addStyle(startCol, "width", colWidth);
 					if (! outputStyle[i][j].equals("black"))
 						startCol = addStyle(startCol, "color", outputStyle[i][j]);
 					bufferOut.write(startCol + boldStart + output[i][j] + boldStop + endCol);

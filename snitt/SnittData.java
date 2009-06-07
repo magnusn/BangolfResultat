@@ -20,7 +20,7 @@ public class SnittData {
     private JCheckBox[][] headers;	// talar om vad som skall visas i snittlistan
     private String[] files;			// innehåller adresser till jämförelsefilerna
     private int nbrTabs;			// anger antal olika snittlistor
-    protected static final int NBR_HEADERS = 8;	// antal möjliga rubriker
+    protected static final int NBR_HEADERS = 9;	// antal möjliga rubriker
     
     /** skapar en klass för snittlistornas inställningar */
     protected SnittData(int nbrTabs) {
@@ -34,7 +34,7 @@ public class SnittData {
         boolean success = false;
         try {
             headers = (JCheckBox[][]) io.load("snittapp");
-            if(headers.length != nbrTabs) {
+            if(headers.length != nbrTabs || headers[0].length != NBR_HEADERS) {
                 JCheckBox[][] tempHeaders = new JCheckBox[nbrTabs][NBR_HEADERS];
                 for(int i = 0; i < nbrTabs; i++) {
                 	if (headers[0].length == tempHeaders[0].length && headers.length > i) {
@@ -62,6 +62,7 @@ public class SnittData {
     /** returnerar originalinställningarna för utseende gällande flik tabIndex */
     private JCheckBox[] getStandardHeaders(int tabIndex) {
         JCheckBox[] standardHeaders = new JCheckBox[NBR_HEADERS];
+        standardHeaders[Snitt.KLASS] = new JCheckBox("Klass", false);
         standardHeaders[Snitt.NAME] = new JCheckBox("Namn", true);
         standardHeaders[Snitt.NAME].setEnabled(false);
         standardHeaders[Snitt.NAME].setToolTipText("Visas alltid");
