@@ -193,6 +193,7 @@ Section Uninstall
   Delete "$INSTDIR\doc\snitt.htm"
   Delete "$INSTDIR\doc\om.htm"
   Delete "$INSTDIR\doc\manual.htm"
+  Delete "$INSTDIR\doc\knownissues.htm"
   Delete "$INSTDIR\doc\lookandfeel.htm"
   Delete "$INSTDIR\doc\comp.htm"
   Delete "$INSTDIR\doc\backup.htm"
