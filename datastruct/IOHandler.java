@@ -149,7 +149,7 @@ public class IOHandler {
 		bufferOut.newLine();
 		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.webhop.org/\">"
+		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.manet.se/\">"
 				+ "BangolfResultat</a></div>");
 		bufferOut.newLine();
 		bufferOut.write("</body>");

@@ -1,7 +1,7 @@
-© Magnus Nilsson 2004-2009
+© Magnus Hovén 2004-2015
 
 - Inget ansvar tas för om programmet mot förmodan skulle orsaka någon skada.
 - Programmet får användas av var och en.
-- Ifall Ni finner att programmet är till nytta mottages tacksamt donationer till utvecklingen. Titta på hemsidan, http://bangolfresultat.webhop.org/ för mer information.
+- Ifall Ni finner att programmet är till nytta mottages tacksamt donationer till utvecklingen. Titta på hemsidan, http://bangolfresultat.manet.se/ för mer information.
 - Programmet får spridas fritt så länge inga ändringar görs i detsamma.
 - Den här informationen får varken ändras eller tas bort vid eventuell spridning av programmet.
