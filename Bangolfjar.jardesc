@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jardesc>
-<jar path="E:/eclipse/workspace/BangolfResultat/installer/BangolfResultat.jar"/>
+<jar path="BangolfResultat/installer/BangolfResultat.jar"/>
 <options buildIfNeeded="true" compress="false" descriptionLocation="/BangolfResultat/Bangolfjar.jardesc" exportErrors="true" exportWarnings="true" overwrite="false" saveDescription="true" useSourceFolders="false"/>
 <manifest generateManifest="false" mainClassHandleIdentifier="=BangolfResultat/&lt;gui{SearchWindow.java[SearchWindow" manifestLocation="/BangolfResultat/bangolf.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">

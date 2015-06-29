@@ -8,7 +8,7 @@ import snitt.SnittData;
 
 /** beskriver tävlingsinformation för en person */
 public class Person {
-	private String name,club;		// namn och klubb
+	private String name,club,klass;	// namn, klubb och klass
 	private int idNbr;				// programmets identifikationsnummer för personen
 	private int comps,rounds,hits;	// antal tävlingar, varv och slag
 	private double oldMean;			// fjolårssnitt
@@ -17,10 +17,11 @@ public class Person {
 	
 	/** skapar resultat för en person med namnet name och klubben club 
 			antal tävlingar comps, antal varv rounds och antal slag hits */
-	public Person(int idNbr, String name, String club, int comps, int rounds, int hits) {
+	public Person(int idNbr, String name, String club, String klass, int comps, int rounds, int hits) {
 	    this.idNbr = idNbr;
 		this.name = name;
 		this.club = club;
+		this.klass = klass;
 		this.comps = comps;
 		this.rounds = rounds;
 		this.hits = hits;
@@ -41,6 +42,11 @@ public class Person {
 	/** returnerar klubben */
 	public String getClub() {
 		return club;
+	}
+	
+	/** returnerar klassen */
+	public String getKlass() {
+		return klass;
 	}
 	
 	/** returnerar antalet tävlingar */
@@ -90,6 +96,11 @@ public class Person {
 	/** ändrar klubben till club */
 	public void changeClub(String club) {
 		this.club = club;
+	}
+	
+	/** ändrar klubben till club */
+	public void changeKlass(String klass) {
+		this.klass = klass;
 	}
 	
 	/** sätter fjolårssnittet till oldMean */

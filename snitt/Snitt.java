@@ -27,14 +27,15 @@ import datastruct.ResultList;
 public class Snitt {
 	private HashMap map;				// datastruktur för att lagra resultat
 	private String fileName, header;	// filnamnet och rubriken
-	public static final int NAME = 0;	// siffran för namn som används vid sortering
-	public static final int CLUB = 1;	// siffran för klubb som används vid sortering
-	public static final int COMPS = 2;	// siffran för tävlingar som används vid sortering
-	public static final int ROUNDS = 3;	// siffran för varv som används vid sortering
-	public static final int HITSUM = 4;	// siffran för slagsumma som används vid sortering
-	public static final int MEAN = 5;	// siffran för snitt som används vid sortering
-	public static final int EX_MEAN = 6;// siffran för fjolårssnitt som används vid sortering
-	public static final int CHANGE = 7;	// siffran för förändringen som används vid sortering
+	public static final int KLASS = 0;	// siffran för klass som används vid sortering
+	public static final int NAME = 1;	// siffran för namn som används vid sortering
+	public static final int CLUB = 2;	// siffran för klubb som används vid sortering
+	public static final int COMPS = 3;	// siffran för tävlingar som används vid sortering
+	public static final int ROUNDS = 4;	// siffran för varv som används vid sortering
+	public static final int HITSUM = 5;	// siffran för slagsumma som används vid sortering
+	public static final int MEAN = 6;	// siffran för snitt som används vid sortering
+	public static final int EX_MEAN = 7;// siffran för fjolårssnitt som används vid sortering
+	public static final int CHANGE = 8;	// siffran för förändringen som används vid sortering
 	private int[][] compare;			// vektorn som håller reda på vad snittlistan skall sorteras efter
 	private int tabIndex;				// talar om vilken snittlistsflik som är vald
 	
@@ -70,7 +71,7 @@ public class Snitt {
 			inLine = fileIn.readLine();
 			inLine = fileIn.readLine();
 			while (inLine != null) {
-				String name,club,identity;
+				String name,club,klass,identity;
 				int result,rounds,playedRounds;
 				result = 0;
 				playedRounds = 0;
@@ -80,7 +81,7 @@ public class Snitt {
 					name = inString.nextToken();
 					club = inString.nextToken();
 					inString.nextToken();
-					inString.nextToken();
+					klass = inString.nextToken();
 					inString.nextToken();
 					inString.nextToken();
 					rounds = Integer.parseInt(inString.nextToken());
@@ -102,12 +103,13 @@ public class Snitt {
 						Person p = (Person) map.get(identity);
 						p.changeName(name);
 						p.changeClub(club);
+						p.changeKlass(klass);
 						p.addComps();
 						p.addRounds(playedRounds);
 						p.addHits(result);
 					}
 					else {
-						map.put(identity, new Person(ident.intValue(), name, club, 1, playedRounds, result));
+						map.put(identity, new Person(ident.intValue(), name, club, klass, 1, playedRounds, result));
 					}
 				}
 				inLine = fileIn.readLine();
@@ -188,24 +190,17 @@ public class Snitt {
 //		String startColLeft = "<TD class=bgrleft>";
 //		String startColCenter = "<TD class=bgrcenter>";
 //		String startColRight = "<TD class=bgrright>";
-		String startColName = "<td style=\"width:160px\">";
-		String startColClub = "<td style=\"width:95px\">";
-		String startColComps = IOHandler.addStyle("<td style=\"width:60px\">", "text-align", alignment);
-		String startColRounds = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
-		String startColHitSum = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
-		String startColMean = IOHandler.addStyle("<td style=\"width:50px\">", "text-align", alignment);
-		String startColExMean = IOHandler.addStyle("<td style=\"width:65px\">", "text-align", alignment);
-		String startColChange = IOHandler.addStyle("<td style=\"width:45px\">", "text-align", alignment);
 		String endCol = "</td>";
 		String[] headers = new String[headerList.length];
-		headers[Snitt.NAME] = startColName + "<b>Namn</b>" + endCol;
-		headers[Snitt.CLUB] = startColClub + "<b>Klubb</b>" + endCol;
-		headers[Snitt.COMPS] = startColComps + "<b>Tävlingar</b>" + endCol;
-		headers[Snitt.ROUNDS] = startColRounds + "<b>Varv</b>" + endCol;
-		headers[Snitt.HITSUM] = startColHitSum + "<b>Slag</b>" + endCol;
-		headers[Snitt.MEAN] = startColMean + "<b>Snitt</b>" + endCol;
-		headers[Snitt.EX_MEAN] = startColExMean + "<b>Snitt ifjol</b>" + endCol;
-		headers[Snitt.CHANGE] = startColChange + "<b>+/-</b>" + endCol;
+		headers[Snitt.KLASS] = startCol + "<b>Klass</b>" + endCol;
+		headers[Snitt.NAME] = startCol + "<b>Namn</b>" + endCol;
+		headers[Snitt.CLUB] = startCol + "<b>Klubb</b>" + endCol;
+		headers[Snitt.COMPS] = startColAligned + "<b>Tävlingar</b>" + endCol;
+		headers[Snitt.ROUNDS] = startColAligned + "<b>Varv</b>" + endCol;
+		headers[Snitt.HITSUM] = startColAligned + "<b>Slag</b>" + endCol;
+		headers[Snitt.MEAN] = startColAligned + "<b>Snitt</b>" + endCol;
+		headers[Snitt.EX_MEAN] = startColAligned + "<b>Snitt ifjol</b>" + endCol;
+		headers[Snitt.CHANGE] = startColAligned + "<b>+/-</b>" + endCol;
 		
 		LinkedList res = list;
 		
@@ -225,7 +220,7 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write("<style type=\"text/css\">" +
 				"body {font-family: arial} " +
-				"td {font-size: 10.0pt; vertical-align: super; white-space: nowrap} " +
+				"td {font-size: 10.0pt; padding-right: 10px; vertical-align: super; white-space: nowrap} " +
 				"</style>");
 		bufferOut.newLine();
 		bufferOut.write("</head>");
@@ -240,7 +235,7 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write(startRow);
 		bufferOut.newLine();
-		bufferOut.write("<td style=\"width:59px; text-align:right\"><b>Ranking&nbsp;</b>" + endCol);
+		bufferOut.write("<td style=\"text-align:right\"><b>Ranking&nbsp;</b>" + endCol);
 		bufferOut.newLine();
 		for(int i = 0; i < headerList.length; i++) {
 		    if(headerList[i]) {
@@ -300,6 +295,7 @@ public class Snitt {
 			oldPerson = person;
 			
 			String[] data = new String[headerList.length];
+			data[Snitt.KLASS] = startCol + person.getKlass() + endCol;
 			data[Snitt.NAME] = startCol + person.getName() + endCol;
 			data[Snitt.CLUB] = startCol + person.getClub() + endCol;
 			data[Snitt.COMPS] = startColAligned + person.getComps() + endCol;
@@ -475,6 +471,7 @@ public class Snitt {
 			Object[] leftCompareBy = new Object[SnittData.NBR_HEADERS];
 			Object[] rightCompareBy = new Object[SnittData.NBR_HEADERS];
 			
+			leftCompareBy[KLASS] = left.getKlass();
 			leftCompareBy[NAME] = left.getName();
 			leftCompareBy[CLUB] = left.getClub();
 			leftCompareBy[COMPS] = new Integer(left.getComps());
@@ -483,6 +480,7 @@ public class Snitt {
 			leftCompareBy[MEAN] = new Integer((int) (left.getMean() * 100000));
 			leftCompareBy[EX_MEAN] = new Integer((int) (left.getOldMean() * 100));
 			leftCompareBy[CHANGE] = new Integer((int) (left.getDiff() * 100));
+			rightCompareBy[KLASS] = right.getKlass();
 			rightCompareBy[NAME] = right.getName();
 			rightCompareBy[CLUB] = right.getClub();
 			rightCompareBy[COMPS] = new Integer(right.getComps());

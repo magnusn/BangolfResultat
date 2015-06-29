@@ -901,7 +901,7 @@ public class SearchWindow {
     			String labelName = inString.nextToken();
     			String labelClub = inString.nextToken().trim();
     			String newName = JOptionPane.showInputDialog(frame, "Skriv in nytt namn", labelName);
-    			if(newName != null && newName.trim() != "") {
+    			if(newName != null && !newName.trim().equals("")) {
     				if(name.add(newName, labelClub)) {
     					name.remove(labelName, labelClub);
     					name.sortedNames();
@@ -923,7 +923,7 @@ public class SearchWindow {
     			String labelName = inString.nextToken();
     			String labelClub = inString.nextToken().trim();
     			String newClub = JOptionPane.showInputDialog(frame, "Skriv in ny klubb", labelClub);
-    			if(newClub != null && newClub.trim() != "") {
+    			if(newClub != null && !newClub.trim().equals("")) {
     				if(name.add(labelName, newClub)) {
     					name.remove(labelName, labelClub);
     					name.sortedNames();
