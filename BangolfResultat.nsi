@@ -7,9 +7,12 @@
 !define PRODUCT_WEB_SITE "http://bangolfresultat.manet.se/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+!define PRODUCT_INSTALL_KEY "Software\${PRODUCT_NAME}"
+!define PRODUCT_INSTALL_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
 !define PRODUCT_PROJECT_PATH "."
-;!define PRODUCT_WORKSPACE "C:\eclipse\workspace"
+!define PRODUCT_APPDATA_DIRECTORY "$APPDATA\${PRODUCT_NAME}"
+!define PRODUCT_DATA_DIRECTORY "${PRODUCT_APPDATA_DIRECTORY}\data"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -51,10 +54,23 @@ var ICONS_GROUP
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "installer\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
 InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+InstallDirRegKey ${PRODUCT_INSTALL_ROOT_KEY} "${PRODUCT_INSTALL_KEY}" "InstallDir"
+RequestExecutionLevel admin
 ShowInstDetails show
 ShowUnInstDetails show
 
 Section "MainSection" SEC01
+  IfFileExists "$INSTDIR\data" MoveDataFolder Continue
+  MoveDataFolder:
+    ClearErrors
+    CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_DATA_DIRECTORY}\"
+    IfErrors AskForRetry RemoveSource
+    AskForRetry:
+      MessageBox MB_ICONQUESTION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}.$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." IDRETRY MoveDataFolder IDIGNORE Continue
+      Abort "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}."
+    RemoveSource:
+      RMDir "$INSTDIR\data"
+  Continue:
   SetOutPath "$INSTDIR"
   SetOverwrite on
   File "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
@@ -96,9 +112,10 @@ Section "MainSection" SEC01
   File "${PRODUCT_PROJECT_PATH}\doc\system.htm"
   File "${PRODUCT_PROJECT_PATH}\doc\versionhistory.htm"
   File "${PRODUCT_PROJECT_PATH}\doc\webbsida.htm"
-  SetOutPath "$INSTDIR\data"
-  SetOverwrite off
+  SetOutPath "${PRODUCT_DATA_DIRECTORY}"
+  File "${PRODUCT_PROJECT_PATH}\installer\data\ikoner.icl"
   File "${PRODUCT_PROJECT_PATH}\installer\data\brikon.gif"
+  SetOverwrite off
   File "${PRODUCT_PROJECT_PATH}\installer\data\classorder"
   File "${PRODUCT_PROJECT_PATH}\installer\data\compare"
   File "${PRODUCT_PROJECT_PATH}\installer\data\compareby"
@@ -109,7 +126,6 @@ Section "MainSection" SEC01
   File "${PRODUCT_PROJECT_PATH}\installer\data\dirjmf"
   File "${PRODUCT_PROJECT_PATH}\installer\data\dirskv"
   File "${PRODUCT_PROJECT_PATH}\installer\data\dirsnitt"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\ikoner.icl"
   File "${PRODUCT_PROJECT_PATH}\installer\data\klass"
   File "${PRODUCT_PROJECT_PATH}\installer\data\klassmap"
   File "${PRODUCT_PROJECT_PATH}\installer\data\klasstring"
@@ -129,8 +145,8 @@ Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-  CreateShortCut "$DESKTOP\BangolfResultat.lnk" "$INSTDIR\BangolfResultat.jar" "" "$INSTDIR\data\ikoner.icl" 0 SW_SHOWNORMAL
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk" "$INSTDIR\BangolfResultat.jar" "" "$INSTDIR\data\ikoner.icl" 0 SW_SHOWNORMAL
+  CreateShortCut "$DESKTOP\BangolfResultat.lnk" "$INSTDIR\BangolfResultat.jar" "" "${PRODUCT_DATA_DIRECTORY}\ikoner.icl" 0 SW_SHOWNORMAL
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk" "javaw.exe" '-jar "$INSTDIR\BangolfResultat.jar"' "${PRODUCT_DATA_DIRECTORY}\ikoner.icl" 0 SW_SHOWNORMAL
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Manual.lnk" "$INSTDIR\doc\manual.htm"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Hemsida.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
@@ -144,6 +160,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+  WriteRegStr ${PRODUCT_INSTALL_ROOT_KEY} "${PRODUCT_INSTALL_KEY}" "InstallDir" "$INSTDIR"
 SectionEnd
 
 
@@ -161,30 +178,30 @@ Section Uninstall
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\data\snittstring"
-  Delete "$INSTDIR\data\snittapp"
-  Delete "$INSTDIR\data\snitt"
-  Delete "$INSTDIR\data\ptrack"
-  Delete "$INSTDIR\data\pnametrack"
-  Delete "$INSTDIR\data\orientation"
-  Delete "$INSTDIR\data\namn"
-  Delete "$INSTDIR\data\licensenamemap"
-  Delete "$INSTDIR\data\licensemap"
-  Delete "$INSTDIR\data\klasstring"
-  Delete "$INSTDIR\data\klassmap"
-  Delete "$INSTDIR\data\klass"
-  Delete "$INSTDIR\data\ikoner.icl"
-  Delete "$INSTDIR\data\dirsnitt"
-  Delete "$INSTDIR\data\dirskv"
-  Delete "$INSTDIR\data\dirjmf"
-  Delete "$INSTDIR\data\dirhtm"
-  Delete "$INSTDIR\data\directory"
-  Delete "$INSTDIR\data\datastore"
-  Delete "$INSTDIR\data\comparefiles"
-  Delete "$INSTDIR\data\compareby"
-  Delete "$INSTDIR\data\compare"
-  Delete "$INSTDIR\data\classorder"
-  Delete "$INSTDIR\data\brikon.gif"
+  Delete "${PRODUCT_DATA_DIRECTORY}\snittstring"
+  Delete "${PRODUCT_DATA_DIRECTORY}\snittapp"
+  Delete "${PRODUCT_DATA_DIRECTORY}\snitt"
+  Delete "${PRODUCT_DATA_DIRECTORY}\ptrack"
+  Delete "${PRODUCT_DATA_DIRECTORY}\pnametrack"
+  Delete "${PRODUCT_DATA_DIRECTORY}\orientation"
+  Delete "${PRODUCT_DATA_DIRECTORY}\namn"
+  Delete "${PRODUCT_DATA_DIRECTORY}\licensenamemap"
+  Delete "${PRODUCT_DATA_DIRECTORY}\licensemap"
+  Delete "${PRODUCT_DATA_DIRECTORY}\klasstring"
+  Delete "${PRODUCT_DATA_DIRECTORY}\klassmap"
+  Delete "${PRODUCT_DATA_DIRECTORY}\klass"
+  Delete "${PRODUCT_DATA_DIRECTORY}\ikoner.icl"
+  Delete "${PRODUCT_DATA_DIRECTORY}\dirsnitt"
+  Delete "${PRODUCT_DATA_DIRECTORY}\dirskv"
+  Delete "${PRODUCT_DATA_DIRECTORY}\dirjmf"
+  Delete "${PRODUCT_DATA_DIRECTORY}\dirhtm"
+  Delete "${PRODUCT_DATA_DIRECTORY}\directory"
+  Delete "${PRODUCT_DATA_DIRECTORY}\datastore"
+  Delete "${PRODUCT_DATA_DIRECTORY}\comparefiles"
+  Delete "${PRODUCT_DATA_DIRECTORY}\compareby"
+  Delete "${PRODUCT_DATA_DIRECTORY}\compare"
+  Delete "${PRODUCT_DATA_DIRECTORY}\classorder"
+  Delete "${PRODUCT_DATA_DIRECTORY}\brikon.gif"
   Delete "$INSTDIR\doc\webbsida.htm"
   Delete "$INSTDIR\doc\versionhistory.htm"
   Delete "$INSTDIR\doc\system.htm"
@@ -235,9 +252,11 @@ Section Uninstall
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
   RMDir "$INSTDIR\doc\bilder"
   RMDir "$INSTDIR\doc"
-  RMDir "$INSTDIR\data"
+  RMDir "${PRODUCT_DATA_DIRECTORY}"
+  RMDir "${PRODUCT_APPDATA_DIRECTORY}"
   RMDir /REBOOTOK "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+  DeleteRegKey ${PRODUCT_INSTALL_ROOT_KEY} "${PRODUCT_INSTALL_KEY}"
   SetAutoClose false
 SectionEnd
