@@ -57,7 +57,7 @@ public class DataStore {
 			if (dataStore == null)
 				dataStore = new Hashtable();
 		} catch (Exception e) {
-			File file = new File(IOHandler.DATA_PATH + filename);
+			File file = new File(IOHandler.getApplicationDataPath() + filename);
 			if (file.exists()) {
 				JOptionPane.showMessageDialog(null,
 						"Data ifrån filen '" + filename + "' går inte att " +

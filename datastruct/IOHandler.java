@@ -2,27 +2,28 @@ package datastruct;
 
 import gui.AlignmentWindow;
 
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.NoSuchElementException;
-import java.util.Vector;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
-	public static final String DATA_PATH = "data/";
+	private static String applicationDataPath = null;
 	
 	/** skapar ett objekt av klassen */
 	public IOHandler() {
@@ -368,7 +369,8 @@ public class IOHandler {
 		utifrån innehållet i vektorn v */
 	public void writeFileList(String fileName, Vector[] v) throws IOException {
 		Vector[] vector = v;
-		BufferedWriter bufferOut = getTextFileWriter(DATA_PATH + fileName);
+		BufferedWriter bufferOut = getTextFileWriter(getApplicationDataPath()
+				+ fileName);
 		for(int i = 0; i < vector.length; i++) {
 			if(i%2 == 0) {
 				bufferOut.write("Unselected");
@@ -391,7 +393,8 @@ public class IOHandler {
 		for(int i = 0; i < vector.length; i++) {
 			vector[i] = new Vector();
 		}
-		BufferedReader fileIn = getTextFileReader(DATA_PATH + fileName);
+		BufferedReader fileIn = getTextFileReader(getApplicationDataPath()
+				+ fileName);
 		String inLine = fileIn.readLine();
 		int i = -1;
 		while(inLine != null && !inLine.trim().equals("")) {
@@ -473,7 +476,7 @@ public class IOHandler {
 	public void save(String file, Object o) throws IOException {
 		FileOutputStream fos;
 		ObjectOutputStream os;
-		fos = new FileOutputStream(DATA_PATH + file);
+		fos = new FileOutputStream(getApplicationDataPath() + file);
 		os = new ObjectOutputStream(fos);
 		os.writeObject(o);
 		os.close();
@@ -484,7 +487,7 @@ public class IOHandler {
 		FileInputStream fis;
 		ObjectInputStream ois;
 		Object o = null;
-		fis = new FileInputStream(DATA_PATH + file);
+		fis = new FileInputStream(getApplicationDataPath() + file);
 		ois = new ObjectInputStream(fis);
 		o = ois.readObject();
 		ois.close();
@@ -550,4 +553,51 @@ public class IOHandler {
 		}
 		return tag;
 	}
+
+	/**
+	 * Returns the path to the application data directory where settings are
+	 * stored.
+	 * <p>
+	 * The path contains a trailing system-depending name-separator character.
+	 * 
+	 * @return the path to the application data directory
+	 */
+	public static String getApplicationDataPath() {
+		if (applicationDataPath == null) {
+			String dataPath = System.getProperty("applicationDataPath");
+			if (dataPath != null) {
+				applicationDataPath = getCanonicalPath(new File(dataPath));
+			} else {
+				String os = System.getProperty("os.name").toLowerCase();
+				if (os.contains("win")) {
+					String appDataFolder = System.getenv("AppData");
+					applicationDataPath = getCanonicalPath(new File(
+							appDataFolder + File.separator + "BangolfResultat"
+									+ File.separator + "data" + File.separator));
+				} else {
+					applicationDataPath = getCanonicalPath(new File("data"
+							+ File.separator));
+				}
+			}
+			applicationDataPath += File.separator;
+		}
+		return applicationDataPath;
+	}
+
+	/**
+	 * Returns the canonical path for the given file, or the absolute path if an
+	 * error occurs while getting the canonical path.
+	 * 
+	 * @param file
+	 *            file to get canonical path for
+	 * @return the canonical path, or the absolute path if an error occurs
+	 */
+	public static String getCanonicalPath(File file) {
+		try {
+			return file.getCanonicalPath();
+		} catch (IOException e) {
+			return file.getAbsolutePath();
+		}
+	}
+
 }

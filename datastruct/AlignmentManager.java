@@ -29,8 +29,8 @@ public class AlignmentManager {
      */
     public boolean loadOrientation() {
         try {
-            BufferedReader fileIn =
-            	IOHandler.getTextFileReader("data/orientation");
+            BufferedReader fileIn = IOHandler.getTextFileReader(IOHandler
+                    .getApplicationDataPath() + "orientation");
             String inLine = fileIn.readLine();
             int i = 0;
             while(inLine != null) {
@@ -50,8 +50,8 @@ public class AlignmentManager {
      */
     public boolean saveOrientation() {
         try {
-            BufferedWriter bufferOut =
-            	IOHandler.getTextFileWriter("data/orientation");
+            BufferedWriter bufferOut = IOHandler.getTextFileWriter(IOHandler
+                    .getApplicationDataPath() + "orientation");
             for(int i = 0; i < orientation.length; i++) {
                 bufferOut.write(String.valueOf(orientation[i]));
                 bufferOut.newLine();

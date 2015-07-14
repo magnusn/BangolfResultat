@@ -106,7 +106,8 @@ public class SearchWindow {
 			System.exit(1);
 		}
 		try {
-			ImageIcon frameIcon = new ImageIcon("data/brikon.gif");
+			ImageIcon frameIcon = new ImageIcon(
+					IOHandler.getApplicationDataPath() + "brikon.gif");
 			ICON = frameIcon.getImage();
 			frame.setIconImage(ICON);
 		} catch (Exception e) {
