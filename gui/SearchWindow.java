@@ -63,6 +63,7 @@ public class SearchWindow {
 	private JMenuItem newComp, openFromSKV, save;		// meny för ny tävling och öppna samt spara
 	private	JMenuItem saveToHTML, quit, editItem; 		// spara till HTML, avsluta, redigera
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
+	private JMenuItem showSystemSettings;				// visa systeminställningar
 	private JMenuItem setLookAndFeel;					// ställ in programmets look and feel 
 	private JMenuItem makeCompareFile, openCompareFile;	// skapar eller öppnar en jämförande snittlista
 	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
@@ -271,6 +272,7 @@ public class SearchWindow {
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
+		showSystemSettings = new JMenuItem("Visa systeminställningar...", KeyEvent.VK_S);
 		about = new JMenuItem("Om BangolfResultat...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
@@ -287,6 +289,7 @@ public class SearchWindow {
 		makeCompareFile.addActionListener(menuHand);
 		openCompareFile.addActionListener(menuHand);
 		setLookAndFeel.addActionListener(menuHand);
+		showSystemSettings.addActionListener(menuHand);
 		about.addActionListener(menuHand);
 		menu.add(newComp);
 		menu.add(openFromSKV);
@@ -307,6 +310,8 @@ public class SearchWindow {
 		snittMenu.add(makeCompareFile);
 		snittMenu.add(openCompareFile);
 		windowMenu.add(setLookAndFeel);
+		help.add(showSystemSettings);
+		help.addSeparator();
 		help.add(about);
 		frame.setJMenuBar(bar);
 		
@@ -890,6 +895,9 @@ public class SearchWindow {
 						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 					}
 				}
+			}
+			else if(e.getSource() == showSystemSettings) {
+				new ShowSystemSettingsWindow(frame);
 			}
     		else if(e.getSource() == about) {
     			new AboutWindow(frame);
