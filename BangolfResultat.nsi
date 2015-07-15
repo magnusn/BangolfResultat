@@ -4,7 +4,7 @@
 Var /GLOBAL previous_uninstaller
 Var /GLOBAL previous_uninstaller_path
 Var /GLOBAL previous_installed_version
-Var /GLOBAL version_compare
+Var /GLOBAL previous_compared_to_0_8
 Var /GLOBAL remove_settings
 
 ; HM NIS Edit Wizard helper defines
@@ -92,24 +92,31 @@ Function UninstallPrevious
   IfFileExists "$previous_uninstaller" 0 Done
 
   ; Check previous version number. If older than 0.8: data folder should be moved and uninstaller can't be run silently.
-  ${VersionCompare} "$previous_installed_version" "0.8" $version_compare
+  ${VersionCompare} "$previous_installed_version" "0.8" $previous_compared_to_0_8
 
   DetailPrint "Avinstallerar föregående version"
 
   ; Run the uninstaller
+  ${If} $previous_compared_to_0_8 == 2
+    MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
+    Call MoveDataFolder
+  ${EndIf}
+  Call RunUninstaller
+  Done:
+FunctionEnd
+
+Function RunUninstaller
+  ${GetParent} "$previous_uninstaller" $previous_uninstaller_path
   Uninstall:
-    ${GetParent} "$previous_uninstaller" $previous_uninstaller_path
-    ${If} $version_compare == 2
-      Call MoveDataFolder
-      ClearErrors
+    ClearErrors
+    ${If} $previous_compared_to_0_8 == 2
       ExecWait '"$previous_uninstaller" _?=$previous_uninstaller_path'
     ${Else}
-      ClearErrors
       ExecWait '"$previous_uninstaller" /S _?=$previous_uninstaller_path'
     ${EndIf}
     IfErrors AskForRetry Done
     AskForRetry:
-      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att avinstallera föregående version.$\r$\n$\r$\nKontrollera att ${PRODUCT_NAME} inte kör och försök sedan igen." IDRETRY Uninstall IDIGNORE Done
+      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att avinstallera föregående version.$\r$\n$\r$\nKontrollera att ${PRODUCT_NAME} inte kör och försök sedan igen." /SD IDIGNORE IDRETRY Uninstall IDIGNORE Done
       Abort "Misslyckades att avinstallera föregående version"
   Done:
 FunctionEnd
@@ -121,8 +128,8 @@ Function MoveDataFolder
     CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_DATA_DIRECTORY}\"
     IfErrors AskForRetry RemoveSource
     AskForRetry:
-      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}.$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." IDRETRY MoveDataFolder IDIGNORE Done
-      Abort "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}."
+      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\".$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." /SD IDIGNORE IDRETRY MoveDataFolder IDIGNORE Done
+      Abort "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\"."
     RemoveSource:
       RMDir /r "$INSTDIR\data"
   Done:
