@@ -5,6 +5,7 @@ Var /GLOBAL previous_uninstaller
 Var /GLOBAL previous_uninstaller_path
 Var /GLOBAL previous_installed_version
 Var /GLOBAL version_compare
+Var /GLOBAL remove_settings
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
@@ -53,6 +54,7 @@ var ICONS_GROUP
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\doc\versionhistory.htm"
+!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -107,7 +109,7 @@ Function UninstallPrevious
     ${EndIf}
     IfErrors AskForRetry Done
     AskForRetry:
-      MessageBox MB_ABORTRETRYIGNORE "Avinstallationen av föregående version misslyckades. Försök igen." IDRETRY Uninstall IDIGNORE Done
+      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att avinstallera föregående version.$\r$\n$\r$\nKontrollera att ${PRODUCT_NAME} inte kör och försök sedan igen." IDRETRY Uninstall IDIGNORE Done
       Abort "Misslyckades att avinstallera föregående version"
   Done:
 FunctionEnd
@@ -119,7 +121,7 @@ Function MoveDataFolder
     CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_DATA_DIRECTORY}\"
     IfErrors AskForRetry RemoveSource
     AskForRetry:
-      MessageBox MB_ICONQUESTION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}.$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." IDRETRY MoveDataFolder IDIGNORE Done
+      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}.$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." IDRETRY MoveDataFolder IDIGNORE Done
       Abort "Misslyckades att kopiera filerna från $INSTDIR\data till den nya programdatamappen ${PRODUCT_DATA_DIRECTORY}."
     RemoveSource:
       RMDir /r "$INSTDIR\data"
@@ -169,8 +171,8 @@ Section "MainSection" SEC01
   File "${PRODUCT_PROJECT_PATH}\doc\versionhistory.htm"
   File "${PRODUCT_PROJECT_PATH}\doc\webbsida.htm"
   SetOutPath "${PRODUCT_DATA_DIRECTORY}"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\ikoner.icl"
   File "${PRODUCT_PROJECT_PATH}\installer\data\brikon.gif"
+  File "${PRODUCT_PROJECT_PATH}\installer\data\ikoner.icl"
   SetOverwrite off
   File "${PRODUCT_PROJECT_PATH}\installer\data\classorder"
   File "${PRODUCT_PROJECT_PATH}\installer\data\compare"
@@ -226,37 +228,42 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Är du säker på att du vill avinstallera $(^Name) och alla dess komponenter?" /SD IDYES IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNOCANCEL|MB_DEFBUTTON3 "$(^Name) kommer att avinstalleras.$\r$\n$\r$\nVill du även ta bort programmets inställningar?" /SD IDNO IDYES RemoveSettings IDNO Done
   Abort
+  RemoveSettings:
+    StrCpy $remove_settings "yes"
+  Done:
 FunctionEnd
 
 Section Uninstall
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
-  Delete "${PRODUCT_DATA_DIRECTORY}\snittstring"
-  Delete "${PRODUCT_DATA_DIRECTORY}\snittapp"
-  Delete "${PRODUCT_DATA_DIRECTORY}\snitt"
-  Delete "${PRODUCT_DATA_DIRECTORY}\ptrack"
-  Delete "${PRODUCT_DATA_DIRECTORY}\pnametrack"
-  Delete "${PRODUCT_DATA_DIRECTORY}\orientation"
-  Delete "${PRODUCT_DATA_DIRECTORY}\namn"
-  Delete "${PRODUCT_DATA_DIRECTORY}\licensenamemap"
-  Delete "${PRODUCT_DATA_DIRECTORY}\licensemap"
-  Delete "${PRODUCT_DATA_DIRECTORY}\klasstring"
-  Delete "${PRODUCT_DATA_DIRECTORY}\klassmap"
-  Delete "${PRODUCT_DATA_DIRECTORY}\klass"
+  ${If} $remove_settings == "yes"
+    Delete "${PRODUCT_DATA_DIRECTORY}\snittstring"
+    Delete "${PRODUCT_DATA_DIRECTORY}\snittapp"
+    Delete "${PRODUCT_DATA_DIRECTORY}\snitt"
+    Delete "${PRODUCT_DATA_DIRECTORY}\ptrack"
+    Delete "${PRODUCT_DATA_DIRECTORY}\pnametrack"
+    Delete "${PRODUCT_DATA_DIRECTORY}\orientation"
+    Delete "${PRODUCT_DATA_DIRECTORY}\namn"
+    Delete "${PRODUCT_DATA_DIRECTORY}\licensenamemap"
+    Delete "${PRODUCT_DATA_DIRECTORY}\licensemap"
+    Delete "${PRODUCT_DATA_DIRECTORY}\klasstring"
+    Delete "${PRODUCT_DATA_DIRECTORY}\klassmap"
+    Delete "${PRODUCT_DATA_DIRECTORY}\klass"
+    Delete "${PRODUCT_DATA_DIRECTORY}\dirsnitt"
+    Delete "${PRODUCT_DATA_DIRECTORY}\dirskv"
+    Delete "${PRODUCT_DATA_DIRECTORY}\dirjmf"
+    Delete "${PRODUCT_DATA_DIRECTORY}\dirhtm"
+    Delete "${PRODUCT_DATA_DIRECTORY}\directory"
+    Delete "${PRODUCT_DATA_DIRECTORY}\datastore"
+    Delete "${PRODUCT_DATA_DIRECTORY}\comparefiles"
+    Delete "${PRODUCT_DATA_DIRECTORY}\compareby"
+    Delete "${PRODUCT_DATA_DIRECTORY}\compare"
+    Delete "${PRODUCT_DATA_DIRECTORY}\classorder"
+  ${EndIf}
   Delete "${PRODUCT_DATA_DIRECTORY}\ikoner.icl"
-  Delete "${PRODUCT_DATA_DIRECTORY}\dirsnitt"
-  Delete "${PRODUCT_DATA_DIRECTORY}\dirskv"
-  Delete "${PRODUCT_DATA_DIRECTORY}\dirjmf"
-  Delete "${PRODUCT_DATA_DIRECTORY}\dirhtm"
-  Delete "${PRODUCT_DATA_DIRECTORY}\directory"
-  Delete "${PRODUCT_DATA_DIRECTORY}\datastore"
-  Delete "${PRODUCT_DATA_DIRECTORY}\comparefiles"
-  Delete "${PRODUCT_DATA_DIRECTORY}\compareby"
-  Delete "${PRODUCT_DATA_DIRECTORY}\compare"
-  Delete "${PRODUCT_DATA_DIRECTORY}\classorder"
   Delete "${PRODUCT_DATA_DIRECTORY}\brikon.gif"
   Delete "$INSTDIR\doc\webbsida.htm"
   Delete "$INSTDIR\doc\versionhistory.htm"
