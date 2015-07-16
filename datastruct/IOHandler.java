@@ -575,7 +575,7 @@ public class IOHandler {
 							+ File.separator + "BangolfResultat"
 							+ File.separator + "Settings" + File.separator));
 				} else {
-					settingsPath = getCanonicalPath(new File("data"
+					settingsPath = getCanonicalPath(new File("settings"
 							+ File.separator));
 				}
 			}
