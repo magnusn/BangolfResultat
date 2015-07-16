@@ -36,7 +36,7 @@ Var /GLOBAL remove_settings
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall-blue.ico"
 
 ; Welcome page
-!define MUI_WELCOMEPAGE_TEXT "Om du redan har en version av ${PRODUCT_NAME} installerad skall du avsluta programmet och säkerhetskopiera programmets inställningar (se manualen) innan du fortsätter med installationen.\r\n\r\n$_CLICK"
+!define MUI_WELCOMEPAGE_TEXT "Om du redan har en version av ${PRODUCT_NAME} installerad skall du avsluta programmet och säkerhetskopiera programmets inställningar innan du fortsätter med installationen.\r\n\r\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !insertmacro MUI_PAGE_LICENSE "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
