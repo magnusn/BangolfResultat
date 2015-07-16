@@ -564,9 +564,9 @@ public class IOHandler {
 	 */
 	public static String getSettingsPath() {
 		if (settingsPath == null) {
-			String dataPath = System.getProperty("settingsPath");
-			if (dataPath != null) {
-				settingsPath = getCanonicalPath(new File(dataPath));
+			String settingsPathProperty = System.getProperty("settingsPath");
+			if (settingsPathProperty != null) {
+				settingsPath = getCanonicalPath(new File(settingsPathProperty));
 			} else {
 				String os = System.getProperty("os.name").toLowerCase();
 				if (os.contains("win")) {
