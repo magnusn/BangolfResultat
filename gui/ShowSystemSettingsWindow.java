@@ -49,7 +49,7 @@ public class ShowSystemSettingsWindow extends JDialog {
 		panel.setBorder(BorderFactory.createTitledBorder("Systeminställningar"));
 		panel.add(new JLabel("Inställningar sparas i:"), c);
 		c.gridx = 1;
-		panel.add(new JLabel(IOHandler.getApplicationDataPath()), c);
+		panel.add(new JLabel(IOHandler.getSettingsPath()), c);
 
 		setLayout(new GridBagLayout());
 		c.gridx = 0;
@@ -76,7 +76,7 @@ public class ShowSystemSettingsWindow extends JDialog {
 	 */
 	private void copyToClipboard() {
 		StringSelection selection = new StringSelection(
-				IOHandler.getApplicationDataPath());
+				IOHandler.getSettingsPath());
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboard.setContents(selection, null);
 	}

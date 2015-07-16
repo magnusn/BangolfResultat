@@ -59,7 +59,7 @@ public class NameList {
 	/** läser in personer till listan från en fil */
 	public void readNames() throws FileNotFoundException, IOException {
 		BufferedReader fileIn = IOHandler.getTextFileReader(IOHandler
-				.getApplicationDataPath() + "namn");
+				.getSettingsPath() + "namn");
 		String inLine = fileIn.readLine();
 		String name,club,identity;
 		while (inLine != null) {
@@ -80,7 +80,7 @@ public class NameList {
 	/** skriver namnlistan till en fil */
 	public void writeNames() throws IOException {
 		BufferedWriter bufferOut = IOHandler.getTextFileWriter(IOHandler
-				.getApplicationDataPath() + "namn");
+				.getSettingsPath() + "namn");
 		LinkedList list = sortNames();
 		for(int i = 0; i < list.size()-1; i++) {
 			bufferOut.write((String)list.get(i));

@@ -160,7 +160,7 @@ public class SnittWindow extends JFrame {
 					fileMap[i] = new HashMap();
 				}
 				
-				File file = new File(IOHandler.getApplicationDataPath()
+				File file = new File(IOHandler.getSettingsPath()
 						+ "snittmap");
 				/* Hanterar övergång från en HashMap för alla snittlistor till
 				 * en HashMap för varje snittlista.

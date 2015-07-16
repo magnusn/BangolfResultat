@@ -23,7 +23,8 @@ import java.util.Vector;
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
-	private static String applicationDataPath = null;
+	private static String settingsPath = null;
+	private static String iconsPath = null;
 	
 	/** skapar ett objekt av klassen */
 	public IOHandler() {
@@ -369,7 +370,7 @@ public class IOHandler {
 		utifrån innehållet i vektorn v */
 	public void writeFileList(String fileName, Vector[] v) throws IOException {
 		Vector[] vector = v;
-		BufferedWriter bufferOut = getTextFileWriter(getApplicationDataPath()
+		BufferedWriter bufferOut = getTextFileWriter(getSettingsPath()
 				+ fileName);
 		for(int i = 0; i < vector.length; i++) {
 			if(i%2 == 0) {
@@ -393,7 +394,7 @@ public class IOHandler {
 		for(int i = 0; i < vector.length; i++) {
 			vector[i] = new Vector();
 		}
-		BufferedReader fileIn = getTextFileReader(getApplicationDataPath()
+		BufferedReader fileIn = getTextFileReader(getSettingsPath()
 				+ fileName);
 		String inLine = fileIn.readLine();
 		int i = -1;
@@ -476,7 +477,7 @@ public class IOHandler {
 	public void save(String file, Object o) throws IOException {
 		FileOutputStream fos;
 		ObjectOutputStream os;
-		fos = new FileOutputStream(getApplicationDataPath() + file);
+		fos = new FileOutputStream(getSettingsPath() + file);
 		os = new ObjectOutputStream(fos);
 		os.writeObject(o);
 		os.close();
@@ -487,7 +488,7 @@ public class IOHandler {
 		FileInputStream fis;
 		ObjectInputStream ois;
 		Object o = null;
-		fis = new FileInputStream(getApplicationDataPath() + file);
+		fis = new FileInputStream(getSettingsPath() + file);
 		ois = new ObjectInputStream(fis);
 		o = ois.readObject();
 		ois.close();
@@ -555,33 +556,48 @@ public class IOHandler {
 	}
 
 	/**
-	 * Returns the path to the application data directory where settings are
-	 * stored.
+	 * Returns the path to the application settings directory.
 	 * <p>
 	 * The path contains a trailing system-depending name-separator character.
 	 * 
-	 * @return the path to the application data directory
+	 * @return the path to the application settings directory
 	 */
-	public static String getApplicationDataPath() {
-		if (applicationDataPath == null) {
-			String dataPath = System.getProperty("applicationDataPath");
+	public static String getSettingsPath() {
+		if (settingsPath == null) {
+			String dataPath = System.getProperty("settingsPath");
 			if (dataPath != null) {
-				applicationDataPath = getCanonicalPath(new File(dataPath));
+				settingsPath = getCanonicalPath(new File(dataPath));
 			} else {
 				String os = System.getProperty("os.name").toLowerCase();
 				if (os.contains("win")) {
 					String appDataFolder = System.getenv("AppData");
-					applicationDataPath = getCanonicalPath(new File(
-							appDataFolder + File.separator + "BangolfResultat"
-									+ File.separator + "data" + File.separator));
+					settingsPath = getCanonicalPath(new File(appDataFolder
+							+ File.separator + "BangolfResultat"
+							+ File.separator + "Settings" + File.separator));
 				} else {
-					applicationDataPath = getCanonicalPath(new File("data"
+					settingsPath = getCanonicalPath(new File("data"
 							+ File.separator));
 				}
 			}
-			applicationDataPath += File.separator;
+			settingsPath += File.separator;
 		}
-		return applicationDataPath;
+		return settingsPath;
+	}
+
+	/**
+	 * Returns the path to the icons directory.
+	 * <p>
+	 * The path contains a trailing system-depending name-separator character.
+	 * 
+	 * @return the path to the icons directory
+	 */
+	public static String getIconsPath() {
+		if (iconsPath == null) {
+			iconsPath = getCanonicalPath(new File("icons"
+					+ File.separator));
+			iconsPath += File.separator;
+		}
+		return iconsPath;
 	}
 
 	/**

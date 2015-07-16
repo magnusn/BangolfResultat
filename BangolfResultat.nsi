@@ -19,7 +19,7 @@ Var /GLOBAL remove_settings
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
 !define PRODUCT_PROJECT_PATH "."
 !define PRODUCT_APPDATA_DIRECTORY "$APPDATA\${PRODUCT_NAME}"
-!define PRODUCT_DATA_DIRECTORY "${PRODUCT_APPDATA_DIRECTORY}\data"
+!define PRODUCT_SETTINGS_DIRECTORY "${PRODUCT_APPDATA_DIRECTORY}\Settings"
 
 ; Include file functions
 !include "FileFunc.nsh"
@@ -36,7 +36,7 @@ Var /GLOBAL remove_settings
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall-blue.ico"
 
 ; Welcome page
-!define MUI_WELCOMEPAGE_TEXT "Om du redan har en version av ${PRODUCT_NAME} installerad skall du avsluta programmet och säkerhetskopiera filerna i mappen data innan du fortsätter med installationen.\r\n\r\n$_CLICK"
+!define MUI_WELCOMEPAGE_TEXT "Om du redan har en version av ${PRODUCT_NAME} installerad skall du avsluta programmet och säkerhetskopiera programmets inställningar (se manualen) innan du fortsätter med installationen.\r\n\r\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !insertmacro MUI_PAGE_LICENSE "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
@@ -98,7 +98,7 @@ Function UninstallPrevious
 
   ; Run the uninstaller
   ${If} $previous_compared_to_0_8 == 2
-    MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
+    MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
     Call MoveDataFolder
   ${EndIf}
   Call RunUninstaller
@@ -125,11 +125,13 @@ Function MoveDataFolder
   IfFileExists "$INSTDIR\data" MoveDataFolder Done
   MoveDataFolder:
     ClearErrors
-    CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_DATA_DIRECTORY}\"
+    CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_SETTINGS_DIRECTORY}\"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\ikoner.icl"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\brikon.gif"
     IfErrors AskForRetry RemoveSource
     AskForRetry:
-      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\".$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." /SD IDIGNORE IDRETRY MoveDataFolder IDIGNORE Done
-      Abort "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till den nya programdatamappen $\"${PRODUCT_DATA_DIRECTORY}$\"."
+      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\".$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." /SD IDIGNORE IDRETRY MoveDataFolder IDIGNORE Done
+      Abort "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"."
     RemoveSource:
       RMDir /r "$INSTDIR\data"
   Done:
@@ -177,32 +179,33 @@ Section "MainSection" SEC01
   File "${PRODUCT_PROJECT_PATH}\doc\system.htm"
   File "${PRODUCT_PROJECT_PATH}\doc\versionhistory.htm"
   File "${PRODUCT_PROJECT_PATH}\doc\webbsida.htm"
-  SetOutPath "${PRODUCT_DATA_DIRECTORY}"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\brikon.gif"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\ikoner.icl"
+  SetOutPath "$INSTDIR\icons"
+  File "${PRODUCT_PROJECT_PATH}\icons\brikon.gif"
+  File "${PRODUCT_PROJECT_PATH}\icons\ikoner.icl"
+  SetOutPath "${PRODUCT_SETTINGS_DIRECTORY}"
   SetOverwrite off
-  File "${PRODUCT_PROJECT_PATH}\installer\data\classorder"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\compare"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\compareby"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\comparefiles"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\datastore"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\directory"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\dirhtm"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\dirjmf"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\dirskv"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\dirsnitt"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\klass"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\klassmap"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\klasstring"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\licensemap"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\licensenamemap"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\namn"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\orientation"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\pnametrack"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\ptrack"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\snitt"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\snittapp"
-  File "${PRODUCT_PROJECT_PATH}\installer\data\snittstring"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\classorder"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\compare"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\compareby"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\comparefiles"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\datastore"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\directory"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\dirhtm"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\dirjmf"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\dirskv"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\dirsnitt"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\klass"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\klassmap"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\klasstring"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\licensemap"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\licensenamemap"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\namn"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\orientation"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\pnametrack"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\ptrack"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\snitt"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\snittapp"
+  File "${PRODUCT_PROJECT_PATH}\installer\settings\snittstring"
 SectionEnd
 
 Section -AdditionalIcons
@@ -210,8 +213,8 @@ Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-  CreateShortCut "$DESKTOP\BangolfResultat.lnk" "$INSTDIR\BangolfResultat.jar" "" "${PRODUCT_DATA_DIRECTORY}\ikoner.icl" 0 SW_SHOWNORMAL
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk" "javaw.exe" '-jar "$INSTDIR\BangolfResultat.jar"' "${PRODUCT_DATA_DIRECTORY}\ikoner.icl" 0 SW_SHOWNORMAL
+  CreateShortCut "$DESKTOP\BangolfResultat.lnk" "$INSTDIR\BangolfResultat.jar" "" "$INSTDIR\icons\ikoner.icl" 0 SW_SHOWNORMAL
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk" "javaw.exe" '-jar "$INSTDIR\BangolfResultat.jar"' "$INSTDIR\icons\ikoner.icl" 0 SW_SHOWNORMAL
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Manual.lnk" "$INSTDIR\doc\manual.htm"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Hemsida.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
@@ -247,31 +250,31 @@ Section Uninstall
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
   ${If} $remove_settings == "yes"
-    Delete "${PRODUCT_DATA_DIRECTORY}\snittstring"
-    Delete "${PRODUCT_DATA_DIRECTORY}\snittapp"
-    Delete "${PRODUCT_DATA_DIRECTORY}\snitt"
-    Delete "${PRODUCT_DATA_DIRECTORY}\ptrack"
-    Delete "${PRODUCT_DATA_DIRECTORY}\pnametrack"
-    Delete "${PRODUCT_DATA_DIRECTORY}\orientation"
-    Delete "${PRODUCT_DATA_DIRECTORY}\namn"
-    Delete "${PRODUCT_DATA_DIRECTORY}\licensenamemap"
-    Delete "${PRODUCT_DATA_DIRECTORY}\licensemap"
-    Delete "${PRODUCT_DATA_DIRECTORY}\klasstring"
-    Delete "${PRODUCT_DATA_DIRECTORY}\klassmap"
-    Delete "${PRODUCT_DATA_DIRECTORY}\klass"
-    Delete "${PRODUCT_DATA_DIRECTORY}\dirsnitt"
-    Delete "${PRODUCT_DATA_DIRECTORY}\dirskv"
-    Delete "${PRODUCT_DATA_DIRECTORY}\dirjmf"
-    Delete "${PRODUCT_DATA_DIRECTORY}\dirhtm"
-    Delete "${PRODUCT_DATA_DIRECTORY}\directory"
-    Delete "${PRODUCT_DATA_DIRECTORY}\datastore"
-    Delete "${PRODUCT_DATA_DIRECTORY}\comparefiles"
-    Delete "${PRODUCT_DATA_DIRECTORY}\compareby"
-    Delete "${PRODUCT_DATA_DIRECTORY}\compare"
-    Delete "${PRODUCT_DATA_DIRECTORY}\classorder"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\snittstring"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\snittapp"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\snitt"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\ptrack"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\pnametrack"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\orientation"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\namn"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\licensenamemap"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\licensemap"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\klasstring"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\klassmap"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\klass"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\dirsnitt"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\dirskv"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\dirjmf"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\dirhtm"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\directory"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\datastore"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\comparefiles"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\compareby"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\compare"
+    Delete "${PRODUCT_SETTINGS_DIRECTORY}\classorder"
   ${EndIf}
-  Delete "${PRODUCT_DATA_DIRECTORY}\ikoner.icl"
-  Delete "${PRODUCT_DATA_DIRECTORY}\brikon.gif"
+  Delete "$INSTDIR\icons\ikoner.icl"
+  Delete "$INSTDIR\icons\brikon.gif"
   Delete "$INSTDIR\doc\webbsida.htm"
   Delete "$INSTDIR\doc\versionhistory.htm"
   Delete "$INSTDIR\doc\system.htm"
@@ -322,7 +325,8 @@ Section Uninstall
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
   RMDir "$INSTDIR\doc\bilder"
   RMDir "$INSTDIR\doc"
-  RMDir "${PRODUCT_DATA_DIRECTORY}"
+  RMDir "$INSTDIR\icons"
+  RMDir "${PRODUCT_SETTINGS_DIRECTORY}"
   RMDir "${PRODUCT_APPDATA_DIRECTORY}"
   RMDir /REBOOTOK "$INSTDIR"
 
