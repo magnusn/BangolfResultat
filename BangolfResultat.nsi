@@ -232,11 +232,6 @@ Section -Post
 SectionEnd
 
 
-Function un.onUninstSuccess
-  HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) är nu borttagit från din dator." /SD IDOK
-FunctionEnd
-
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNOCANCEL|MB_DEFBUTTON3 "$(^Name) kommer att avinstalleras.$\r$\n$\r$\nVill du även ta bort programmets inställningar?" /SD IDNO IDYES RemoveSettings IDNO Done
   Abort
