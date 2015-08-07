@@ -5,3 +5,4 @@
 *.jar
 /data/
 /target/
+/.settings/
