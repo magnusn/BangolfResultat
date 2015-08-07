@@ -141,7 +141,7 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
   File "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
-  File "${PRODUCT_PROJECT_PATH}\installer\BangolfResultat.jar"
+  File /oname=BangolfResultat.jar "${PRODUCT_PROJECT_PATH}\target\BangolfResultat*.jar"
   SetOutPath "$INSTDIR\doc\bilder"
   File "${PRODUCT_PROJECT_PATH}\doc\bilder\align.gif"
   File "${PRODUCT_PROJECT_PATH}\doc\bilder\bgr.gif"

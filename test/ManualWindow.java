@@ -1,10 +1,9 @@
 package test;
 
-import gui.SearchWindow;
-
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
+
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +12,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
+
+import se.manet.bangolfresultat.gui.SearchWindow;
 
 
 class ManualWindow extends JFrame {

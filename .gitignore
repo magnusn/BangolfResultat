@@ -4,3 +4,4 @@
 *.exe
 *.jar
 /data/
+/target/

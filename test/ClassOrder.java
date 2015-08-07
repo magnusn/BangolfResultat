@@ -2,7 +2,7 @@ package test;
 
 import java.util.HashMap;
 
-import datastruct.IOHandler;
+import se.manet.bangolfresultat.datastruct.IOHandler;
 
 
 class ClassOrder {

@@ -2,7 +2,7 @@ package test;
 
 import java.util.*;
 
-import datastruct.IOHandler;
+import se.manet.bangolfresultat.datastruct.IOHandler;
 
 
 class IDFix {
