@@ -1,17 +1,18 @@
-1. Ändra doc/om.htm
+1. Ändra version i pom.xml
 2. Ändra doc/versionhistory.htm
 3. Ändra hemsida/index.htm
 4. Ändra BangolfResultat.nsi
-5. Skapa ny jar-fil
+5. mvn clean install
 6. Kompilera ny exekverbar fil
 7. Lägga upp alla ändringar
 
 Vid ny hemsideadress skall följande filer ändras:
-- Javakoden som genererar HTML-sidor.
+- pom.xml
 - doc/licens.txt
 - doc/manual.htm
 - doc/snitt.htm
 - doc/webbsida.htm
 
 Vid andra speciella tillfällen:
+- Ändra doc/om.htm (vid nytt år)
 - Ändra doc/licens.txt (vid nytt år eller ändrade licensvillkor)

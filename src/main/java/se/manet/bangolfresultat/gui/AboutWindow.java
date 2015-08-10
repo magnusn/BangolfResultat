@@ -8,10 +8,12 @@ import java.io.IOException;
 
 import javax.swing.JDialog;
 
+import se.manet.bangolfresultat.datastruct.PropertyReader;
+
 public class AboutWindow extends JDialog {
 	
 	public AboutWindow(JFrame owner) {
-		super(owner, "Om BangolfResultat", true);
+		super(owner, "Om " + PropertyReader.getApplicationName(), true);
 		setResizable(false);
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);

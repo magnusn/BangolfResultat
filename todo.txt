@@ -1,1 +1,2 @@
 * Check license to be used and what is specified in GitHub.
+* Check if it is possible to do error logging to Program Files directory.

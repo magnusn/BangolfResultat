@@ -42,6 +42,7 @@ import se.manet.bangolfresultat.datastruct.DataStore;
 import se.manet.bangolfresultat.datastruct.Filter;
 import se.manet.bangolfresultat.datastruct.IOHandler;
 import se.manet.bangolfresultat.datastruct.NameList;
+import se.manet.bangolfresultat.datastruct.PropertyReader;
 import se.manet.bangolfresultat.datastruct.ResultList;
 import se.manet.bangolfresultat.snitt.SnittWindow;
 
@@ -102,7 +103,7 @@ public class SearchWindow {
 			name.sortedNames();
 		}
 		try {
-			frame = new JFrame("BangolfResultat");
+			frame = new JFrame(PropertyReader.getApplicationName());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Programmet gick ej att starta", "Programfel", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
@@ -274,7 +275,7 @@ public class SearchWindow {
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
 		showSystemSettings = new JMenuItem("Visa systeminställningar...", KeyEvent.VK_S);
-		about = new JMenuItem("Om BangolfResultat...", KeyEvent.VK_O);
+		about = new JMenuItem("Om " + PropertyReader.getApplicationName() + "...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
 		saveToHTML.addActionListener(menuHand);
 		saveAsHTML.addActionListener(menuHand);
@@ -886,9 +887,11 @@ public class SearchWindow {
 					}
 				}
 				String newLookAndFeel = (String) JOptionPane.showInputDialog(
-						frame, "Välj utseende och känsla:\n(Börjar gälla när BangolfResultat har startats om.)",
-						"Utseende och känsla", JOptionPane.INFORMATION_MESSAGE,
-						null, new String[]{java,system}, initialSelectionValue);
+						frame, "Välj utseende och känsla:\n(Börjar gälla när "
+								+ PropertyReader.getApplicationName()
+								+ " har startats om.)", "Utseende och känsla",
+						JOptionPane.INFORMATION_MESSAGE, null, new String[] {
+								java, system }, initialSelectionValue);
 				if (newLookAndFeel != null) {
 					if (newLookAndFeel.equals(java)) {
 						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getCrossPlatformLookAndFeelClassName());

@@ -151,8 +151,8 @@ public class IOHandler {
 		bufferOut.newLine();
 		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.manet.se/\">"
-				+ "BangolfResultat</a></div>");
+		bufferOut.write("<div style=\"font-size:7.5pt\">Denna sida är skapad av <a href=\"" + PropertyReader.getApplicationUrl() + "\">"
+				+ PropertyReader.getApplicationName() + "</a></div>");
 		bufferOut.newLine();
 		bufferOut.write("</body>");
 		bufferOut.newLine();
@@ -572,7 +572,8 @@ public class IOHandler {
 				if (os.contains("win")) {
 					String appDataFolder = System.getenv("AppData");
 					settingsPath = getCanonicalPath(new File(appDataFolder
-							+ File.separator + "BangolfResultat"
+							+ File.separator
+							+ PropertyReader.getApplicationName()
 							+ File.separator + "Settings" + File.separator));
 				} else {
 					settingsPath = getCanonicalPath(new File("settings"

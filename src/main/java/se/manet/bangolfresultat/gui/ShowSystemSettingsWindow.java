@@ -83,7 +83,6 @@ public class ShowSystemSettingsWindow extends JDialog {
 
 	class ButtonActionListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == okButton) {
 				dialog.dispose();

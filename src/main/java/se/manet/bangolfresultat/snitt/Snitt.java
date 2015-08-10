@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 
 import se.manet.bangolfresultat.datastruct.IOHandler;
 import se.manet.bangolfresultat.datastruct.Person;
+import se.manet.bangolfresultat.datastruct.PropertyReader;
 import se.manet.bangolfresultat.datastruct.ResultList;
 import se.manet.bangolfresultat.gui.AlignmentWindow;
 
@@ -328,8 +329,8 @@ public class Snitt {
 		bufferOut.newLine();
 		bufferOut.write("<p><br>");
 		bufferOut.newLine();
-		bufferOut.write("<div style=\"text-align:center; font-size:7.5pt\">Denna sida är skapad av <a href=\"http://bangolfresultat.manet.se/\">"
-				+ "BangolfResultat</a></div>");
+		bufferOut.write("<div style=\"text-align:center; font-size:7.5pt\">Denna sida är skapad av <a href=\"" + PropertyReader.getApplicationUrl() + "\">"
+				+ PropertyReader.getApplicationName() + "</a></div>");
 		bufferOut.newLine();
 		bufferOut.write("</body>");
 		bufferOut.newLine();
