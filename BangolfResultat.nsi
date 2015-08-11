@@ -20,6 +20,7 @@ Var /GLOBAL remove_settings
 !define PRODUCT_PROJECT_PATH "."
 !define PRODUCT_APPDATA_DIRECTORY "$APPDATA\${PRODUCT_NAME}"
 !define PRODUCT_SETTINGS_DIRECTORY "${PRODUCT_APPDATA_DIRECTORY}\Settings"
+!define PRODUCT_LOGS_DIRECTORY "${PRODUCT_APPDATA_DIRECTORY}\Logs"
 
 ; Include file functions
 !include "FileFunc.nsh"
@@ -306,9 +307,9 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\bytanamn.gif"
   Delete "$INSTDIR\doc\bilder\bgr.gif"
   Delete "$INSTDIR\doc\bilder\align.gif"
-  Delete "$INSTDIR\error.log"
   Delete "$INSTDIR\licens.txt"
   Delete "$INSTDIR\BangolfResultat.jar"
+  Delete "${PRODUCT_LOGS_DIRECTORY}\error.log"
 
   Delete "$DESKTOP\BangolfResultat.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk"
@@ -322,6 +323,7 @@ Section Uninstall
   RMDir "$INSTDIR\doc"
   RMDir "$INSTDIR\icons"
   RMDir "${PRODUCT_SETTINGS_DIRECTORY}"
+  RMDir "${PRODUCT_LOGS_DIRECTORY}"
   RMDir "${PRODUCT_APPDATA_DIRECTORY}"
   RMDir /REBOOTOK "$INSTDIR"
 

@@ -23,7 +23,7 @@ import se.manet.bangolfresultat.gui.AlignmentWindow;
 
 /** klassen som sköter om skrivning till filer och läsning från filer */
 public class IOHandler {
-	private static String settingsPath = null;
+	private static String applicationDataPath = null;
 	private static String iconsPath = null;
 	
 	/** skapar ett objekt av klassen */
@@ -500,7 +500,8 @@ public class IOHandler {
 	public static boolean logError(Throwable throwable) {
 	    LinkedList list = new LinkedList();
         try {
-        	BufferedReader fileIn = getTextFileReader("error.log");
+            BufferedReader fileIn = getTextFileReader(getLogsPath()
+                    + "error.log");
             String inLine = fileIn.readLine();
             while(inLine != null) {
                 list.add(inLine);
@@ -509,7 +510,11 @@ public class IOHandler {
             fileIn.close();
         } catch (Exception e) {}
         try {
-            PrintStream printStream = new PrintStream("error.log", "UTF-8");
+            File logFile = new File(getLogsPath() + "error.log");
+            if (!logFile.exists()) {
+                logFile.getParentFile().mkdirs();
+            }
+            PrintStream printStream = new PrintStream(logFile, "UTF-8");
             printStream.println("UTF-8");
             Date date = new Date(System.currentTimeMillis());
             printStream.println(date.toString());
@@ -556,6 +561,38 @@ public class IOHandler {
 	}
 
 	/**
+	 * Returns the path to the application data directory.
+	 * <p>
+	 * The path contains a trailing system-depending name-separator character.
+	 * 
+	 * @return the path to the application data directory
+	 */
+	public static String getApplicationDataPath() {
+		if (applicationDataPath == null) {
+			String applicationDataPathProperty = System
+					.getProperty("applicationDataPath");
+			if (applicationDataPathProperty != null) {
+				applicationDataPath = getCanonicalPath(new File(
+						applicationDataPathProperty));
+			} else {
+				String os = System.getProperty("os.name").toLowerCase();
+				if (os.contains("win")) {
+					String appDataFolder = System.getenv("AppData");
+					applicationDataPath = getCanonicalPath(new File(
+							appDataFolder + File.separator
+									+ PropertyReader.getApplicationName()
+									+ File.separator));
+				} else {
+					applicationDataPath = getCanonicalPath(new File("AppData"
+							+ File.separator));
+				}
+			}
+			applicationDataPath += File.separator;
+		}
+		return applicationDataPath;
+	}
+
+	/**
 	 * Returns the path to the application settings directory.
 	 * <p>
 	 * The path contains a trailing system-depending name-separator character.
@@ -563,26 +600,18 @@ public class IOHandler {
 	 * @return the path to the application settings directory
 	 */
 	public static String getSettingsPath() {
-		if (settingsPath == null) {
-			String settingsPathProperty = System.getProperty("settingsPath");
-			if (settingsPathProperty != null) {
-				settingsPath = getCanonicalPath(new File(settingsPathProperty));
-			} else {
-				String os = System.getProperty("os.name").toLowerCase();
-				if (os.contains("win")) {
-					String appDataFolder = System.getenv("AppData");
-					settingsPath = getCanonicalPath(new File(appDataFolder
-							+ File.separator
-							+ PropertyReader.getApplicationName()
-							+ File.separator + "Settings" + File.separator));
-				} else {
-					settingsPath = getCanonicalPath(new File("settings"
-							+ File.separator));
-				}
-			}
-			settingsPath += File.separator;
-		}
-		return settingsPath;
+		return getApplicationDataPath() + "Settings" + File.separator;
+	}
+
+	/**
+	 * Returns the path to the application logs directory.
+	 * <p>
+	 * The path contains a trailing system-depending name-separator character.
+	 * 
+	 * @return the path to the application logs directory
+	 */
+	public static String getLogsPath() {
+		return getApplicationDataPath() + "Logs" + File.separator;
 	}
 
 	/**

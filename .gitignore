@@ -3,7 +3,7 @@
 *.class
 *.exe
 *.jar
-/data/
 /target/
 /.settings/
 /bangolfresultat.properties
+/AppData/

@@ -646,12 +646,11 @@ public class SearchWindow {
 	/** loggar informationen om Throwable throwable */
 	private static void logError(Throwable throwable) {
 	    JOptionPane.showMessageDialog(null, "Ett fel i programmet har uppstått. " +
-        		"Informationen om detta sparas i filen error.log.\n" +
-        		"Denna fil finns i katalogen där programmet installerades, " +
-        		"vanligtvis C:\\Program\\BangolfResultat.\n\n" +
-        		"Var vänlig spara aktivt arbete och starta om programmet.\n" +
-        		"Om problem uppstår igen tag kontakt med programmets tillverkare.",
-        		"Varningsmeddelande", JOptionPane.WARNING_MESSAGE);
+                "Informationen om detta sparas i filen \"" +
+                IOHandler.getLogsPath() + "error.log\".\n\n" +
+                "Var vänlig spara aktivt arbete och starta om programmet.\n" +
+                "Om problem uppstår igen tag kontakt med programmets tillverkare.",
+                "Varningsmeddelande", JOptionPane.WARNING_MESSAGE);
 	    if(IOHandler.logError(throwable)) {
 	        JOptionPane.showMessageDialog(null, "Loggningen är klar.");
 	    } else {
