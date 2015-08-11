@@ -295,7 +295,6 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\resultat.gif"
   Delete "$INSTDIR\doc\bilder\resinmat.gif"
   Delete "$INSTDIR\doc\bilder\redig.gif"
-  Delete "$INSTDIR\doc\bilder\nyckel.gif"
   Delete "$INSTDIR\doc\bilder\lafsystem.gif"
   Delete "$INSTDIR\doc\bilder\lafjava.gif"
   Delete "$INSTDIR\doc\bilder\klasstar.gif"
