@@ -1,2 +1,3 @@
 * Check license to be used and what is specified in GitHub.
 * Check what about window looks like on Linux.
+* Check why about window is not shown.
