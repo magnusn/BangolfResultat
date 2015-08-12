@@ -583,8 +583,16 @@ public class IOHandler {
 									+ PropertyReader.getApplicationName()
 									+ File.separator));
 				} else {
-					applicationDataPath = getCanonicalPath(new File("AppData"
-							+ File.separator));
+					String userHome = System.getProperty("user.home");
+					if (userHome != null) {
+						applicationDataPath = getCanonicalPath(new File(
+								userHome + File.separator + "."
+										+ PropertyReader.getApplicationName()
+										+ File.separator));
+					} else {
+						applicationDataPath = getCanonicalPath(new File(
+								"AppData" + File.separator));
+					}
 				}
 			}
 			applicationDataPath += File.separator;
