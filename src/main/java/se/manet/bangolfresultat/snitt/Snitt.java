@@ -453,7 +453,7 @@ public class Snitt {
 			try {
 			    io.save("compareby", compare);
 			} catch (Exception ex) {}
-			if(!(e instanceof ClassCastException)) {
+			if (!(e instanceof ClassCastException) && !(e instanceof FileNotFoundException)) {
 			    JOptionPane.showMessageDialog(null, "Inläsningen av sorteringsobjektet misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			}
 		}

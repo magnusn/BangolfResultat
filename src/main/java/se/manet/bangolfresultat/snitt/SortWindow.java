@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
 
 /** klassen som beskriver fönstret där man bestämmer sorteringsordningen */
 public class SortWindow extends JDialog {
@@ -77,7 +78,9 @@ public class SortWindow extends JDialog {
 			}
 			compare = new ListPanel(sortVector[tabIndex*2], sortVector[tabIndex*2 + 1]);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(owner, "Inläsningen av sorteringslistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			if (!(e instanceof FileNotFoundException)) {
+				JOptionPane.showMessageDialog(owner, "Inläsningen av sorteringslistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			}
 			sortVector = new Vector[nbrTabs*2];
 			
 			Vector selectionVector = getSelectionStartVector();
@@ -179,7 +182,9 @@ public class SortWindow extends JDialog {
 		        int[] oldCompareBy = (int[]) io.load("compareby");
 		        oldCompareBy.hashCode(); // can be removed without any sideeffects
 		    } catch (Exception ex) {
-		        JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
+		        if (!(ex instanceof FileNotFoundException)) {
+		            JOptionPane.showMessageDialog(compareDialog, "Kunde inte läsa in filen compareby", "Varning", JOptionPane.ERROR_MESSAGE);
+		        }
 		    }
 		    compareBy = new int[nbrTabs][2];
 		    for(int i = 0; i < compareBy[tabIndex].length; i++) {

@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
 
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
@@ -42,7 +43,9 @@ class KlassWindow extends JFrame {
 			klass = new ListPanel(v[0], v[1]);
 			map = (HashMap) io.load("klassmap");
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			if (!(e instanceof FileNotFoundException)) {
+				JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			}
 			klass = new ListPanel(new Vector(), new Vector());
 			map = new HashMap();
 		}

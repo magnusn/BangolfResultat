@@ -33,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.awt.event.KeyEvent;
 
@@ -203,8 +204,10 @@ public class SnittWindow extends JFrame {
 				fileMap = tempFileMap;
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades",
-					"Varning", JOptionPane.ERROR_MESSAGE);
+			if (!(e instanceof FileNotFoundException)) {
+				JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades",
+						"Varning", JOptionPane.ERROR_MESSAGE);
+			}
 			for(int i = 0; i < snittList.length; i++) {
 				snittList[i] = new ListPanel(new Vector(), new Vector());
 			}
@@ -297,15 +300,9 @@ public class SnittWindow extends JFrame {
 		setVisible(true);
 		
 		snittData = new SnittData(tab.getTabCount());
-		if(!snittData.readCompareFiles()) {
-		    JOptionPane.showMessageDialog(frame, "Jämförelsefilernas adresser kunde ej läsas in",
-		            "Varning", JOptionPane.ERROR_MESSAGE);
-		}
+		snittData.readCompareFiles();
 		// måste göras efter readCompareFiles() för att fungera korrekt
-		if(!snittData.readAppearanceSettings()) {
-		    JOptionPane.showMessageDialog(frame, "Föregående inställningar för snittlistans utseende gick ej" +
-		    		" att läsa in", "Varning", JOptionPane.ERROR_MESSAGE);
-		}
+		snittData.readAppearanceSettings();
 	}
 	
 	

@@ -25,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -99,7 +100,9 @@ public class SearchWindow {
 		try {
 			name.readNames();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Inläsningen av namnlistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			if (!(e instanceof FileNotFoundException)) {
+				JOptionPane.showMessageDialog(null, "Inläsningen av namnlistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
+			}
 			name.sortedNames();
 		}
 		try {
@@ -122,10 +125,7 @@ public class SearchWindow {
 		CHANGE = false;
 		
 		alignmentManager = new AlignmentManager();
-		if(!alignmentManager.loadOrientation()) {
-		    JOptionPane.showMessageDialog(null, "Tidigare sifferorienteringsinställningar gick ej att läsa in",
-                    "Varning", JOptionPane.ERROR_MESSAGE);
-		}
+		alignmentManager.loadOrientation();
 		
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		WindowHandler window = new WindowHandler();
