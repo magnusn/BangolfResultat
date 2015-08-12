@@ -1,3 +1,4 @@
 * Check license to be used and what is specified in GitHub.
 * Check what about window looks like on Linux.
 * Platform independent resource filtering.
+* Check differences between installer/settings files and what is created if file does not exist.

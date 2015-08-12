@@ -45,9 +45,5 @@
 			<directory>${project.basedir}/icons</directory>
 			<outputDirectory>icons</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${project.basedir}/installer/settings</directory>
-			<outputDirectory>AppData/Settings</outputDirectory>
-		</fileSet>
 	</fileSets>
 </assembly>
