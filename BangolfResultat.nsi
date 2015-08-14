@@ -67,7 +67,7 @@ var ICONS_GROUP
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "installer\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
+OutFile "target\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
 InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 InstallDirRegKey ${PRODUCT_INSTALL_ROOT_KEY} "${PRODUCT_INSTALL_KEY}" "InstallDir"
 RequestExecutionLevel admin
