@@ -662,6 +662,8 @@ public class SearchWindow {
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
 	    
+	    IOHandler.createSettingsDirectory();
+	    
 	    Object lookAndFeel = DataStore.get(DataStore.LOOK_AND_FEEL);
 	    try {
 	    	if (lookAndFeel != null) {

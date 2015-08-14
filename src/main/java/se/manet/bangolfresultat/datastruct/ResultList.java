@@ -1,14 +1,15 @@
 package se.manet.bangolfresultat.datastruct;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 /** klassen som beskriver resultatlistan */
 public class ResultList {
-	private HashMap IDMap, classMap, classOrder;// sparar personresultaten, de olika klassnamnen samt klassordningen
+	private HashMap IDMap, classMap;			// saves personal results and the different class names
+	private HashMap<String, String> classOrder; // contains the class order
 	public static final int FILT = 0;			// filtunderlagets heltalsvärde
 	public static final int EB = 1;				// EB-underlagets heltalsvärde
 	public static final int BETONG = 2;			// Betong-underlagets heltalsvärde
@@ -41,14 +42,47 @@ public class ResultList {
 		}
 		IDMap = new HashMap();
 		classMap = new HashMap();
-		IOHandler io = new IOHandler();
-		try {
-			classOrder = (HashMap) io.load("classorder");
-		} catch (Exception e) {
-			classOrder = new HashMap();
+		initializeClassOrder();
+	}
+
+	/**
+	 * Initializes the classes having special order. Other classes are ordered
+	 * by class name.
+	 */
+	private void initializeClassOrder() {
+		classOrder = new HashMap<String, String>();
+
+		String[] names = new String[21];
+		int i = 0;
+		names[i++] = "Damveteraner";
+		names[i++] = "Herrveteraner";
+		names[i++] = "Oldtimers Damer";
+		names[i++] = "Oldtimers Herrar";
+		names[i++] = "Oldgirls";
+		names[i++] = "Oldboys";
+		names[i++] = "Ungdom flickor C";
+		names[i++] = "Ungdom flickor B";
+		names[i++] = "Ungdom flickor A";
+		names[i++] = "Ungdom pojkar C";
+		names[i++] = "Ungdom pojkar B";
+		names[i++] = "Ungdom pojkar A";
+		names[i++] = "Ungdom";
+		names[i++] = "Damjuniorer";
+		names[i++] = "Herrjuniorer";
+		names[i++] = "Damseniorer";
+		names[i++] = "Herrseniorer";
+		names[i++] = "Klass D";
+		names[i++] = "Klass C";
+		names[i++] = "Klass B";
+		names[i++] = "Klass A";
+
+		String s = " ";
+		for(int j = 0; j < names.length; j++) {
+			classOrder.put(names[j], s);
+			s = s + " ";
 		}
 	}
-	
+
 	/** lägger till ett resultat med startnummer startNbr, namn name, klubb club, idnummer idNbr, varvresultat results
 	 antal varv rounds, klassen klass, prioritetsnummer prio och antal varv avklarade nbrRoundsFinished */
 	public void addResult(int startNbr, String name, String club, String idNbr, int[] results, int rounds, String klass

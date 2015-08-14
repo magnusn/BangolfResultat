@@ -187,7 +187,7 @@ public class SortWindow extends JDialog {
 		        }
 		    }
 		    compareBy = new int[nbrTabs][2];
-		    for(int i = 0; i < compareBy[tabIndex].length; i++) {
+		    for(int i = 0; i < compareBy.length; i++) {
 		        compareBy[i][0] = Snitt.MEAN;
 		        compareBy[i][1] = Snitt.ROUNDS;
 		    }

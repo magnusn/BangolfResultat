@@ -46,8 +46,16 @@ class KlassWindow extends JFrame {
 			if (!(e instanceof FileNotFoundException)) {
 				JOptionPane.showMessageDialog(frame, "Inläsningen av fillistan misslyckades", "Varning", JOptionPane.ERROR_MESSAGE);
 			}
-			klass = new ListPanel(new Vector(), new Vector());
+			Vector<String> defaultSelection = getDefaultSelection();
+			Vector<String> defaultSelected = getDefaultSelected();
+			klass = new ListPanel(defaultSelection, defaultSelected);
 			map = new HashMap();
+			for (String s : defaultSelection) {
+				map.put(s, s);
+			}
+			for (String s : defaultSelected) {
+				map.put(s, s);
+			}
 		}
 		
 		klass.setBorder(new EmptyBorder(5,5,5,5));
@@ -79,7 +87,44 @@ class KlassWindow extends JFrame {
 		frame.setLocationRelativeTo(owner);
 		frame.setVisible(true);
 	}
-	
+
+	private Vector<String> getDefaultSelection() {
+		Vector<String> v = new Vector<String>();
+		v.add("[Ingen klass]");
+		v.add("Herrveteraner");
+		v.add("Damveteraner");
+		v.add("Oldtimers Herrar");
+		v.add("Oldtimers Damer");
+		v.add("Oldboys");
+		v.add("Oldgirls");
+		v.add("Ungdom flickor C");
+		v.add("Ungdom flickor B");
+		v.add("Ungdom flickor A");
+		v.add("Ungdom pojkar C");
+		v.add("Ungdom pojkar B");
+		v.add("Ungdom pojkar A");
+		v.add("Ungdom");
+		v.add("Damjuniorer");
+		v.add("Herrjuniorer");
+		v.add("Damseniorer");
+		v.add("Herrseniorer");
+		v.add("Klass D");
+		v.add("Klass C");
+		v.add("Klass B");
+		v.add("Klass A");
+
+		return v;
+	}
+
+	private Vector<String> getDefaultSelected() {
+		Vector<String> v = new Vector<String>();
+		v.add("Klass 1");
+		v.add("Klass 2");
+		v.add("Klass 3");
+
+		return v;
+	}
+
 	/** klassen som tar hand om knapptryckningarna i menyn */
 	class MenuHandler implements ActionListener {
 		/** kollar vilket menyalternativ som valts */

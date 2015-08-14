@@ -561,6 +561,16 @@ public class IOHandler {
 	}
 
 	/**
+	 * Creates the directory used for storing application settings.
+	 */
+	public static void createSettingsDirectory() {
+		File settingsDirectory = new File(getSettingsPath());
+		if (!settingsDirectory.exists()) {
+			settingsDirectory.mkdirs();
+		}
+	}
+
+	/**
 	 * Returns the path to the application data directory.
 	 * <p>
 	 * The path contains a trailing system-depending name-separator character.
