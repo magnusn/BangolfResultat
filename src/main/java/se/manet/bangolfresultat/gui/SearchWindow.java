@@ -15,6 +15,7 @@ import javax.swing.UIManager;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -142,21 +143,13 @@ public class SearchWindow {
 		searchLabel[3] = new JLabel("Ändra i det sökbara namnregistret:");
 		searchLabel[4] = new JLabel("Namn:");
 		searchLabel[5] = new JLabel("Klubb:");
-		for(int i = 0; i < 4; i++) {
-			searchLabel[i].setPreferredSize(new Dimension(250,15));
-		}
-		searchLabel[4].setPreferredSize(new Dimension(120,15));
-		searchLabel[5].setPreferredSize(new Dimension(120,15));
 		
 		KeyHandler keyhand = new KeyHandler();
 		searchField = new JTextField();
-		searchField.setPreferredSize(new Dimension(240,20));
 		searchField.addKeyListener(keyhand);
 		
 		nameField = new JTextField();
-		nameField.setPreferredSize(new Dimension(120,20));
 		clubField = new JTextField();
-		clubField.setPreferredSize(new Dimension(120,20));
 		GridBagLayout gridbag = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
 		searchPanel.setLayout(gridbag);
@@ -178,10 +171,9 @@ public class SearchWindow {
 		ButtonKeyHandler buttonHand = new ButtonKeyHandler();
 		int key = KeyEvent.VK_0;
 		for(int i = 0; i < 10; i++) {
-			button[i] = new JButton();
+			button[i] = new JButton(" ");
 			button[i].setMnemonic(key);
 			key++;
-			button[i].setPreferredSize(new Dimension(240,25));
 			button[i].setHorizontalAlignment(SwingConstants.LEFT);
 			button[i].setFocusable(false);
 			button[i].addActionListener(searchHand);
@@ -192,37 +184,32 @@ public class SearchWindow {
 		JLabel emptyLabel = new JLabel(" ");
 		gridbag.setConstraints(emptyLabel, c);
 		searchPanel.add(emptyLabel);
-		c.gridwidth = 1;
-		c.insets = new Insets(1,1,1,2);
-		gridbag.setConstraints(searchLabel[4], c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		gridbag.setConstraints(searchLabel[5], c);
-		c.gridwidth = 1;
-		gridbag.setConstraints(nameField, c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		gridbag.setConstraints(clubField, c);
-		c.gridwidth = 1;
 		addPlayerButton = new JButton("Lägg till");
 		addPlayerButton.setMnemonic(KeyEvent.VK_L);
-		addPlayerButton.setPreferredSize(new Dimension(120,25));
 		removePlayerButton = new JButton("Ta bort");
 		removePlayerButton.setMnemonic(KeyEvent.VK_T);
-		removePlayerButton.setPreferredSize(new Dimension(120,25));
 		PlayerHandler playHand = new PlayerHandler();
 		addPlayerButton.addActionListener(playHand);
 		addPlayerButton.addKeyListener(buttonHand);
 		removePlayerButton.addActionListener(playHand);
 		removePlayerButton.addKeyListener(buttonHand);
-		gridbag.setConstraints(addPlayerButton, c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		gridbag.setConstraints(removePlayerButton, c);
 		searchPanel.add(searchLabel[3]);
-		searchPanel.add(searchLabel[4]);
-		searchPanel.add(searchLabel[5]);
-		searchPanel.add(nameField);
-		searchPanel.add(clubField);
-		searchPanel.add(addPlayerButton);
-		searchPanel.add(removePlayerButton);
+		JPanel editRegistryLabelPanel = new JPanel(new GridLayout(1, 2, 3, 0));
+		editRegistryLabelPanel.add(searchLabel[4]);
+		editRegistryLabelPanel.add(searchLabel[5]);
+		JPanel editRegistryInputPanel = new JPanel(new GridLayout(1, 2, 3, 0));
+		editRegistryInputPanel.add(nameField);
+		editRegistryInputPanel.add(clubField);
+		JPanel editRegistryButtonPanel = new JPanel(new GridLayout(1, 2, 3, 0));
+		editRegistryButtonPanel.add(addPlayerButton);
+		editRegistryButtonPanel.add(removePlayerButton);
+		c.insets = new Insets(1,1,1,2);
+		gridbag.setConstraints(editRegistryLabelPanel, c);
+		gridbag.setConstraints(editRegistryInputPanel, c);
+		gridbag.setConstraints(editRegistryButtonPanel, c);
+		searchPanel.add(editRegistryLabelPanel);
+		searchPanel.add(editRegistryInputPanel);
+		searchPanel.add(editRegistryButtonPanel);
 		
 		JMenuBar bar = new JMenuBar();
 		JMenu menu = new JMenu("Arkiv");
@@ -497,7 +484,7 @@ public class SearchWindow {
 			}
 			else {
 				button[i].setFocusable(false);
-				button[i].setText("");
+				button[i].setText(" ");
 			}
 		}
 	}
@@ -1127,7 +1114,7 @@ public class SearchWindow {
     	/** kollar vilken knapp som tryckts ned */
     	public void actionPerformed(ActionEvent e) {
     		for(int i = 0; i < 10; i++) {
-    			if(e.getSource()==button[i] && !button[i].getText().equals("")){
+    			if(e.getSource()==button[i] && !button[i].getText().trim().equals("")){
     				setPopup(button[i]);
     			}
     		}
@@ -1174,7 +1161,7 @@ public class SearchWindow {
     		if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
     			searchField.setEditable(false);
     			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
-    			if(!button[keyNbr].getText().equals("")) {
+    			if(!button[keyNbr].getText().trim().equals("")) {
     				setPopup(button[keyNbr]);
     			}
     			searchField.setEditable(true);
@@ -1189,7 +1176,7 @@ public class SearchWindow {
     		JButton pressedButton = (JButton) e.getSource();
     		if((e.getKeyChar() >= '0' && e.getKeyChar() <= '9')) {
     			int keyNbr = Integer.parseInt(String.valueOf(e.getKeyChar()));
-    			if(!button[keyNbr].getText().equals("")) {
+    			if(!button[keyNbr].getText().trim().equals("")) {
     				setPopup(button[keyNbr]);
     			}
     		} else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
