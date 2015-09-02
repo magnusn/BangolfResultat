@@ -1,5 +1,5 @@
 * Check license to be used and what is specified in GitHub.
-* Check what about window looks like on Linux.
 * Platform independent resource filtering.
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
+* Check for new version, setting homepage/remind-next-time/remind-next-version/never-remind

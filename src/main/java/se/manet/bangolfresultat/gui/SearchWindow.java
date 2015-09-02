@@ -1,41 +1,45 @@
 package se.manet.bangolfresultat.gui;
 
-import javax.swing.JOptionPane;
-import javax.swing.JFrame;
-import javax.swing.SwingConstants;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.UIManager;
-
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.event.KeyAdapter;
-import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.swing.ImageIcon;
-
-import java.awt.Image;
-
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import se.manet.bangolfresultat.datastruct.AlignmentManager;
@@ -47,8 +51,8 @@ import se.manet.bangolfresultat.datastruct.NameList;
 import se.manet.bangolfresultat.datastruct.PropertyReader;
 import se.manet.bangolfresultat.datastruct.ResultList;
 import se.manet.bangolfresultat.snitt.SnittWindow;
-
-import java.util.StringTokenizer;
+import se.manet.bangolfresultat.updatecheck.UpdateCheckResponse;
+import se.manet.bangolfresultat.updatecheck.UpdateChecker;
 
 /** klassen som beskriver själva huvudfönstret och delen för sökning */
 public class SearchWindow {
@@ -73,6 +77,7 @@ public class SearchWindow {
 	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
 	private JMenuItem changeName, changeClub;			// ändra namn och klubb på en spelare
 	private JMenuItem numberOrientation;				// alternativ för sifferorienteringen
+	private JMenuItem checkForUpdates;					// sök efter uppdateringar
 	private JLabel inputNameLabel;				// innehåller namnet på den person som resultat skrivs in för
 	private JFileChooser fileChooser;			// filväljare
 	private Filter skvFilter, htmFilter;		// filter för skv- och htmfiler
@@ -97,6 +102,7 @@ public class SearchWindow {
 	
 	/** skapar huvudfönstret */
 	public SearchWindow() {
+		backgroundUpdateCheck();
 		name = new NameList();
 		try {
 			name.readNames();
@@ -261,6 +267,7 @@ public class SearchWindow {
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
+		checkForUpdates = new JMenuItem("Sök efter uppdateringar...", KeyEvent.VK_U);
 		showSystemSettings = new JMenuItem("Visa systeminställningar...", KeyEvent.VK_S);
 		about = new JMenuItem("Om " + PropertyReader.getApplicationName() + "...", KeyEvent.VK_O);
 		newComp.addActionListener(menuHand);
@@ -278,6 +285,7 @@ public class SearchWindow {
 		makeCompareFile.addActionListener(menuHand);
 		openCompareFile.addActionListener(menuHand);
 		setLookAndFeel.addActionListener(menuHand);
+		checkForUpdates.addActionListener(menuHand);
 		showSystemSettings.addActionListener(menuHand);
 		about.addActionListener(menuHand);
 		menu.add(newComp);
@@ -299,6 +307,8 @@ public class SearchWindow {
 		snittMenu.add(makeCompareFile);
 		snittMenu.add(openCompareFile);
 		windowMenu.add(setLookAndFeel);
+		help.add(checkForUpdates);
+		help.addSeparator();
 		help.add(showSystemSettings);
 		help.addSeparator();
 		help.add(about);
@@ -644,7 +654,36 @@ public class SearchWindow {
 	        JOptionPane.showMessageDialog(null, "Loggningen misslyckades.");
 	    }
 	}
-	
+
+	private void backgroundUpdateCheck() {
+		final ExecutorService executor = Executors.newFixedThreadPool(2);
+		executor.execute(new Runnable() {
+
+			public void run() {
+				try {
+					Future<UpdateCheckResponse> future = executor
+							.submit(new UpdateChecker());
+					UpdateCheckResponse response = future.get();
+					if (response.isSuccessful() && response.isUpdateAvailable()) {
+						while (!frame.isVisible()) {
+							Thread.sleep(200);
+						}
+						JOptionPane.showMessageDialog(frame, "En ny version av " + PropertyReader.getApplicationName() +
+								" finns tillgänlig: " + response.getLatestVersion(),
+								"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+					}
+				} catch (ExecutionException e) {
+
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+		});
+
+		executor.shutdown();
+	}
+
 	/** mainmetoden som startar hela programmet */
 	public static void main(String[] args) {
 	    System.setProperty("sun.awt.exception.handler", "gui.SearchWindow$ErrorHandler");
@@ -886,6 +925,24 @@ public class SearchWindow {
 					} else if (newLookAndFeel.equals(system)) {
 						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 					}
+				}
+			}
+			else if(e.getSource() == checkForUpdates) {
+				UpdateCheckResponse response = UpdateChecker.getResponse(frame);
+
+				if (response.isSuccessful()) {
+					if (response.isUpdateAvailable()) {
+						JOptionPane.showMessageDialog(frame, "En ny version av " + PropertyReader.getApplicationName() +
+								" finns tillgänlig: " + response.getLatestVersion(),
+								"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(frame,
+								"Du använder den senaste versionen av " + PropertyReader.getApplicationName(),
+								"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(frame, response.getErrorMessage(),
+							"Sök efter uppdateringar", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 			else if(e.getSource() == showSystemSettings) {
