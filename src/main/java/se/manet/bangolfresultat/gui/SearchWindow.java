@@ -676,12 +676,12 @@ public class SearchWindow {
 
 				} catch (InterruptedException e) {
 
+				} finally {
+					executor.shutdown();
 				}
 			}
 
 		});
-
-		executor.shutdown();
 	}
 
 	/** mainmetoden som startar hela programmet */
