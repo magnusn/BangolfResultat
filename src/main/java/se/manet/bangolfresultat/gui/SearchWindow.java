@@ -28,6 +28,7 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -655,6 +656,17 @@ public class SearchWindow {
 	    }
 	}
 
+	private void showNewVersionDialog(String version) {
+		JEditorPane editorPane = GuiUtil.getEditorPaneWithHyperLinkListener();
+		editorPane.setBackground(UIManager.getColor("OptionPane.background"));
+		editorPane.setText("En ny version av " + PropertyReader.getApplicationName() +
+				" finns tillgänlig: " + version + "<p>" +
+				"<a href=\"" + PropertyReader.getApplicationUrl() +
+				"\">" + PropertyReader.getApplicationUrl() + "</a>");
+		JOptionPane.showMessageDialog(frame, editorPane,
+				"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	private void backgroundUpdateCheck() {
 		final ExecutorService executor = Executors.newFixedThreadPool(2);
 		executor.execute(new Runnable() {
@@ -663,18 +675,18 @@ public class SearchWindow {
 				try {
 					Future<UpdateCheckResponse> future = executor
 							.submit(new UpdateChecker());
-					UpdateCheckResponse response = future.get();
+					UpdateCheckResponse response = future.get(60, TimeUnit.SECONDS);
 					if (response.isSuccessful() && response.isUpdateAvailable()) {
 						while (!frame.isVisible()) {
 							Thread.sleep(200);
 						}
-						JOptionPane.showMessageDialog(frame, "En ny version av " + PropertyReader.getApplicationName() +
-								" finns tillgänlig: " + response.getLatestVersion(),
-								"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+						showNewVersionDialog(response.getLatestVersion());
 					}
 				} catch (ExecutionException e) {
 
 				} catch (InterruptedException e) {
+
+				} catch (TimeoutException e) {
 
 				} finally {
 					executor.shutdown();
@@ -932,9 +944,7 @@ public class SearchWindow {
 
 				if (response.isSuccessful()) {
 					if (response.isUpdateAvailable()) {
-						JOptionPane.showMessageDialog(frame, "En ny version av " + PropertyReader.getApplicationName() +
-								" finns tillgänlig: " + response.getLatestVersion(),
-								"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
+						showNewVersionDialog(response.getLatestVersion());
 					} else {
 						JOptionPane.showMessageDialog(frame,
 								"Du använder den senaste versionen av " + PropertyReader.getApplicationName(),

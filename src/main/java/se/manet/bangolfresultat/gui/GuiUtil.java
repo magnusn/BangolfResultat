@@ -1,12 +1,21 @@
 package se.manet.bangolfresultat.gui;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLDocument;
 
 /**
  * Utility class for graphical user interfaces.
@@ -73,6 +82,42 @@ public class GuiUtil {
 		dialog.setLocationRelativeTo(owner);
 
 		return dialog;
+	}
+
+	/**
+	 * Returns a non editable <code>JEditorPane</code> which already has a
+	 * hyperlink listener added to itself.
+	 * 
+	 * @return a non editable <code>JEditorPane</code> which already has a
+	 *         hyperlink listener added to itself
+	 */
+	public static JEditorPane getEditorPaneWithHyperLinkListener() {
+		JEditorPane editorPane = new JEditorPane();
+		editorPane.setEditable(false);
+		editorPane.setEditorKit(JEditorPane
+				.createEditorKitForContentType("text/html"));
+		Font font = UIManager.getFont("Label.font");
+		if (font != null) {
+			String bodyRule = "body { font-family: " + font.getFamily() + "; "
+					+ "font-size: " + font.getSize() + "pt; }";
+			((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(
+					bodyRule);
+		}
+		editorPane.addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+					if (Desktop.isDesktopSupported()) {
+						try {
+							Desktop.getDesktop().browse(e.getURL().toURI());
+						} catch (IOException e1) {
+						} catch (URISyntaxException e1) {
+						}
+					}
+				}
+			}
+		});
+
+		return editorPane;
 	}
 
 }
