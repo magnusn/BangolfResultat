@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,8 +33,8 @@ import se.manet.bangolfresultat.updatecheck.Frequency;
 public class SettingsWindow extends JDialog {
 	private JComboBox<Frequency> frequencyComboBox;
 	private JCheckBox doNotRemindCheckBox;
-	private JButton acceptButton; // knapp för att bekräfta inställningarna
-	private JButton cancelButton; // knapp för att avbryta
+	private JButton acceptButton;
+	private JButton cancelButton;
 
 	/**
 	 * Creates the settings window.
@@ -59,6 +61,8 @@ public class SettingsWindow extends JDialog {
 
 		loadUpdateCheckFrequency();
 		loadUpdateCheckDoNotRemind();
+		toggleUpdateCheckSettings();
+		frequencyComboBox.addItemListener(new FrequencyItemChangeListener());
 		settingsPanel.add(frequencyComboBox, c);
 		settingsPanel.add(doNotRemindCheckBox, c);
 		setResizable(false);
@@ -125,6 +129,21 @@ public class SettingsWindow extends JDialog {
 	}
 
 	/**
+	 * Toggles automatic update check settings between enabled or disabled
+	 * dependent on the current state of the frequency setting.
+	 */
+	private void toggleUpdateCheckSettings() {
+		Frequency frequency = (Frequency) frequencyComboBox.getSelectedItem();
+
+		if (frequency == Frequency.NEVER && doNotRemindCheckBox.isEnabled()) {
+			doNotRemindCheckBox.setEnabled(false);
+		} else if (frequency != Frequency.NEVER
+				&& !doNotRemindCheckBox.isEnabled()) {
+			doNotRemindCheckBox.setEnabled(true);
+		}
+	}
+
+	/**
 	 * Disposes the window without changing any of the settings.
 	 */
 	private void exitWithoutChanges() {
@@ -154,6 +173,20 @@ public class SettingsWindow extends JDialog {
 				dispose();
 			} else if (e.getSource() == cancelButton) {
 				exitWithoutChanges();
+			}
+		}
+
+	}
+
+	/**
+	 * Reacts when the currently selected item changes for the automatic update
+	 * check frequency setting.
+	 */
+	class FrequencyItemChangeListener implements ItemListener {
+
+		public void itemStateChanged(ItemEvent e) {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				toggleUpdateCheckSettings();
 			}
 		}
 
