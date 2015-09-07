@@ -16,6 +16,10 @@ public class DataStore {
 	public static final String SNITT_FILE_MAP = "snittFileMap";
 	public static final String SNITT_TAB_INDEX = "snittTabIndex";
 	public static final String SNITT_TAB_TITLE = "snittTabTitle";
+	public static final String UPDATE_CHECK_FREQUENCY = "updateCheckFrequency";
+	public static final String UPDATE_CHECK_DO_NOT_REMIND = "updateCheckDoNotRemind";
+	public static final String UPDATE_CHECK_LAST_VERSION_FOUND = "updateCheckLastVersionFound";
+	public static final String UPDATE_CHECK_LAST_RUN_DATE = "updateCheckLastRunDate";
 	/* End of list of keys. */
 	
 	private static Hashtable dataStore;

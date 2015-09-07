@@ -2,4 +2,5 @@
 * Platform independent resource filtering.
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
-* Check for new version, setting homepage/remind-next-time/remind-next-version/never-remind
+* Remove knownissues link from manual.htm
+* Go through and update manual, check for updates

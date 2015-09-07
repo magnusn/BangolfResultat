@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
@@ -51,9 +52,12 @@ import se.manet.bangolfresultat.datastruct.IOHandler;
 import se.manet.bangolfresultat.datastruct.NameList;
 import se.manet.bangolfresultat.datastruct.PropertyReader;
 import se.manet.bangolfresultat.datastruct.ResultList;
+import se.manet.bangolfresultat.datastruct.util.Settings;
 import se.manet.bangolfresultat.snitt.SnittWindow;
+import se.manet.bangolfresultat.updatecheck.Frequency;
 import se.manet.bangolfresultat.updatecheck.UpdateCheckResponse;
 import se.manet.bangolfresultat.updatecheck.UpdateChecker;
+import se.manet.bangolfresultat.updatecheck.VersionCompare;
 
 /** klassen som beskriver själva huvudfönstret och delen för sökning */
 public class SearchWindow {
@@ -73,7 +77,8 @@ public class SearchWindow {
 	private	JMenuItem saveToHTML, quit, editItem; 		// spara till HTML, avsluta, redigera
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
 	private JMenuItem showSystemSettings;				// visa systeminställningar
-	private JMenuItem setLookAndFeel;					// ställ in programmets look and feel 
+	private JMenuItem setLookAndFeel;					// ställ in programmets look and feel
+	private JMenuItem settingsMenuItem;					// inställningar
 	private JMenuItem makeCompareFile, openCompareFile;	// skapar eller öppnar en jämförande snittlista
 	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
 	private JMenuItem changeName, changeClub;			// ändra namn och klubb på en spelare
@@ -268,6 +273,8 @@ public class SearchWindow {
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
 		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
+		settingsMenuItem = new JMenuItem("Inställningar...", KeyEvent.VK_I);
+
 		checkForUpdates = new JMenuItem("Sök efter uppdateringar...", KeyEvent.VK_U);
 		showSystemSettings = new JMenuItem("Visa systeminställningar...", KeyEvent.VK_S);
 		about = new JMenuItem("Om " + PropertyReader.getApplicationName() + "...", KeyEvent.VK_O);
@@ -286,6 +293,7 @@ public class SearchWindow {
 		makeCompareFile.addActionListener(menuHand);
 		openCompareFile.addActionListener(menuHand);
 		setLookAndFeel.addActionListener(menuHand);
+		settingsMenuItem.addActionListener(menuHand);
 		checkForUpdates.addActionListener(menuHand);
 		showSystemSettings.addActionListener(menuHand);
 		about.addActionListener(menuHand);
@@ -308,6 +316,8 @@ public class SearchWindow {
 		snittMenu.add(makeCompareFile);
 		snittMenu.add(openCompareFile);
 		windowMenu.add(setLookAndFeel);
+		windowMenu.addSeparator();
+		windowMenu.add(settingsMenuItem);
 		help.add(checkForUpdates);
 		help.addSeparator();
 		help.add(showSystemSettings);
@@ -667,7 +677,22 @@ public class SearchWindow {
 				"Sök efter uppdateringar", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	/**
+	 * Performs the automatic update check.
+	 */
 	private void backgroundUpdateCheck() {
+		Frequency frequency = Settings.getFrequency();
+		if (frequency == Frequency.NEVER) {
+			return;
+		}
+
+		Date lastRunDate = Settings.getLastRunDate();
+		Date dateToRun = new Date(lastRunDate.getTime() +
+				TimeUnit.MILLISECONDS.convert(frequency.getInterval(), TimeUnit.DAYS));
+		if (new Date().before(dateToRun)) {
+			return;
+		}
+
 		final ExecutorService executor = Executors.newFixedThreadPool(2);
 		executor.execute(new Runnable() {
 
@@ -676,7 +701,23 @@ public class SearchWindow {
 					Future<UpdateCheckResponse> future = executor
 							.submit(new UpdateChecker());
 					UpdateCheckResponse response = future.get(60, TimeUnit.SECONDS);
+					if (response.isSuccessful()) {
+						DataStore.set(DataStore.UPDATE_CHECK_LAST_RUN_DATE, new Date());
+					}
 					if (response.isSuccessful() && response.isUpdateAvailable()) {
+						Boolean doNotRemind = Settings.getDoNotRemind();
+						if (doNotRemind) {
+							String lastVersionFound = Settings
+									.getLastVersionFound();
+							if (VersionCompare.compareVersion(lastVersionFound,
+									response.getLatestVersion()) == 0) {
+								return;
+							}
+						}
+
+						DataStore.set(
+								DataStore.UPDATE_CHECK_LAST_VERSION_FOUND,
+								response.getLatestVersion());
 						while (!frame.isVisible()) {
 							Thread.sleep(200);
 						}
@@ -938,6 +979,9 @@ public class SearchWindow {
 						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 					}
 				}
+			}
+			else if(e.getSource() == settingsMenuItem) {
+				new SettingsWindow(frame);
 			}
 			else if(e.getSource() == checkForUpdates) {
 				UpdateCheckResponse response = UpdateChecker.getResponse(frame);
