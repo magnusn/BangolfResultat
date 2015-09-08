@@ -30,16 +30,6 @@
 		<fileSet>
 			<directory>${project.basedir}/doc</directory>
 			<outputDirectory>doc</outputDirectory>
-			<excludes>
-				<exclude>licens.txt</exclude>
-			</excludes>
-		</fileSet>
-		<fileSet>
-			<directory>${project.basedir}/doc</directory>
-			<outputDirectory></outputDirectory>
-			<includes>
-				<include>licens.txt</include>
-			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/icons</directory>

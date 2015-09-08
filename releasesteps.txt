@@ -8,11 +8,10 @@
 
 Vid ny hemsideadress skall följande filer ändras:
 - pom.xml
-- doc/licens.txt
 - doc/manual.htm
 - doc/snitt.htm
 - doc/webbsida.htm
 
 Vid andra speciella tillfällen:
 - Ändra doc/om.htm (vid nytt år)
-- Ändra doc/licens.txt (vid nytt år eller ändrade licensvillkor)
+- Ändra LICENSE.txt (vid nytt år eller ändrade licensvillkor)

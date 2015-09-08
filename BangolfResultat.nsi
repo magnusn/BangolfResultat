@@ -40,7 +40,7 @@ Var /GLOBAL remove_settings
 !define MUI_WELCOMEPAGE_TEXT "Om du redan har en version av ${PRODUCT_NAME} installerad skall du avsluta programmet och säkerhetskopiera programmets inställningar innan du fortsätter med installationen.\r\n\r\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
+!insertmacro MUI_PAGE_LICENSE "${PRODUCT_PROJECT_PATH}\LICENSE.txt"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Start menu page
@@ -141,7 +141,7 @@ FunctionEnd
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  File "${PRODUCT_PROJECT_PATH}\doc\licens.txt"
+  File "${PRODUCT_PROJECT_PATH}\LICENSE.txt"
   File /oname=BangolfResultat.jar "${PRODUCT_PROJECT_PATH}\target\BangolfResultat*.jar"
   SetOutPath "$INSTDIR\doc\bilder"
   File "${PRODUCT_PROJECT_PATH}\doc\bilder\align.gif"
@@ -284,6 +284,7 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\bgr.gif"
   Delete "$INSTDIR\doc\bilder\align.gif"
   Delete "$INSTDIR\licens.txt"
+  Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\BangolfResultat.jar"
   Delete "${PRODUCT_LOGS_DIRECTORY}\error.log"
 
