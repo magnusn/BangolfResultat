@@ -1,4 +1,8 @@
 * Platform independent resource filtering.
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
-* Go through and update manual, check for updates
+* Go through and update manual, check for updates, show system settings, settings
+* Create info@bangolfresultat.manet.se e-mail address
+* Add updatecheck web content to project
+* Create dynamic parts of updatecheck web content
+* Create release notes
