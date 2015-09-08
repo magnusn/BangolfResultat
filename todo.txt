@@ -1,6 +1,4 @@
-* Check license to be used and what is specified in GitHub.
 * Platform independent resource filtering.
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
-* Remove knownissues link from manual.htm
 * Go through and update manual, check for updates
