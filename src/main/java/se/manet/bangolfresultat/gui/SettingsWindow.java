@@ -20,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import se.manet.bangolfresultat.datastruct.DataStore;
@@ -31,8 +32,13 @@ import se.manet.bangolfresultat.updatecheck.Frequency;
  * Represents the general settings window.
  */
 public class SettingsWindow extends JDialog {
+
+	public static final String JAVA_LOOK_AND_FEEL = "Java";
+	public static final String SYSTEM_LOOK_AND_FEEL = "Naturlig";
+
 	private JComboBox<Frequency> frequencyComboBox;
 	private JCheckBox doNotRemindCheckBox;
+	private JComboBox<String> lookAndFeelComboBox;
 	private JButton acceptButton;
 	private JButton cancelButton;
 
@@ -47,24 +53,25 @@ public class SettingsWindow extends JDialog {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowHandler());
 
-		JPanel settingsPanel = new JPanel();
-		settingsPanel.setLayout(new GridBagLayout());
+		JPanel updateCheckPanel = new JPanel();
+		updateCheckPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(1, 1, 1, 2);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		settingsPanel.setBorder(BorderFactory
+		c.weightx = 1;
+		updateCheckPanel.setBorder(BorderFactory
 				.createTitledBorder("Uppdateringar av "
 						+ PropertyReader.getApplicationName()));
-		settingsPanel.add(new JLabel(
+		updateCheckPanel.add(new JLabel(
 				"Sök automatiskt efter uppdateringar av BangolfResultat:"), c);
 
 		loadUpdateCheckFrequency();
 		loadUpdateCheckDoNotRemind();
 		toggleUpdateCheckSettings();
 		frequencyComboBox.addItemListener(new FrequencyItemChangeListener());
-		settingsPanel.add(frequencyComboBox, c);
-		settingsPanel.add(doNotRemindCheckBox, c);
+		updateCheckPanel.add(frequencyComboBox, c);
+		updateCheckPanel.add(doNotRemindCheckBox, c);
 		setResizable(false);
 
 		ButtonHandler buttonHand = new ButtonHandler();
@@ -80,13 +87,42 @@ public class SettingsWindow extends JDialog {
 		buttonPanel.add(cancelButton);
 
 		setLayout(new GridBagLayout());
-		getContentPane().add(settingsPanel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		getContentPane().add(updateCheckPanel, c);
+		getContentPane().add(createLookAndFeelPanel(), c);
+		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.EAST;
 		getContentPane().add(buttonPanel, c);
 
 		pack();
 		setLocationRelativeTo(owner);
 		setVisible(true);
+	}
+
+	/**
+	 * Creates the look and feel panel and calls {@link #loadLookAndFeel()}.
+	 * 
+	 * @return the look and feel panel
+	 */
+	private JPanel createLookAndFeelPanel() {
+		JPanel lookAndFeelPanel = new JPanel();
+		lookAndFeelPanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(1, 1, 1, 2);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.weightx = 1;
+		lookAndFeelPanel.setBorder(BorderFactory
+				.createTitledBorder("Utseende och känsla"));
+		lookAndFeelPanel.add(new JLabel("Välj utseende och känsla:"), c);
+		lookAndFeelPanel.add(
+				new JLabel("(Börjar gälla när "
+						+ PropertyReader.getApplicationName()
+						+ " har startats om)"), c);
+		loadLookAndFeel();
+		lookAndFeelPanel.add(lookAndFeelComboBox, c);
+
+		return lookAndFeelPanel;
 	}
 
 	/**
@@ -126,6 +162,41 @@ public class SettingsWindow extends JDialog {
 	private void saveUpdateCheckDoNotRemind() {
 		DataStore.set(DataStore.UPDATE_CHECK_DO_NOT_REMIND,
 				doNotRemindCheckBox.isSelected());
+	}
+
+	/**
+	 * Creates the look and feel <code>ComboBox</code> and sets its value based
+	 * on the current setting.
+	 */
+	private void loadLookAndFeel() {
+		String initialSelectedItem = JAVA_LOOK_AND_FEEL;
+		String lookAndFeel = (String) DataStore.get(DataStore.LOOK_AND_FEEL);
+		if (lookAndFeel != null) {
+			if (lookAndFeel.equals(UIManager.getSystemLookAndFeelClassName())) {
+				initialSelectedItem = SYSTEM_LOOK_AND_FEEL;
+			}
+		}
+		lookAndFeelComboBox = new JComboBox<String>(new String[] {
+				JAVA_LOOK_AND_FEEL, SYSTEM_LOOK_AND_FEEL });
+		lookAndFeelComboBox.setSelectedItem(initialSelectedItem);
+	}
+
+	/**
+	 * Saves the look and feel setting.
+	 */
+	private void saveLookAndFeel() {
+		int selectedIndex = lookAndFeelComboBox.getSelectedIndex();
+		if (selectedIndex == -1) {
+			return;
+		}
+		String lookAndFeel = lookAndFeelComboBox.getItemAt(selectedIndex);
+		if (lookAndFeel.equals(JAVA_LOOK_AND_FEEL)) {
+			DataStore.set(DataStore.LOOK_AND_FEEL,
+					UIManager.getCrossPlatformLookAndFeelClassName());
+		} else if (lookAndFeel.equals(SYSTEM_LOOK_AND_FEEL)) {
+			DataStore.set(DataStore.LOOK_AND_FEEL,
+					UIManager.getSystemLookAndFeelClassName());
+		}
 	}
 
 	/**
@@ -170,6 +241,7 @@ public class SettingsWindow extends JDialog {
 			if (e.getSource() == acceptButton) {
 				saveUpdateCheckFrequency();
 				saveUpdateCheckDoNotRemind();
+				saveLookAndFeel();
 				dispose();
 			} else if (e.getSource() == cancelButton) {
 				exitWithoutChanges();

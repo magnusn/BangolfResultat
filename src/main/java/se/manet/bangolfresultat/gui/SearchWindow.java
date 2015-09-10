@@ -77,7 +77,6 @@ public class SearchWindow {
 	private	JMenuItem saveToHTML, quit, editItem; 		// spara till HTML, avsluta, redigera
 	private JMenuItem klassStart, snittStart, about;	// hantera klasser och snittlista, om programmet
 	private JMenuItem showSystemSettings;				// visa systeminställningar
-	private JMenuItem setLookAndFeel;					// ställ in programmets look and feel
 	private JMenuItem settingsMenuItem;					// inställningar
 	private JMenuItem makeCompareFile, openCompareFile;	// skapar eller öppnar en jämförande snittlista
 	private JMenuItem headerItem, saveAs, saveAsHTML;	// sätter tävlingens namn, spara som för SKV- och HTML-filer
@@ -232,15 +231,15 @@ public class SearchWindow {
 		klassMenu.setMnemonic(KeyEvent.VK_K);
 		JMenu snittMenu = new JMenu("Snittlistor");
 		snittMenu.setMnemonic(KeyEvent.VK_S);
-		JMenu windowMenu = new JMenu("Fönster");
-		windowMenu.setMnemonic(KeyEvent.VK_F);
+		JMenu toolsMenu = new JMenu("Verktyg");
+		toolsMenu.setMnemonic(KeyEvent.VK_V);
 		JMenu help = new JMenu("Info");
 		help.setMnemonic(KeyEvent.VK_I);
 		bar.add(menu);
 		bar.add(edit);
 		bar.add(klassMenu);
 		bar.add(snittMenu);
-		bar.add(windowMenu);
+		bar.add(toolsMenu);
 		bar.add(help);
 		MenuHandler menuHand = new MenuHandler();
 		newComp = new JMenuItem("Ny tävling...", KeyEvent.VK_N);
@@ -272,7 +271,6 @@ public class SearchWindow {
 		snittStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
 		makeCompareFile = new JMenuItem("Ny jämförande snittlista...", KeyEvent.VK_N);
 		openCompareFile = new JMenuItem("Öppna jämförande snittlista...", KeyEvent.VK_P);
-		setLookAndFeel = new JMenuItem("Välj utseende och känsla...", KeyEvent.VK_U);
 		settingsMenuItem = new JMenuItem("Inställningar...", KeyEvent.VK_I);
 
 		checkForUpdates = new JMenuItem("Sök efter uppdateringar...", KeyEvent.VK_U);
@@ -292,7 +290,6 @@ public class SearchWindow {
 		snittStart.addActionListener(menuHand);
 		makeCompareFile.addActionListener(menuHand);
 		openCompareFile.addActionListener(menuHand);
-		setLookAndFeel.addActionListener(menuHand);
 		settingsMenuItem.addActionListener(menuHand);
 		checkForUpdates.addActionListener(menuHand);
 		showSystemSettings.addActionListener(menuHand);
@@ -315,9 +312,7 @@ public class SearchWindow {
 		snittMenu.addSeparator();
 		snittMenu.add(makeCompareFile);
 		snittMenu.add(openCompareFile);
-		windowMenu.add(setLookAndFeel);
-		windowMenu.addSeparator();
-		windowMenu.add(settingsMenuItem);
+		toolsMenu.add(settingsMenuItem);
 		help.add(checkForUpdates);
 		help.addSeparator();
 		help.add(showSystemSettings);
@@ -955,31 +950,6 @@ public class SearchWindow {
     				}
     			}
 	    	}
-			else if(e.getSource() == setLookAndFeel) {
-				String java = "Java";
-				String system = "Naturlig";
-				String initialSelectionValue = java;
-				Object lookAndFeel = DataStore.get(DataStore.LOOK_AND_FEEL);
-				if (lookAndFeel != null) {
-					if (((String) lookAndFeel).equals(
-							UIManager.getSystemLookAndFeelClassName())) {
-						initialSelectionValue = system;
-					}
-				}
-				String newLookAndFeel = (String) JOptionPane.showInputDialog(
-						frame, "Välj utseende och känsla:\n(Börjar gälla när "
-								+ PropertyReader.getApplicationName()
-								+ " har startats om.)", "Utseende och känsla",
-						JOptionPane.INFORMATION_MESSAGE, null, new String[] {
-								java, system }, initialSelectionValue);
-				if (newLookAndFeel != null) {
-					if (newLookAndFeel.equals(java)) {
-						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getCrossPlatformLookAndFeelClassName());
-					} else if (newLookAndFeel.equals(system)) {
-						DataStore.set(DataStore.LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
-					}
-				}
-			}
 			else if(e.getSource() == settingsMenuItem) {
 				new SettingsWindow(frame);
 			}
