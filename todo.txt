@@ -1,7 +1,5 @@
 Needed for release:
-* Go through and update manual, check for updates, show system settings, settings
 * Change e-mail address from info@bangolfresultat.manet.se to magnus.hoven@manet.se
-* Add updatecheck web content to project
 * Create dynamic parts of updatecheck web content
 * Create release notes
 * Test that it works
