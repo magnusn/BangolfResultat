@@ -8,3 +8,4 @@ Nice to have:
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
 * Create dynamic parts of updatecheck web content
+* Do not include documentation on local install?
