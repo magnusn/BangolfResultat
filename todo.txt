@@ -1,5 +1,4 @@
 Needed for release:
-* Change e-mail address from info@bangolfresultat.manet.se to magnus.hoven@manet.se
 * Create dynamic parts of updatecheck web content
 * Create release notes
 * Test that it works
