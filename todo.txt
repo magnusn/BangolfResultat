@@ -1,5 +1,5 @@
 Needed for release:
-* Create release notes
+* Test install, move installation, upgrade
 * Test that it works
 * Add system test?
 
