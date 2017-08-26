@@ -1,5 +1,4 @@
 Needed for release:
-* Create dynamic parts of updatecheck web content
 * Create release notes
 * Test that it works
 * Add system test?
@@ -8,3 +7,4 @@ Nice to have:
 * Platform independent resource filtering.
 * Check which settings files that really needs to be stored on disk, for example klassmap can
 be derived from klass, compareBy from ?
+* Create dynamic parts of updatecheck web content
