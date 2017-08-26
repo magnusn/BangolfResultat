@@ -89,19 +89,28 @@ Function UninstallPrevious
     Goto Done
   ${EndIf}
 
-  ; Exit function if uninstaller file does not exist
-  IfFileExists "$previous_uninstaller" 0 Done
-
   ; Check previous version number. If older than 0.8: data folder should be moved and uninstaller can't be run silently.
   ${VersionCompare} "$previous_installed_version" "0.8" $previous_compared_to_0_8
+
+  ; Migrate settings directory
+  ${If} $previous_compared_to_0_8 == 2
+    DetailPrint "Flyttar programmets inställningar"
+    IfFileExists "$previous_uninstaller" MigrateWithUninstall MigrateWithoutUninstall
+    MigrateWithUninstall:
+      MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
+      Goto Migrate
+    MigrateWithoutUninstall:
+      MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n" /SD IDOK
+    Migrate:
+      Call MoveDataFolder
+  ${EndIf}
+
+  ; Exit function if uninstaller file does not exist
+  IfFileExists "$previous_uninstaller" 0 Done
 
   DetailPrint "Avinstallerar föregående version"
 
   ; Run the uninstaller
-  ${If} $previous_compared_to_0_8 == 2
-    MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
-    Call MoveDataFolder
-  ${EndIf}
   Call RunUninstaller
   Done:
 FunctionEnd
@@ -287,6 +296,10 @@ Section Uninstall
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\BangolfResultat.jar"
   Delete "${PRODUCT_LOGS_DIRECTORY}\error.log"
+  ; Files no longer used
+  Delete "$INSTDIR\doc\lookandfeel.htm"
+  Delete "$INSTDIR\doc\bilder\lafsystem.gif"
+  Delete "$INSTDIR\doc\bilder\lafjava.gif"
 
   Delete "$DESKTOP\BangolfResultat.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk"

@@ -1,5 +1,5 @@
 Needed for release:
-* Test install, move installation, upgrade
+* Test install, move installation, upgrade -> only works if installing to previous directory
 * Test that it works
 * Add system test?
 
