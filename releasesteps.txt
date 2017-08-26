@@ -11,7 +11,9 @@ Vid ny hemsideadress skall följande filer ändras:
 - doc/manual.htm
 - doc/snitt.htm
 - doc/webbsida.htm
+- BangolfResultat.nsi
 
 Vid andra speciella tillfällen:
 - Ändra doc/om.htm (vid nytt år)
 - Ändra LICENSE.txt (vid nytt år eller ändrade licensvillkor)
+- Ändra pom.xml (vid nytt år)
