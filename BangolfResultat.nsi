@@ -6,6 +6,8 @@ Var /GLOBAL previous_uninstaller_path
 Var /GLOBAL previous_installed_version
 Var /GLOBAL previous_compared_to_0_8
 Var /GLOBAL remove_settings
+Var /GLOBAL old_inst_dir
+VAR /GLOBAL should_migrate
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
@@ -42,6 +44,16 @@ Var /GLOBAL remove_settings
 ; License page
 !insertmacro MUI_PAGE_LICENSE "${PRODUCT_PROJECT_PATH}\LICENSE.txt"
 ; Directory page
+!insertmacro MUI_PAGE_DIRECTORY
+; Ask for old installation directory if previous installation exists and the
+; user is not installing into old installation directory. This because I
+; previously have given the advice to move the installation directory to solve
+; a permission problem when trying to access user data in installation directory
+!define MUI_PAGE_CUSTOMFUNCTION_PRE AskForOldInstallDir
+!define MUI_PAGE_HEADER_SUBTEXT "Välj katalog som tidigare version av BangolfResultat är installerad i."
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Guiden kommer att kopiera programmets inställningar ifrån följande installationskatalog. För att välja katalog, klicka Bläddra och välj katalog. Klicka på Nästa för att fortsätta.$\r$\n$\r$\nExempel på hur sökvägen skall se ut: C:\Users\Magnus\Program\BangolfResultat\"
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION "Källkatalog"
+!define MUI_DIRECTORYPAGE_VARIABLE $old_inst_dir ; <= the other directory will be stored into that variable
 !insertmacro MUI_PAGE_DIRECTORY
 ; Start menu page
 var ICONS_GROUP
@@ -80,42 +92,29 @@ Section "" UninstallPrevious
 SectionEnd
 
 Function UninstallPrevious
+  ; Migrate settings
+  Call MigrateSettings
+
+  ; Run the uninstaller
+  Call RunUninstaller
+FunctionEnd
+
+Function RunUninstaller
   ; Read register entries
   ReadRegStr $previous_uninstaller ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "UninstallString"
   ReadRegStr $previous_installed_version ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "DisplayVersion"
 
-  ; Exit function if no register entry
+  ; Exit function if no register entry or if file does not exist
   ${If} $previous_uninstaller == ""
     Goto Done
   ${EndIf}
-
-  ; Check previous version number. If older than 0.8: data folder should be moved and uninstaller can't be run silently.
-  ${VersionCompare} "$previous_installed_version" "0.8" $previous_compared_to_0_8
-
-  ; Migrate settings directory
-  ${If} $previous_compared_to_0_8 == 2
-    DetailPrint "Flyttar programmets inställningar"
-    IfFileExists "$previous_uninstaller" MigrateWithUninstall MigrateWithoutUninstall
-    MigrateWithUninstall:
-      MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
-      Goto Migrate
-    MigrateWithoutUninstall:
-      MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n" /SD IDOK
-    Migrate:
-      Call MoveDataFolder
-  ${EndIf}
-
-  ; Exit function if uninstaller file does not exist
   IfFileExists "$previous_uninstaller" 0 Done
 
   DetailPrint "Avinstallerar föregående version"
 
-  ; Run the uninstaller
-  Call RunUninstaller
-  Done:
-FunctionEnd
+  ; Check previous version number. If older than 0.8: uninstaller can't be run silently.
+  ${VersionCompare} "$previous_installed_version" "0.8" $previous_compared_to_0_8
 
-Function RunUninstaller
   ${GetParent} "$previous_uninstaller" $previous_uninstaller_path
   Uninstall:
     ClearErrors
@@ -131,20 +130,119 @@ Function RunUninstaller
   Done:
 FunctionEnd
 
-Function MoveDataFolder
-  IfFileExists "$INSTDIR\data" MoveDataFolder Done
-  MoveDataFolder:
-    ClearErrors
-    CopyFiles "$INSTDIR\data\*.*" "${PRODUCT_SETTINGS_DIRECTORY}\"
-    Delete "${PRODUCT_SETTINGS_DIRECTORY}\ikoner.icl"
-    Delete "${PRODUCT_SETTINGS_DIRECTORY}\brikon.gif"
-    IfErrors AskForRetry RemoveSource
-    AskForRetry:
-      MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\".$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." /SD IDIGNORE IDRETRY MoveDataFolder IDIGNORE Done
-      Abort "Misslyckades att kopiera filerna från $\"$INSTDIR\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"."
-    RemoveSource:
-      RMDir /r "$INSTDIR\data"
+Function MigrateSettings
+  ${If} $should_migrate == "yes"
+    DetailPrint "Flyttar programmets inställningar"
+
+    ; Read register entries
+    ReadRegStr $previous_uninstaller ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "UninstallString"
+
+    Var /GLOBAL migration_install_dir
+    StrCpy $migration_install_dir "$INSTDIR"
+    IfFileExists "$migration_install_dir\data" ShowMessage 0
+    ${If} $old_inst_dir == ""
+      Abort "Misslyckades att flytta inställningarna då sökvägen till den gamla installationen är tom."
+    ${EndIf}
+    StrCpy $migration_install_dir "$old_inst_dir"
+    IfFileExists "$migration_install_dir\data" ShowMessage 0
+    Abort "Katalogen som inställningarna försökte flyttas ifrån finns inte: $\"$migration_install_dir\data$\"."
+
+    ShowMessage:
+      IfFileExists "$previous_uninstaller" MigrateWithUninstall MigrateWithoutUninstall
+      MigrateWithUninstall:
+        MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$migration_install_dir\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n* Föregående version kommer att avinstalleras" /SD IDOK
+        Goto Migrate
+      MigrateWithoutUninstall:
+        MessageBox MB_ICONINFORMATION|MB_OK "Följande migreringssteg kommer nu att utföras:$\r$\n$\r$\n* Programmets inställningar kommer att flyttas från $\"$migration_install_dir\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"$\r$\n" /SD IDOK
+    Migrate:
+      MoveDataFolder:
+        ClearErrors
+        CreateDirectory "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\snittstring" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\snittapp" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\snitt" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\ptrack" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\pnametrack" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\orientation" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\namn" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\licensenamemap" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\licensemap" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\klasstring" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\klassmap" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\klass" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\dirsnitt" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\dirskv" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\dirjmf" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\dirhtm" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\datastore" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\comparefiles" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\compareby" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        CopyFiles "$migration_install_dir\data\compare" "${PRODUCT_SETTINGS_DIRECTORY}\"
+        IfErrors AskForRetry RemoveSource
+        AskForRetry:
+          MessageBox MB_ICONEXCLAMATION|MB_ABORTRETRYIGNORE|MB_DEFBUTTON2 "Misslyckades att kopiera filerna från $\"$migration_install_dir\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\".$\r$\n$\r$\nSe till så att filerna inte används och försök sedan igen." /SD IDIGNORE IDRETRY MoveDataFolder IDIGNORE Done
+          Abort "Misslyckades att kopiera filerna från $\"$migration_install_dir\data$\" till $\"${PRODUCT_SETTINGS_DIRECTORY}$\"."
+        RemoveSource:
+          Delete "$migration_install_dir\data\snittstring"
+          Delete "$migration_install_dir\data\snittapp"
+          Delete "$migration_install_dir\data\snitt"
+          Delete "$migration_install_dir\data\ptrack"
+          Delete "$migration_install_dir\data\pnametrack"
+          Delete "$migration_install_dir\data\orientation"
+          Delete "$migration_install_dir\data\namn"
+          Delete "$migration_install_dir\data\licensenamemap"
+          Delete "$migration_install_dir\data\licensemap"
+          Delete "$migration_install_dir\data\klasstring"
+          Delete "$migration_install_dir\data\klassmap"
+          Delete "$migration_install_dir\data\klass"
+          Delete "$migration_install_dir\data\dirsnitt"
+          Delete "$migration_install_dir\data\dirskv"
+          Delete "$migration_install_dir\data\dirjmf"
+          Delete "$migration_install_dir\data\dirhtm"
+          Delete "$migration_install_dir\data\datastore"
+          Delete "$migration_install_dir\data\comparefiles"
+          Delete "$migration_install_dir\data\compareby"
+          Delete "$migration_install_dir\data\compare"
+          ; No longer used
+          Delete "$migration_install_dir\data\directory"
+          Delete "$migration_install_dir\data\classorder"
+          ; No longer belongs here
+          Delete "$migration_install_dir\data\brikon.gif"
+          Delete "$migration_install_dir\data\ikoner.icl"
+          RMDir "$migration_install_dir\data\"
+  ${EndIf}
   Done:
+FunctionEnd
+
+Function AskForOldInstallDir
+  ; Read register entries
+  ReadRegStr $previous_installed_version ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "DisplayVersion"
+
+  ; Exit function if no register entry
+  ${If} $previous_installed_version == ""
+    StrCpy $should_migrate "no"
+    Abort
+  ${EndIf}
+
+  ; Check previous version number. If older than 0.8: data folder should be moved.
+  ${VersionCompare} "$previous_installed_version" "0.8" $previous_compared_to_0_8
+
+  ; Migrate settings directory
+  ${If} $previous_compared_to_0_8 == 2
+    IfFileExists "$INSTDIR\data" 0 AskToShowPage
+    StrCpy $should_migrate "yes"
+    Abort
+  ${Else}
+    StrCpy $should_migrate "no"
+    Abort
+  ${EndIf}
+  AskToShowPage:
+    MessageBox MB_ICONINFORMATION|MB_YESNO|MB_DEFBUTTON1 "Det verkar som att du har en tidigare version installerad men inte valt att installera i samma katalog. Vill du ange var den tidigare versionen finns installerad så att programinställningarna följer med?" /SD IDNO IDYES ShowPage IDNO DoNotShowPage
+    DoNotShowPage:
+      StrCpy $should_migrate "no"
+      Abort
+  ShowPage:
+    StrCpy $should_migrate "yes"
 FunctionEnd
 
 Section "MainSection" SEC01
@@ -292,7 +390,6 @@ Section Uninstall
   Delete "$INSTDIR\doc\bilder\bytanamn.gif"
   Delete "$INSTDIR\doc\bilder\bgr.gif"
   Delete "$INSTDIR\doc\bilder\align.gif"
-  Delete "$INSTDIR\licens.txt"
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\BangolfResultat.jar"
   Delete "${PRODUCT_LOGS_DIRECTORY}\error.log"
@@ -300,6 +397,7 @@ Section Uninstall
   Delete "$INSTDIR\doc\lookandfeel.htm"
   Delete "$INSTDIR\doc\bilder\lafsystem.gif"
   Delete "$INSTDIR\doc\bilder\lafjava.gif"
+  Delete "$INSTDIR\licens.txt"
 
   Delete "$DESKTOP\BangolfResultat.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\BangolfResultat.lnk"
