@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import datastruct.IOHandler;
+import se.manet.bangolfresultat.datastruct.IOHandler;
 
 class Test extends Test2 {
     

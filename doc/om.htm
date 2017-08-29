@@ -1,14 +1,32 @@
-<HTML>
-<HEAD>
-</HEAD>
-<BODY>
-
-<BOLD>
-<TABLE CELLPADDING="8" ALIGN=CENTER>
-<TR><TD ALIGN=CENTER><FONT SIZE=+1><STRONG>BangolfResultat</STRONG></FONT><BR>version 0.8pre1<BR><STRONG><NOBR>http://bangolfresultat.webhop.org/</NOBR></STRONG></TD></TR>
-<TR><TD ALIGN=CENTER><STRONG>Copyright &copy; 2004-2009 Magnus Nilsson</STRONG></TD></TR>
-<TR><TD ALIGN=CENTER><IMG SRC="bilder/bgr.gif"></TD></TR>
-</TABLE>
-</BOLD>
-</BODY>
-</HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Om ${project.name}</title>
+<style type="text/css">
+body {
+	font-family: "Segoe UI";
+	font-size: small;
+	text-align: center;
+}
+a {
+	white-space: nowrap;
+}
+.big p {
+	line-height: 150%
+}
+</style>
+<meta http-equiv="Content-Type"
+	content="text/html; charset=WINDOWS-1252" />
+</head>
+<body>
+	<p class="big">
+		${project.name}<br />
+		version ${project.version}<br />
+		<a href="${project.url}">${project.url}</a>
+	</p>
+	<p>Copyright &copy; 2004-2017 ${author}</p>
+	<p>
+		<img src="bilder/bgr.gif" alt="logo" />
+	</p>
+</body>
+</html>
