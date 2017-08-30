@@ -11,7 +11,7 @@ VAR /GLOBAL should_migrate
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "BangolfResultat"
-!define PRODUCT_VERSION "0.8.0"
+!define PRODUCT_VERSION "0.8.1"
 !define PRODUCT_PUBLISHER "Magnus Hovén"
 !define PRODUCT_WEB_SITE "http://bangolfresultat.manet.se/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

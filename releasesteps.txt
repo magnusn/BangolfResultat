@@ -6,6 +6,15 @@
 6. mvn clean install
 7. Kompilera ny exekverbar fil
 8. Lägga upp alla ändringar
+--
+9.  git checkout master
+10. git pull
+11. git merge --no-ff dev
+12. git diff master dev
+13. git tag -a x.x.x
+14. git push
+15. git checkout dev
+16. Ändra version i pom.xml -SNAPSHOT
 
 Vid ny hemsideadress skall följande filer ändras:
 - pom.xml

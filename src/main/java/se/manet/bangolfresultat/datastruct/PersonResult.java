@@ -5,7 +5,7 @@ public class PersonResult {
 	private String licenseNbr;				// personens licensnummer
 	private int startNbr, rounds; 			// startnummer, idnummer och tävlingens antal varv
 	private int prio, nbrRoundsFinished; 	// prioritet vid samma antal slag, antal färdigspelade varv
-	private int max, min;					// högsta och lägsta varv
+	private int diff;						// skillnaden mellan högsta och lägsta varv
 	private int personID;					// nummer för identifiering av personen
 	private int[] results;					// vektor med resultaten på varje varv
 	
@@ -14,19 +14,17 @@ public class PersonResult {
 	 * 	prio prioriteten och nbrRoundsFinished antal varv som är slutförda */
 	public PersonResult(int startNbr, String name, String club, String idNbr, int[] results, 
 						int rounds, String klass, int prio, int nbrRoundsFinished, int personID) {
-		min = Integer.MAX_VALUE;
-		max = Integer.MIN_VALUE;
 		this.startNbr = startNbr;
 		this.name = name;
 		this.club = club;
 		this.licenseNbr = idNbr;
 		this.results = results;
-		setMinMax();
 		this.rounds = rounds;
 		this.klass = klass;
 		this.prio = prio;
 		this.nbrRoundsFinished = nbrRoundsFinished;
 		this.personID = personID;
+		calculateDiff();
 	}
 	
 	/** returnerar startnumret */
@@ -90,7 +88,7 @@ public class PersonResult {
 	/** returnerar antal spelade varv */
 	public int getNbrRoundsPlayed() {
 		int nbrRoundsPlayed = nbrRoundsFinished;
-		for(int i = 0; i < results.length; i++) {
+		for(int i = 0; i < nbrRoundsFinished; i++) {
 			if(results[i] > ResultList.MAX_SCORE || results[i] < ResultList.MIN_SCORE) {
 				nbrRoundsPlayed--;
 			}
@@ -105,21 +103,28 @@ public class PersonResult {
 	
 	/** returnerar skillnaden mellan högsta och lägsta varv */
 	public int getDiff() {
-		return max - min;
+		return diff;
 	}
-	
-	/** bestämmer högsta och lägsta varv */
-	private void setMinMax() {
-		for(int i = 0; i < results.length; i++) {
-			int value = results[i];
-			if(value <= ResultList.MAX_SCORE && value >= ResultList.MIN_SCORE) {
-			    if(value > max) {
-			        max = value;
-			    }
-			    if(value < min) {
-			        min = value;
-			    }
+
+	/** räknar ut skillnaden mellan högsta och lägsta varv */
+	private void calculateDiff() {
+		if (getNbrRoundsPlayed() == 0) {
+			diff = 0;
+		} else {
+			int min = Integer.MAX_VALUE;
+			int max = Integer.MIN_VALUE;
+			for(int i = 0; i < results.length; i++) {
+				int value = results[i];
+				if(value <= ResultList.MAX_SCORE && value >= ResultList.MIN_SCORE) {
+				    if(value > max) {
+				        max = value;
+				    }
+				    if(value < min) {
+				        min = value;
+				    }
+				}
 			}
+			diff = max - min;
 		}
 	}
 	
@@ -131,10 +136,10 @@ public class PersonResult {
 		this.club = club;
 		this.licenseNbr = licenseNbr;
 		this.results = results;
-		setMinMax();
 		this.klass = klass;
 		this.prio = prio;
 		this.nbrRoundsFinished = nbrRoundsFinished;
+		calculateDiff();
 	}
 	
 	/** ändrar personens namn och klubb */
