@@ -13,8 +13,9 @@
 12. git diff master dev
 13. git tag -a x.x.x
 14. git push
-15. git checkout dev
-16. Ändra version i pom.xml -SNAPSHOT
+15. git push --tags
+16. git checkout dev
+17. Ändra version i pom.xml -SNAPSHOT
 
 Vid ny hemsideadress skall följande filer ändras:
 - pom.xml
