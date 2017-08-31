@@ -10,6 +10,7 @@
 
 	<properties>
 		<author>Magnus Hovén</author>
+		<currentYear>2017</currentYear>
 	</properties>
 
 	<build>
@@ -63,6 +64,7 @@
 				<targetPath>${project.basedir}</targetPath>
 				<includes>
 					<include>bangolfresultat.properties</include>
+					<include>LICENSE.txt</include>
 				</includes>
 			</resource>
 		</resources>
