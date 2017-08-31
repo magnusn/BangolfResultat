@@ -64,7 +64,6 @@
 				<targetPath>${project.basedir}</targetPath>
 				<includes>
 					<include>bangolfresultat.properties</include>
-					<include>LICENSE.txt</include>
 				</includes>
 			</resource>
 		</resources>

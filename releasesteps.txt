@@ -26,3 +26,4 @@ Vid ny hemsideadress skall följande filer ändras:
 
 Vid andra speciella tillfällen:
 - Ändra pom.xml (vid nytt år)
+- Ändra LICENSE.txt (vid nytt år eller ändrade licensvillkor)
