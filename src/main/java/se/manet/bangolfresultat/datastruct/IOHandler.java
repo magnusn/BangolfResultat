@@ -596,7 +596,8 @@ public class IOHandler {
 					String userHome = System.getProperty("user.home");
 					if (userHome != null) {
 						applicationDataPath = getCanonicalPath(new File(
-								userHome + File.separator + "."
+								userHome + File.separator + ".config"
+										+ File.separator
 										+ PropertyReader.getApplicationName()
 										+ File.separator));
 					} else {
