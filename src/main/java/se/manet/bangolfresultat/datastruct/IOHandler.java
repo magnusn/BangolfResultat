@@ -586,7 +586,7 @@ public class IOHandler {
 						applicationDataPathProperty));
 			} else {
 				String os = System.getProperty("os.name").toLowerCase();
-				if (os.contains("win")) {
+				if (os.startsWith("windows")) {
 					String appDataFolder = System.getenv("AppData");
 					applicationDataPath = getCanonicalPath(new File(
 							appDataFolder + File.separator
@@ -596,7 +596,8 @@ public class IOHandler {
 					String userHome = System.getProperty("user.home");
 					if (userHome != null) {
 						applicationDataPath = getCanonicalPath(new File(
-								userHome + File.separator + "."
+								userHome + File.separator + ".config"
+										+ File.separator
 										+ PropertyReader.getApplicationName()
 										+ File.separator));
 					} else {

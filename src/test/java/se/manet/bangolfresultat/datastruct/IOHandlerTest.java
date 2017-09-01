@@ -19,7 +19,7 @@ public class IOHandlerTest {
 	@BeforeClass
 	public static void setUpClass() {
 		String os = System.getProperty("os.name").toLowerCase();
-		if (os.contains("win")) {
+		if (os.startsWith("windows")) {
 			expectedAppDataPath = System.getenv("AppData") + File.separator
 					+ PropertyReader.getApplicationName() + File.separator;
 		} else {
